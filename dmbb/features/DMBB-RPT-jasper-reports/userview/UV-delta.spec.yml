@@ -1,0 +1,31 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Reports
+    permission_role: dm_officer
+    menus:
+    - type: jasper
+      customId: rptDebtAging
+      label: Debt Aging Report
+      jrxmlFile: ../reports/rptDebtAging.jrxml
+    - type: jasper
+      customId: rptTaxDebtStatus
+      label: Tax Debt Status Report
+      jrxmlFile: ../reports/rptTaxDebtStatus.jrxml
+    - type: jasper
+      customId: rptRecoveryByAction
+      label: Recovery by Action Report
+      jrxmlFile: ../reports/rptRecoveryByAction.jrxml
+    - type: jasper
+      customId: rptInstalmentCompliance
+      label: Instalment Compliance Report
+      jrxmlFile: ../reports/rptInstalmentCompliance.jrxml
+    - type: jasper
+      customId: rptWriteOff
+      label: Write-Off Report
+      jrxmlFile: ../reports/rptWriteOff.jrxml
+    - type: jasper
+      customId: rptDebtorsList
+      label: Debtors List Report
+      jrxmlFile: ../reports/rptDebtorsList.jrxml

@@ -1,0 +1,49 @@
+datalist:
+  id: list_worklist
+  name: 'My work list'
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: >-
+      SELECT c.id,
+             c.c_caseref AS case_ref,
+             COALESCE(NULLIF(c.c_taxpayername,''), c.c_tin) AS taxpayer,
+             NULLIF(c.c_amountatstake,'')::numeric AS debt_amount,
+             COALESCE((SELECT b.c_code FROM app_fd_mdpriorityband b
+                       WHERE NULLIF(b.c_minscore,'')::numeric
+                             <= COALESCE(NULLIF(c.c_riskscore,'')::numeric, 40)
+                       ORDER BY NULLIF(b.c_minscore,'')::numeric DESC LIMIT 1),'M') AS priority,
+             COALESCE(NULLIF(c.c_nextactiondue,''),'-') AS next_action_due,
+             CASE WHEN NULLIF(c.c_nextactiondue,'') IS NULL THEN ''
+                  WHEN c.c_nextactiondue::date < CURRENT_DATE THEN
+                       '<span style="color:#fff;background:#d9534f;padding:2px 6px;border-radius:3px">OVERDUE</span>'
+                  WHEN c.c_nextactiondue::date <= CURRENT_DATE + 1 THEN
+                       '<span style="color:#000;background:#f0ad4e;padding:2px 6px;border-radius:3px">DUE &lt;24H</span>'
+                  ELSE '' END AS due_flag,
+             COALESCE(NULLIF(c.c_slastatus,''),'-') AS sla_status,
+             COALESCE(c.c_currentstate,'') AS status
+      FROM app_fd_cmcase c
+      WHERE c.c_assignee = '#currentUser.username#'
+        AND COALESCE(c.c_currentstate,'') NOT IN
+            (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal='true')
+      ORDER BY COALESCE(NULLIF(c.c_riskscore,'')::numeric,40) DESC,
+               CASE COALESCE(c.c_slastatus,'') WHEN 'RED' THEN 3 WHEN 'AMBER' THEN 2
+                    WHEN 'GREEN' THEN 1 ELSE 0 END DESC,
+               c.datecreated ASC
+  columns:
+  - {id: case_ref, label: Case ID}
+  - {id: taxpayer, label: Taxpayer}
+  - {id: debt_amount, label: Debt amount}
+  - {id: priority, label: Priority}
+  - {id: next_action_due, label: Next action due}
+  - {id: due_flag, label: Due, renderHtml: true}
+  - {id: sla_status, label: SLA}
+  - {id: status, label: Case status}
+  filters:
+  - {id: status, label: Case status}
+  - {id: priority, label: Priority}
+notes: >
+  WF-FR-009: officer landing page (UV delta puts this menu first). Red/amber
+  highlighting via due_flag HTML column. SLA countdown column lands with F05.
+  Quick actions: open-case row link is native; log-call/visit/letter actions
+  follow with their carriers (F06/F07) — FIS A5.

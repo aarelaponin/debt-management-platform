@@ -1,0 +1,23 @@
+form:
+  id: mmLinkType
+  name: CM - Link Type
+  table: mmLinkType
+  description: 'CMBB metamodel: Link Type (CAD-CMBB s2.2)'
+sections:
+- label: Link type
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: targetCaseTypes
+    type: textfield
+    label: Permitted target case types
+  - id: description
+    type: textarea
+    label: Description

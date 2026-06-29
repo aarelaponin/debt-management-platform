@@ -1,0 +1,32 @@
+form:
+  id: mmCalendar
+  name: CM - Calendar
+  table: mmCalendar
+  description: 'CMBB metamodel: Calendar (CAD-CMBB s2.2)'
+sections:
+- label: Calendar
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: workingDayMode
+    type: select
+    label: Day mode
+    static_options:
+    - value: CALENDAR
+      label: Calendar days
+    - value: WORKING
+      label: Working days
+    required: true
+- label: Holidays
+  columns: 1
+  fields:
+  - id: holidays
+    type: textarea
+    label: Holidays (YYYY-MM-DD, comma-separated)

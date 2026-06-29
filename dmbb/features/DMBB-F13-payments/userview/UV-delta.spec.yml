@@ -1,0 +1,10 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Operations
+    menus:
+    - type: crud
+      formDefId: dmPayment
+      datalistId: list_dmPayment
+      label: Payments

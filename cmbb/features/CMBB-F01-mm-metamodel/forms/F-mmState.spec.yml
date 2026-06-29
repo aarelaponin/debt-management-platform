@@ -1,0 +1,59 @@
+form:
+  id: mmState
+  name: CM - Lifecycle State
+  table: mmState
+  description: 'CMBB metamodel: Lifecycle State (CAD-CMBB s2.2)'
+sections:
+- label: State
+  columns: 2
+  fields:
+  - id: caseType
+    type: select
+    label: Case type
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: envelopeState
+    type: select
+    label: Envelope state
+    static_options:
+    - value: New
+      label: New
+    - value: Open
+      label: Open
+    - value: InProgress
+      label: InProgress
+    - value: OnHold
+      label: OnHold
+    - value: PendingClosure
+      label: PendingClosure
+    - value: Closed
+      label: Closed
+    required: true
+  - id: isTerminal
+    type: checkbox
+    label: Terminal state
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+  - id: version
+    type: textfield
+    label: Lifecycle version
+    storeNumeric: true
+  - id: active
+    type: checkbox
+    label: Active
+    static_options:
+    - value: 'true'
+      label: 'Yes'

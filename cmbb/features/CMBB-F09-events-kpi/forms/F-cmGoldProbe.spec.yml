@@ -1,0 +1,36 @@
+form:
+  id: cmGoldProbe
+  name: CM - Gold Mart Probe
+  table: cmGoldProbe
+  description: 'EventEmitter PROBE trigger (I-1 / INT-FR-001/004). POST a TIN; GoldMartClient reads sta_v1 (or the cmGoldSnapshot cache on outage) and writes the profile + source LIVE/CACHE back. Test/ops affordance for the GoldMartClient shared lib.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.EventEmitter
+  properties:
+    mode: PROBE
+  runOn: create
+sections:
+- label: Probe
+  columns: 2
+  fields:
+  - id: tin
+    type: textfield
+    label: TIN
+    required: true
+  - id: enforceableBalance
+    type: textfield
+    label: Enforceable balance (set by engine)
+  - id: debtCategory
+    type: textfield
+    label: Debt category (set by engine)
+  - id: asaConfidence
+    type: textfield
+    label: ASA confidence (set by engine)
+  - id: asOf
+    type: textfield
+    label: As-of (set by engine)
+  - id: source
+    type: textfield
+    label: Source LIVE/CACHE (set by engine)
+  - id: result
+    type: textfield
+    label: Result OK/ERROR (set by engine)

@@ -1,0 +1,19 @@
+[
+    {
+        "title": "DMBB Enforcement Config Engine",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "value": "VALIDATE",
+                "options": [
+                    { "value": "VALIDATE", "label": "VALIDATE — config consistency check (cmEnfConfigCheck)" },
+                    { "value": "PREVIEW", "label": "PREVIEW — render a template against a case (cmTemplatePreview)" }
+                ]
+            },
+            { "name": "recordId", "label": "Trigger record id (blank = auto)", "type": "textfield", "required": "False" }
+        ]
+    }
+]

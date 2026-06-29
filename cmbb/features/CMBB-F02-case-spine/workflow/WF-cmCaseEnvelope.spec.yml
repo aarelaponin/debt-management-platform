@@ -1,0 +1,91 @@
+package:
+  id: cmbb
+  name: CMBB Case Fabric
+  version: 1
+participants:
+- id: requester
+  name: Requester
+  resolve:
+    type: requester
+- id: caseOfficer
+  name: Case officer
+  resolve:
+    type: workflowVariable
+    value: assignee,user
+- id: supervisor
+  name: Supervisor
+  resolve:
+    type: group
+    value: dm_supervisor
+- id: processStartWhiteList
+  name: Start permission
+  resolve:
+    type: group
+    value: cmbb_user
+variables:
+- caseId
+- status
+- assignee
+processes:
+- id: cmCaseEnvelope
+  name: Case lifecycle envelope (CAD-CMBB s2.3)
+  activities:
+  - id: openCase
+    type: manual
+    performer: requester
+    form: cmCase
+  - id: guardOpen
+    type: tool
+    tools:
+    - className: com.fiscaladmin.mtca.cmbb.TransitionGuard
+      config:
+        phase: OPEN
+        caseId: '#variable.caseId#'
+    - className: com.fiscaladmin.mtca.cmbb.AllocationEngine
+      config:
+        mode: ASSIGN
+        caseId: '#variable.caseId#'
+    - className: com.fiscaladmin.mtca.cmbb.DeadlineEngine
+      config:
+        mode: START
+        caseId: '#variable.caseId#'
+  - id: workInProgress
+    type: manual
+    performer: caseOfficer
+    form: cmCase
+  - id: guardClosure
+    type: tool
+    plugin: custom
+    className: com.fiscaladmin.mtca.cmbb.TransitionGuard
+    config:
+      phase: PRE_CLOSE
+      caseId: '#variable.caseId#'
+  - id: approveClosure
+    type: manual
+    performer: supervisor
+    form: cmCase
+  - id: guardFinal
+    type: tool
+    tools:
+    - className: com.fiscaladmin.mtca.cmbb.TransitionGuard
+      config:
+        phase: CLOSE
+        caseId: '#variable.caseId#'
+    - className: com.fiscaladmin.mtca.cmbb.DeadlineEngine
+      config:
+        mode: CLOSE
+        caseId: '#variable.caseId#'
+  transitions:
+  - from: openCase
+    to: guardOpen
+  - from: guardOpen
+    to: workInProgress
+  - from: workInProgress
+    to: guardClosure
+  - from: guardClosure
+    to: approveClosure
+  - from: approveClosure
+    to: guardFinal
+notes: 'OnHold is data-level (currentState + deadline pause), not an XPDL stop — per
+  CAD: the envelope is the only XPDL; per-type stages are mm config interpreted by
+  guards.'

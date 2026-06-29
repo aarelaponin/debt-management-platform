@@ -1,0 +1,5 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  # UX-QA3: the cmStrategyCheck dry-run moved to "Operations — batch runs" (DMBB-UX-QA). Category retired.
+  categories: []

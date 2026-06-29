@@ -1,0 +1,49 @@
+form:
+  id: dmDebtorsExtract
+  name: DM - Debtors Registry Extract
+  table: dmDebtorsExtract
+  description: 'DMBB registry-extract run (DM-FR-058): on create the DebtorsListEngine EXTRACT gathers the currently PUBLISHED dmDebtorPub entries (the website-published list F07 maintains) and produces a national-registry extract — debtor count, total amount, and a delimited payload — tagged with the registry + format. The actual file transfer / API push is external; this record is the audited hand-off.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.DebtorsListEngine
+  properties:
+    mode: EXTRACT
+  runOn: create
+sections:
+- label: Extract request
+  columns: 2
+  fields:
+  - id: registry
+    type: textfield
+    label: Target registry
+  - id: format
+    type: select
+    label: Format
+    static_options:
+    - value: CSV
+      label: CSV (file transfer)
+    - value: JSON
+      label: JSON (API)
+- label: Result (set by engine)
+  columns: 2
+  fields:
+  - id: debtorCount
+    type: textfield
+    label: Debtors in extract (set by engine)
+    storeNumeric: true
+  - id: totalAmount
+    type: textfield
+    label: Total amount (set by engine)
+    storeNumeric: true
+  - id: status
+    type: textfield
+    label: Status (set by engine)
+  - id: generatedDate
+    type: textfield
+    label: Generated date
+  - id: payload
+    type: textarea
+    label: Extract payload (set by engine)
+    rows: 5
+  - id: result
+    type: textfield
+    label: Detail (set by engine)

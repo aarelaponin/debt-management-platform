@@ -1,0 +1,6 @@
+id,strategyCode,seq,stepName,triggerDays,triggerEvent,instrument,graceDays,proportionalityMinAmount,noticeTemplate,exitCondition,description,workflowCode
+STD-MLT-1,STD-MLT,1,Reminder,7,,,0,30,TPL-REMINDER,paid_in_full,Payment reminder 7 days after due (BR-DM-005),W-DEFAULT
+STD-MLT-2,STD-MLT,2,Demand notice,14,,DEMAND,0,30,TPL-DEMAND,paid_in_full,Demand after reminder expiry (BR-DM-008),W-DEFAULT
+STD-MLT-3,STD-MLT,3,Final demand,21,,DEMAND,0,100,TPL-FINAL,paid_or_arrangement,Final demand +21 days (BR-DM-011),W-DEFAULT
+STD-MLT-4,STD-MLT,4,Bank garnishing,14,,BANK_GARNISH,3,1000,TPL-GARNISH,recovered,Enforcement: bank garnishing for C3+ (BR-DM-030),W-DEFAULT
+STD-MLT-5,STD-MLT,5,Field enforcement,30,,PROPERTY_SEIZURE,0,5000,TPL-SEIZURE,recovered,Enforcement: property seizure for C4+ (BR-DM-030/031),W-DEFAULT

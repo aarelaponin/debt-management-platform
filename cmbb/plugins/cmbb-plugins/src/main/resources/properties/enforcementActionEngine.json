@@ -1,0 +1,21 @@
+[
+    {
+        "title": "DMBB Enforcement Action Engine",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "value": "INITIATE",
+                "options": [
+                    { "value": "INITIATE", "label": "INITIATE — execute a recovery instrument (dmAction)" },
+                    { "value": "AGENT_APPOINT", "label": "AGENT_APPOINT — appoint a recovery agent (dmAgent)" },
+                    { "value": "AGENT_REPORT", "label": "AGENT_REPORT — log agent activity (dmAgentRpt)" },
+                    { "value": "SWEEP", "label": "SWEEP — PUBLISH / AGENT_ALERT / RELEASE / CONFIRM (cmEnfActionRun)" }
+                ]
+            },
+            { "name": "recordId", "label": "Trigger record id (blank = auto)", "type": "textfield", "required": "False" }
+        ]
+    }
+]

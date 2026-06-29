@@ -1,0 +1,28 @@
+datalist:
+  id: list_debtByCategory
+  name: Debt by category (MI)
+  binder:
+    type: jdbc
+    primaryKey: category
+    sql: >-
+      SELECT COALESCE(NULLIF(d.c_debtcategory,''), c.c_category, '-') AS category,
+             COUNT(*) AS cases,
+             SUM(COALESCE(NULLIF(d.c_consolidatedamount,'')::numeric,0)) AS total_debt,
+             ROUND(AVG(COALESCE(NULLIF(d.c_consolidatedamount,'')::numeric,0)), 2) AS avg_debt
+      FROM app_fd_cmcase c JOIN app_fd_dmdebt d ON d.id = c.id
+      WHERE c.c_casetype = 'DM'
+        AND COALESCE(d.c_writeoffstatus,'') <> 'written-off'
+        AND COALESCE(c.c_currentstate,'') NOT IN
+            (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal='true')
+      GROUP BY 1 ORDER BY 1
+  columns:
+  - {id: category, label: Category, drill: {to: list_debtorsList, hrefColumn: category, hrefParam: fcat}}
+  - {id: cases, label: Open cases}
+  - {id: total_debt, label: Total debt}
+  - {id: avg_debt, label: Avg debt}
+  filters:
+  - {id: category, label: Category, type: select, param: f_category, options: [C1, C2, C3, C4, C5, C6]}
+  rowActions:
+  - {label: View debtors, to: list_debtorsList, hrefColumn: category, hrefParam: fcat}
+notes: 'DM-FR-048 (total debt by category) / RPT-FR-014. UX-QA: the Category cell + a row action drill to
+  list_debtorsList?fcat=<category> (summary->detail). Outstanding = open DM, not written-off, not terminal.'

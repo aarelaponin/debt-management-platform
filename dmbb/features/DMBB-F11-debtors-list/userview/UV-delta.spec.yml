@@ -1,0 +1,14 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Debtors list
+    permission_role: dm_officer
+    menus:
+    - type: datalist
+      datalistId: list_debtorsList
+      label: Debtors list (outstanding)
+    - type: crud
+      formDefId: dmDebtorsExtract
+      datalistId: list_dmDebtorsExtract
+      label: Registry extracts

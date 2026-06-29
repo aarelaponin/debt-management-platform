@@ -1,0 +1,29 @@
+form:
+  id: mdWoGround
+  name: DM - Write-Off Ground
+  table: mdWoGround
+  description: 'DPM write-off grounds (DM-FR-043, BR-DM-039): the documented reason for a write-off and whether it requires evidence and/or approval. Read by WriteOffEngine SUBMIT.'
+sections:
+- label: Ground
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: requiresEvidence
+    type: textfield
+    label: Requires evidence (true/false)
+  - id: requiresApproval
+    type: textfield
+    label: Requires approval (true/false)
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

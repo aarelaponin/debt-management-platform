@@ -1,0 +1,20 @@
+form:
+  id: cmSweepRun
+  name: CM - SLA Sweep Run
+  table: cmSweepRun
+  description: 'DeadlineEngine SWEEP trigger + audit log (FIS A1). Cron POSTs a row via the form API; result written back by the engine.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.DeadlineEngine
+  properties:
+    mode: SWEEP
+  runOn: create
+sections:
+- label: Run
+  columns: 2
+  fields:
+  - id: asOf
+    type: textfield
+    label: As-of (ISO, blank = now; test affordance)
+  - id: result
+    type: textfield
+    label: Result (set by engine)

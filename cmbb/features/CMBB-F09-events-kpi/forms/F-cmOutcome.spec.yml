@@ -1,0 +1,46 @@
+form:
+  id: cmOutcome
+  name: CM - Case Outcome (writeback ledger)
+  table: cmOutcome
+  description: 'Exactly-once shipping ledger for case outcomes sent to ClickHouse fact_case_outcomes (I-2). One row per shipped outcome key; OutcomeWriteback sets id = caseId-outcomeCode for idempotency. No postProcessor (engine-written register).'
+sections:
+- label: Outcome
+  columns: 2
+  fields:
+  - id: caseId
+    type: textfield
+    label: Case ID
+  - id: caseRef
+    type: textfield
+    label: Case ref
+  - id: tin
+    type: textfield
+    label: TIN
+  - id: outcomeType
+    type: textfield
+    label: Outcome type
+  - id: outcomeCode
+    type: textfield
+    label: Outcome code
+  - id: amount
+    type: textfield
+    label: Amount
+  - id: officer
+    type: textfield
+    label: Officer
+  - id: outcomeDate
+    type: date
+    label: Outcome date
+  - id: shipStatus
+    type: textfield
+    label: Ship status SHIPPED/QUEUED/FAILED
+  - id: goldSource
+    type: textfield
+    label: Gold source LIVE/CACHE
+  - id: asOf
+    type: textfield
+    label: Gold as-of
+  - id: detail
+    type: textarea
+    label: Detail
+    rows: 2

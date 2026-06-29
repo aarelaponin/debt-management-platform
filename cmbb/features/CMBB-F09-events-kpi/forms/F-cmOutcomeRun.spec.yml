@@ -1,0 +1,35 @@
+form:
+  id: cmOutcomeRun
+  name: CM - Outcome Writeback Run
+  table: cmOutcomeRun
+  description: 'OutcomeWriteback SHIP/RETRY trigger + audit log (I-2 / Blueprint §14.2.2). Cron or console POSTs a row; OutcomeService scans CLOSED cases with no SHIPPED cmOutcome (SHIP) or re-ships QUEUED outcomes (RETRY) into ClickHouse mtca_ors.fact_case_outcomes. Idempotent.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.OutcomeWriteback
+  properties:
+    mode: SHIP
+  runOn: create
+sections:
+- label: Run
+  columns: 2
+  fields:
+  - id: mode
+    type: select
+    label: Mode
+    static_options:
+    - value: SHIP
+      label: SHIP (newly closed)
+    - value: RETRY
+      label: RETRY (queued)
+  - id: shippedCount
+    type: textfield
+    label: Shipped (set by engine)
+  - id: queuedCount
+    type: textfield
+    label: Queued/retried (set by engine)
+  - id: failedCount
+    type: textfield
+    label: Failed (set by engine)
+  - id: result
+    type: textarea
+    label: Detail (set by engine)
+    rows: 3

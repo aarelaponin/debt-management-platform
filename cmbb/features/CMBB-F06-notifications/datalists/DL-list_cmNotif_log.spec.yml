@@ -1,0 +1,37 @@
+datalist:
+  id: list_cmNotif_log
+  name: Outbound notification log
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: SELECT n.id, n.c_tin AS tin, n.c_recipient AS recipient, n.c_channel AS channel, n.c_template
+      AS template, n.c_summary AS summary, n.c_status AS status, n.c_sentat AS sent_at, c.c_caseref AS
+      case_ref FROM app_fd_cmnotif n LEFT JOIN app_fd_cmcase c ON c.id = n.c_caseid ORDER BY n.datecreated
+      DESC
+  columns:
+  - id: tin
+    label: TIN
+  - id: recipient
+    label: Recipient
+  - id: channel
+    label: Channel
+  - id: template
+    label: Template
+  - id: summary
+    label: Summary
+  - id: status
+    label: Status
+  - id: sent_at
+    label: Sent at
+  - id: case_ref
+    label: Case
+  filters:
+  - id: tin
+    label: TIN
+  - id: channel
+    label: Channel
+  - id: status
+    label: Status
+  - id: sent_at
+    label: Date
+notes: 'WF-FR-016: searchable by TIN/date/channel/status; failed rows filterable for manual review.'

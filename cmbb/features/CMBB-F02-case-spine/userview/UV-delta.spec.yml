@@ -1,0 +1,18 @@
+userview_delta:
+  userviewId: cmbbConsole
+  name: CMBB Console
+  categories:
+  - label: Case work
+    permission_role: cmbb_user
+    menus:
+    - type: crud
+      formDefId: cmCase
+      datalistId: list_cmCase
+      label: Cases
+    - type: crud
+      formDefId: cmTask
+      datalistId: list_cmTask
+      label: Tasks
+    - type: datalist
+      datalistId: list_cmEvent
+      label: Case history (events)

@@ -1,0 +1,31 @@
+userview_delta:
+  userviewId: cmbbConsole
+  name: CMBB Console
+  categories:
+  - label: Decisions & Holds
+    permission_role: cmbb_user
+    menus:
+    - type: crud
+      formDefId: cmDecision
+      datalistId: list_cmDecision
+      label: Decisions & approvals
+    - type: crud
+      formDefId: cmHold
+      datalistId: list_cmHold
+      label: Holds (assert)
+    - type: crud
+      formDefId: cmHoldRelease
+      datalistId: list_cmHoldRelease
+      label: Hold release
+    - type: crud
+      formDefId: cmLink
+      datalistId: list_cmLink
+      label: Case linkage
+    - type: crud
+      formDefId: cmInfoRequest
+      datalistId: list_cmInfoRequest
+      label: Pending-info requests
+    - type: crud
+      formDefId: cmInfoResponse
+      datalistId: list_cmInfoResponse
+      label: Pending-info responses

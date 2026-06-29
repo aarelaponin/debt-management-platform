@@ -1,0 +1,36 @@
+form:
+  id: cmWriteOffApprove
+  name: DM - Write-Off Approval
+  table: cmWriteOffApprove
+  description: 'WriteOffEngine APPROVE trigger (DM-FR-043): an authorised officer records a decision on a write-off request that is UNDER_REVIEW. On APPROVE the write-off is posted (case closed, dmDebt stamped, dmCharge WRITE_OFF + WRITEOFF_POSTED event); on REJECT the request is returned for alternative action.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.WriteOffEngine
+  properties:
+    mode: APPROVE
+  runOn: create
+sections:
+- label: Approval
+  columns: 2
+  fields:
+  - id: writeOffId
+    type: textfield
+    label: Write-off record id (dmWriteOff)
+    required: true
+  - id: decision
+    type: select
+    label: Decision
+    static_options:
+    - value: APPROVE
+      label: Approve
+    - value: REJECT
+      label: Reject
+  - id: approver
+    type: textfield
+    label: Approver
+  - id: note
+    type: textarea
+    label: Note
+    rows: 2
+  - id: result
+    type: textfield
+    label: Result (set by engine)

@@ -1,0 +1,40 @@
+datalist:
+  id: list_enfActions
+  name: Enforcement actions
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: >-
+      SELECT a.id,
+             COALESCE(NULLIF(c.c_caseref,''), a.c_debtcaseid) AS case_ref,
+             a.c_tin AS tin,
+             COALESCE(NULLIF(c.c_taxpayername,''), a.c_tin) AS taxpayer,
+             a.c_instrument AS instrument,
+             a.c_status AS status,
+             NULLIF(a.c_amount,'')::numeric AS amount,
+             NULLIF(a.c_recoveredamount,'')::numeric AS recovered,
+             COALESCE(NULLIF(a.c_costamount,'')::numeric,0) AS legal_fee,
+             a.c_debtcaseid AS case_id
+      FROM app_fd_dmaction a LEFT JOIN app_fd_cmcase c ON c.id = a.c_debtcaseid
+      WHERE ('#requestParam.finstr#' = '' OR a.c_instrument = '#requestParam.finstr#')
+        AND ('#requestParam.fstat#' = '' OR a.c_status = '#requestParam.fstat#')
+        AND ('#requestParam.ftin#' = '' OR a.c_tin = '#requestParam.ftin#')
+      ORDER BY a.dateCreated DESC
+  columns:
+  - {id: case_ref, label: Case}
+  - {id: tin, label: TIN}
+  - {id: taxpayer, label: Taxpayer}
+  - {id: instrument, label: Instrument}
+  - {id: status, label: Status}
+  - {id: amount, label: Amount}
+  - {id: recovered, label: Recovered}
+  - {id: legal_fee, label: Legal fee}
+  filters:
+  - {id: instrument, label: Instrument, type: select, param: finstr, options: [BANK_GARNISH, LIEN, THIRD_PARTY, PROPERTY_SEIZURE, BANKRUPTCY, JUDICIAL_LETTER, AGENT_WARRANT, PUBLISH_NAME, REFUND_INTERCEPT]}
+  - {id: status, label: Status, type: select, param: fstat, options: [INITIATED, EXECUTED, SUBMITTED, CONFIRMED, FAILED, BLOCKED, REFERRED]}
+  - {id: tin, label: TIN, type: text, param: ftin}
+  rowActions:
+  - {label: Open case, to: dmCaseConsole_crud, hrefColumn: case_id, hrefParam: id}
+  sort: {column: amount, desc: true}
+notes: 'UX-QA2: enforcement-action detail list (drill target for the Recovery-by-action summary via
+  ?finstr=<instrument>). dmAction joined to cmCase for TIN/taxpayer/case ref. Filters + drill via #requestParam#.'

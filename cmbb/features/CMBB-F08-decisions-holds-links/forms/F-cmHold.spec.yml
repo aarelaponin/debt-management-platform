@@ -1,0 +1,85 @@
+form:
+  id: cmHold
+  name: CM - Case Hold (assert)
+  table: cmHold
+  description: 'GCMF §3.3-8 / E1: a hold the case asserts. On create the HoldConnector
+    sets status ACTIVE and stamps the owning BB. Suppression scopes
+    (CORRESPONDENCE_SUPPRESS / ENFORCEMENT_SUPPRESS) gate downstream engines.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.HoldConnector
+  properties:
+    mode: ASSERT
+  runOn: create
+sections:
+- label: Hold
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: caseRef
+    type: textfield
+    label: Case reference
+    required: true
+  - id: tin
+    type: textfield
+    label: TIN
+  - id: holdType
+    type: select
+    label: Hold type
+    lookup:
+      formDefId: mdHoldType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: scope
+    type: select
+    label: Scope
+    static_options:
+    - value: COLLECTION
+      label: Collection
+    - value: DISBURSEMENT
+      label: Disbursement
+    - value: OFFSET
+      label: Offset exclusion
+    - value: CORRESPONDENCE_SUPPRESS
+      label: Correspondence suppression
+    - value: ENFORCEMENT_SUPPRESS
+      label: Enforcement suppression
+    required: true
+  - id: basis
+    type: textfield
+    label: Basis / grounds
+    required: true
+  - id: targetBB
+    type: select
+    label: Owning building block
+    static_options:
+    - value: CMBB
+      label: CMBB (this fabric)
+    - value: DMBB
+      label: Debt management
+    - value: REFUNDS
+      label: Refunds
+    - value: ACCOUNTING
+      label: Accounting
+  - id: status
+    type: select
+    label: Status (set by engine)
+    static_options:
+    - value: REQUESTED
+      label: Requested
+    - value: ACTIVE
+      label: Active
+    - value: RELEASED
+      label: Released
+  - id: assertedBy
+    type: textfield
+    label: Asserted by
+  - id: assertedAt
+    type: textfield
+    label: Asserted at (set by engine)
+  - id: result
+    type: textfield
+    label: Engine result (set by engine)

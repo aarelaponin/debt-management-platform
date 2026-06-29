@@ -1,0 +1,74 @@
+form:
+  id: dmPayment
+  name: DM - Payment
+  table: dmPayment
+  loadBinder: prefill        # configurable FormPrefillLoadBinder — config in prefill: below
+  prefill:
+    keySources:
+      - {source: requestParam, name: tin}
+    formId: cmCase
+    matchField: tin
+    filters:
+      - {field: caseType, op: eq, value: DM}
+      - {field: currentState, op: ne, value: CLOSED}
+    orderBy: amountAtStake
+    orderNumeric: true
+    mappings:
+      - {from: key, to: tin}
+      - {from: id, to: caseId}
+  listColumns: [tin, amount, appliedAmount, balanceAfter, status, paymentDate]
+  description: 'DMBB payment against a debt case. On create, PaymentEngine (POST) resolves the debtor''s case from the TIN, reduces the outstanding (dmDebt.consolidatedAmount + dmLine enforceable amounts, oldest first), records applied + balance-after, and on full settlement marks the debt Settled, closes the case (CLOSED) and releases any enforcement-suppress holds. Launched prefilled from the worklist "Record payment" action (?tin=).'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.PaymentEngine
+  properties:
+    mode: POST
+  runOn: create
+sections:
+- label: Payment
+  columns: 2
+  fields:
+  # Prefilled (tin + caseId) by FormPrefillLoadBinder from the debtor's open DM case when
+  # launched via the worklist "Record payment" action (?tin=). tin stays editable so the
+  # data-API create path the acceptance tests use still persists it.
+  - id: tin
+    type: textfield
+    label: TIN
+    required: true
+  - id: amount
+    type: textfield
+    label: Amount received
+    storeNumeric: true
+    required: true
+  - id: paymentDate
+    type: textfield
+    label: Payment date (YYYY-MM-DD; blank = today)
+  - id: reference
+    type: textfield
+    label: Payment reference
+  - id: method
+    type: select
+    label: Method
+    static_options:
+    - {value: CB, label: Central Bank transfer}
+    - {value: BANK, label: Bank}
+    - {value: CASH, label: Cash / office}
+  - id: caseId
+    type: hidden
+    label: Debt case (resolved)
+  - id: status
+    type: textfield
+    label: Status
+    managed: true
+- label: Applied (set by engine)
+  columns: 2
+  fields:
+  - id: appliedAmount
+    type: textfield
+    label: Amount applied to debt
+    storeNumeric: true
+    managed: true
+  - id: balanceAfter
+    type: textfield
+    label: Outstanding balance after payment
+    storeNumeric: true
+    managed: true

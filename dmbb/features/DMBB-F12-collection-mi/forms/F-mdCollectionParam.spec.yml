@@ -1,0 +1,26 @@
+form:
+  id: mdCollectionParam
+  name: DM - Collection Parameter
+  table: mdCollectionParam
+  description: 'DPM target-setting parameters (BR-DM-043): the historical recovery rate per debt category used by CollectionMiEngine SUGGEST (suggested target = current category stock × recoveryRate). Capacity/seasonal factors are recorded refinements.'
+sections:
+- label: Parameter
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: category
+    type: textfield
+    label: Debt category (blank = default)
+  - id: recoveryRate
+    type: textfield
+    label: Historical recovery rate (fraction, e.g. 0.30)
+    storeNumeric: true
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

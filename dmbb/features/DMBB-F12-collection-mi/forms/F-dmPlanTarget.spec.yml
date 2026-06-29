@@ -1,0 +1,34 @@
+form:
+  id: dmPlanTarget
+  name: DM - Plan Target (child)
+  table: dmPlanTarget
+  description: 'DMBB-owned 1:many target line of a dmCollectionPlan (DM-FR-047): the target recovery amount for a debt category (and optional tax type). actualAmount + attainmentPct are filled by the CollectionMiEngine ROLLUP; targetAmount can be seeded by SUGGEST. planId is the FormGrid foreignKey to the parent dmCollectionPlan id.'
+sections:
+- label: Target
+  columns: 2
+  fields:
+  - id: planId
+    type: hidden
+    label: Plan id (FK)
+  - id: category
+    type: textfield
+    label: Debt category (C1-C6)
+  - id: taxType
+    type: textfield
+    label: Tax type (blank = all)
+  - id: targetAmount
+    type: textfield
+    label: Target recovery amount
+    storeNumeric: true
+  - id: actualAmount
+    type: textfield
+    label: Actual recovered (set by ROLLUP)
+    storeNumeric: true
+  - id: attainmentPct
+    type: textfield
+    label: Attainment % (set by ROLLUP)
+    storeNumeric: true
+  - id: suggestedAmount
+    type: textfield
+    label: Suggested target (set by SUGGEST)
+    storeNumeric: true

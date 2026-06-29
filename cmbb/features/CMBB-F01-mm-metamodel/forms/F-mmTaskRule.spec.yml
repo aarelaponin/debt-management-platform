@@ -1,0 +1,44 @@
+form:
+  id: mmTaskRule
+  name: CM - Task Auto-Generation Rule
+  table: mmTaskRule
+  description: 'CMBB metamodel: Task Auto-Generation Rule (CAD-CMBB s2.2)'
+sections:
+- label: Rule
+  columns: 2
+  fields:
+  - id: caseType
+    type: select
+    label: Case type
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: eventType
+    type: textfield
+    label: Trigger event type
+    required: true
+  - id: taskType
+    type: textfield
+    label: Task type to create
+    required: true
+  - id: assigneeRule
+    type: textfield
+    label: Assignee rule
+  - id: dueRule
+    type: textfield
+    label: Due rule
+  - id: active
+    type: checkbox
+    label: Active
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+- label: Condition
+  columns: 1
+  fields:
+  - id: condition
+    type: textarea
+    label: Condition expression

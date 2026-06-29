@@ -1,0 +1,37 @@
+form:
+  id: cmEvent
+  name: CM - Case Event (append-only)
+  table: cmEvent
+  description: CMBB case spine (CAD-CMBB s2.2)
+sections:
+- label: Event
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: seq
+    type: textfield
+    label: Chain sequence (zero-padded, writer-managed)
+  - id: eventType
+    type: textfield
+    label: Event type
+    required: true
+  - id: actor
+    type: textfield
+    label: Actor
+  - id: eventTime
+    type: textfield
+    label: Event time (set by writer)
+  - id: prevHash
+    type: textfield
+    label: Previous hash
+  - id: hash
+    type: textfield
+    label: Hash
+- label: Payload
+  columns: 1
+  fields:
+  - id: payload
+    type: textarea
+    label: Payload (JSON)

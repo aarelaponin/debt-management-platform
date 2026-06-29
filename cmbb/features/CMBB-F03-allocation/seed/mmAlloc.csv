@@ -1,0 +1,2 @@
+caseType,code,supervisorMode,teamSupport,criteria,reallocationRule
+TEST,TEST-DEFAULT,NONE,,"{""strategy"":""ROUND_ROBIN"",""filters"":[""WORKLOAD"",""SPECIALISATION""],""warnPct"":90}",

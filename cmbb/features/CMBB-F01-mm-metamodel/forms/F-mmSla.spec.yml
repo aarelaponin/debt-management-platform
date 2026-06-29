@@ -1,0 +1,87 @@
+form:
+  id: mmSla
+  name: CM - SLA / Deadline Clock
+  table: mmSla
+  description: 'CMBB metamodel: SLA / Deadline Clock (CAD-CMBB s2.2)'
+sections:
+- label: Clock
+  columns: 2
+  fields:
+  - id: caseType
+    type: select
+    label: Case type
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: clockCode
+    type: textfield
+    label: Clock code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: source
+    type: select
+    label: Source
+    static_options:
+    - value: STATUTORY
+      label: Statutory
+    - value: SLA
+      label: SLA
+    - value: PROCEDURAL
+      label: Procedural
+    required: true
+  - id: kind
+    type: select
+    label: Kind
+    static_options:
+    - value: TARGET
+      label: Target
+    - value: HARD
+      label: Hard
+    required: true
+  - id: durationDays
+    type: textfield
+    label: Duration (days)
+    storeNumeric: true
+  - id: durationRule
+    type: textfield
+    label: Duration rule (overrides days)
+  - id: warnPct
+    type: textfield
+    label: Warning threshold % (default 75)
+    storeNumeric: true
+  - id: critPct
+    type: textfield
+    label: Critical threshold % (default 90)
+    storeNumeric: true
+  - id: calendar
+    type: select
+    label: Calendar
+    lookup:
+      formDefId: mmCalendar
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+- label: Escalation & suspension
+  columns: 1
+  fields:
+  - id: pauseOnHold
+    type: checkbox
+    label: Pause clock while case On Hold (WF-FR-010)
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+  - id: escalationChain
+    type: textarea
+    label: Escalation chain
+  - id: suspensionGrounds
+    type: textarea
+    label: Suspension grounds + clock effect
+  - id: extensionLimit
+    type: textfield
+    label: Extension limit + authority

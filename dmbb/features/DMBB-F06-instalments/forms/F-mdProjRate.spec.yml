@@ -1,0 +1,27 @@
+form:
+  id: mdProjRate
+  name: DM - Projected Interest Rate (instalment)
+  table: mdProjRate
+  description: 'DPM reduced interest rate applied to an instalment plan projection (DM-FR-023, D-SAD-04 — informational, never posted to Gold). Percent per month. Read by ReliefProductInterpreter APPLY.'
+sections:
+- label: Projected rate
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: reducedRate
+    type: textfield
+    label: Reduced interest rate (% per month)
+    storeNumeric: true
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

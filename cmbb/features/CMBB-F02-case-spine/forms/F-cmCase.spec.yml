@@ -1,0 +1,105 @@
+form:
+  id: cmCase
+  name: CM - Case
+  table: cmCase
+  description: CMBB case spine (CAD-CMBB s2.2)
+sections:
+- label: Identification
+  columns: 2
+  fields:
+  - id: caseRef
+    type: textfield
+    label: Case reference (set by guard)
+    readonly: false
+  - id: tenant
+    type: textfield
+    label: Tenant (managed - resolved from profile, ADR-004)
+    readonly: true
+  - id: caseType
+    type: select
+    label: Case type
+    lookup:
+      formDefId: mmCaseType
+      idColumn: code
+      labelColumn: name
+    required: true
+  - id: tin
+    type: textfield
+    label: TIN
+    required: true
+  - id: taxType
+    type: textfield
+    label: Tax type
+  - id: taxPeriod
+    type: textfield
+    label: Tax period
+  - id: origin
+    type: select
+    label: Origin
+    static_options:
+    - value: RISK
+      label: Risk selection
+    - value: TAXPAYER
+      label: Taxpayer initiated
+    - value: SYSTEM
+      label: System detection
+    - value: ESCALATION
+      label: Escalation
+    - value: EXTERNAL
+      label: External request
+    - value: MANUAL
+      label: Manual
+    required: true
+- label: Subject & classification
+  columns: 2
+  fields:
+  - id: subjectKind
+    type: textfield
+    label: Subject kind
+  - id: subjectId
+    type: textfield
+    label: Subject id
+  - id: category
+    type: textfield
+    label: Category
+  - id: priority
+    type: textfield
+    label: Priority
+    storeNumeric: true
+  - id: amountAtStake
+    type: textfield
+    label: Amount at stake
+    storeNumeric: true
+  - id: currentState
+    type: textfield
+    label: Current state (managed)
+  - id: assignee
+    type: textfield
+    label: Assignee
+  - id: assignmentStatus
+    type: textfield
+    label: Assignment status (managed by AllocationEngine - F03)
+    readonly: false
+  - id: taxpayerName
+    type: textfield
+    label: Taxpayer name (snapshot from Gold / officer-entered)
+  - id: riskScore
+    type: textfield
+    label: Risk score (0-100, from risk selection)
+    storeNumeric: true
+  - id: nextActionDue
+    type: date
+    label: Next action due
+  - id: slaStatus
+    type: textfield
+    label: SLA status (managed by DeadlineEngine - F05)
+    readonly: false
+  - id: addressFlag
+    type: textfield
+    label: Address flag (RETURNED_MAIL - WF-FR-019)
+- label: Summary
+  columns: 1
+  fields:
+  - id: summary
+    type: textarea
+    label: Summary

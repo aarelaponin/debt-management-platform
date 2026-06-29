@@ -1,0 +1,63 @@
+datalist:
+  id: list_debtorsList
+  name: Debtors list (outstanding debts)
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: >-
+      SELECT c.id,
+             c.c_tin AS tin,
+             COALESCE(NULLIF(c.c_taxpayername,''), c.c_tin) AS taxpayer,
+             NULLIF(d.c_consolidatedamount,'')::numeric AS total_debt,
+             GREATEST(0, EXTRACT(day FROM now() - c.datecreated))::int AS debt_age_days,
+             COALESCE(NULLIF(d.c_debtcategory,''), c.c_category, '-') AS category,
+             COALESCE(NULLIF(d.c_stage,''),'-') AS stage,
+             NULLIF(c.c_riskscore,'')::numeric AS risk_score,
+             COALESCE(NULLIF(c.c_assignee,''),'-') AS assignee,
+             COALESCE(NULLIF(c.c_taxtype,''),'-') AS tax_type
+      FROM app_fd_cmcase c JOIN app_fd_dmdebt d ON d.id = c.id
+      WHERE c.c_casetype = 'DM'
+        AND COALESCE(d.c_writeoffstatus,'') <> 'written-off'
+        AND COALESCE(c.c_currentstate,'') NOT IN
+            (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal='true')
+        AND ('#requestParam.fcat#' = '' OR COALESCE(NULLIF(d.c_debtcategory,''), c.c_category, '-') = '#requestParam.fcat#')
+        AND ('#requestParam.fstage#' = '' OR COALESCE(NULLIF(d.c_stage,''),'-') ILIKE '%#requestParam.fstage#%')
+        AND ('#requestParam.ftax#' = '' OR COALESCE(NULLIF(c.c_taxtype,''),'-') = '#requestParam.ftax#')
+        AND ('#requestParam.ftin#' = '' OR c.c_tin = '#requestParam.ftin#')
+        AND ('#requestParam.fage#' = '' OR
+             (CASE WHEN EXTRACT(day FROM now()-c.datecreated) <= 30  THEN '1: 0-30'
+                   WHEN EXTRACT(day FROM now()-c.datecreated) <= 60  THEN '2: 31-60'
+                   WHEN EXTRACT(day FROM now()-c.datecreated) <= 90  THEN '3: 61-90'
+                   WHEN EXTRACT(day FROM now()-c.datecreated) <= 180 THEN '4: 91-180'
+                   WHEN EXTRACT(day FROM now()-c.datecreated) <= 365 THEN '5: 181-365'
+                   ELSE '6: >365' END) = '#requestParam.fage#')
+      ORDER BY COALESCE(NULLIF(d.c_consolidatedamount,'')::numeric,0) DESC,
+               debt_age_days DESC
+  columns:
+  - {id: tin, label: TIN}
+  - {id: taxpayer, label: Taxpayer}
+  - {id: total_debt, label: Total debt}
+  - {id: debt_age_days, label: Debt age (days)}
+  - {id: category, label: Category}
+  - {id: stage, label: Enforcement stage}
+  - {id: risk_score, label: Risk score}
+  - {id: assignee, label: Assigned officer}
+  - {id: tax_type, label: Tax type}
+  filters:
+  - {id: tin, label: TIN, type: text, param: ftin}
+  - {id: category, label: Debt category, type: select, param: fcat, options: [C1, C2, C3, C4, C5, C6]}
+  - {id: stage, label: Enforcement stage (contains), type: text, param: fstage}
+  - {id: tax_type, label: Tax type, type: text, param: ftax}
+  rowActions:
+  # _mode=edit opens the specific record; without it the CRUD shows its default list.
+  - {label: Open case, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmCaseConsole_crud?_mode=edit', hrefColumn: id, hrefParam: id}
+  # Step 6 officer action: launch the instalment form prefilled from this debtor's case
+  # (caseId/tin/total reach the form's field defaults via #requestParam.*#).
+  # Joget datalist actions pass ONE row value only — multiple comma params are NOT
+  # substituted. Pass the TIN; the engine resolves the debtor's case + total from it.
+  - {label: Set up instalment plan, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmInstAgr_crud?_mode=add', hrefColumn: 'tin', hrefParam: 'tin'}
+  - {label: Record payment, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmPayment_crud?_mode=add', hrefColumn: 'tin', hrefParam: 'tin'}
+  sort: {column: total_debt, desc: true}
+notes: 'DM-FR-057 debtors list. UX-QA: sortable columns; category dropdown + stage/tax filters via
+  #requestParam.fcat/fstage/ftax# (the verified JDBC filter mechanism — same param a summary cell-drill
+  passes in); row drill "Open case" -> dmCaseConsole. Outstanding = DM case, not written-off, not terminal.'

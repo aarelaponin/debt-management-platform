@@ -1,0 +1,49 @@
+form:
+  id: mmAuthority
+  name: CM - Authority Matrix Row
+  table: mmAuthority
+  description: 'CMBB metamodel: Authority Matrix Row (CAD-CMBB s2.2)'
+sections:
+- label: Row
+  columns: 2
+  fields:
+  - id: actionType
+    type: textfield
+    label: Action type
+    required: true
+  - id: amountMin
+    type: textfield
+    label: Amount from
+    storeNumeric: true
+  - id: amountMax
+    type: textfield
+    label: Amount to
+    storeNumeric: true
+  - id: level
+    type: textfield
+    label: Approver role/level
+    required: true
+  - id: bodyType
+    type: select
+    label: Body type
+    static_options:
+    - value: SINGLE
+      label: Single officer
+    - value: SUPERVISOR
+      label: Supervisor
+    - value: COLLEGIAL
+      label: Collegial body
+  - id: quorum
+    type: textfield
+    label: Quorum (collegial)
+    storeNumeric: true
+  - id: effectiveFrom
+    type: date
+    label: Effective from
+  - id: effectiveTo
+    type: date
+    label: Effective to
+  - id: version
+    type: textfield
+    label: Version
+    storeNumeric: true

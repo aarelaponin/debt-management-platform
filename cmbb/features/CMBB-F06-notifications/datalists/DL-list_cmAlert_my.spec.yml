@@ -1,0 +1,31 @@
+datalist:
+  id: list_cmAlert_my
+  name: My alerts (unread first)
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: SELECT a.id, a.c_alerttype AS alert_type, a.c_message AS message, a.c_priority AS priority, COALESCE(NULLIF(a.c_isread,''),'')
+      AS is_read, to_char(a.datecreated,'DD/MM/YYYY HH24:MI') AS created, c.c_caseref AS case_ref FROM
+      app_fd_cmalert a LEFT JOIN app_fd_cmcase c ON c.id = a.c_caseid WHERE a.c_recipient = '#currentUser.username#'
+      OR a.c_recipient IN (SELECT g.groupid FROM dir_user_group g WHERE g.userid = '#currentUser.username#')
+      ORDER BY COALESCE(NULLIF(a.c_isread,''),'') ASC, a.datecreated DESC
+  columns:
+  - id: alert_type
+    label: Type
+  - id: message
+    label: Message
+  - id: case_ref
+    label: Case
+  - id: priority
+    label: Priority
+  - id: is_read
+    label: Read
+  - id: created
+    label: Created
+  filters:
+  - id: alert_type
+    label: Type
+  - id: is_read
+    label: Read
+notes: 'WF-FR-015 in-app panel: unread first; recipient = user OR their groups. Unread badge = count query
+  over same predicate (theme OPEN item).'

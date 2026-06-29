@@ -1,0 +1,31 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Write-off
+    permission_role: dm_officer
+    menus:
+    - type: crud
+      formDefId: dmWriteOff
+      datalistId: list_dmWriteOff
+      label: Write-off records (Write-Off Report)
+    - type: crud
+      formDefId: cmWriteOffApprove
+      datalistId: list_cmWriteOffApprove
+      label: Write-off approvals
+    # UX-QA3: cmWriteOffRun batch trigger moved to "Operations — batch runs"
+  - label: Write-off config
+    permission_role: dm_policy_admin
+    menus:
+    - type: crud
+      formDefId: mdWoGround
+      datalistId: list_mdWoGround
+      label: Write-off grounds
+    - type: crud
+      formDefId: mdWoDelegation
+      datalistId: list_mdWoDelegation
+      label: Approval delegation
+    - type: crud
+      formDefId: mdWoPolicy
+      datalistId: list_mdWoPolicy
+      label: Write-off policy

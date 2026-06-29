@@ -1,0 +1,27 @@
+form:
+  id: mdWoDelegation
+  name: DM - Write-Off Approval Delegation
+  table: mdWoDelegation
+  description: 'DPM write-off approval delegation thresholds (BR-DM-037): DMO up to dmoMax, SDO up to sdoMax, Director above. Read by WriteOffEngine SUBMIT to set the required approval level by amount.'
+sections:
+- label: Delegation
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: dmoMax
+    type: textfield
+    label: DMO approval ceiling
+    storeNumeric: true
+  - id: sdoMax
+    type: textfield
+    label: SDO approval ceiling (Director above)
+    storeNumeric: true
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

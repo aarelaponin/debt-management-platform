@@ -1,0 +1,50 @@
+form:
+  id: mdTemplate
+  name: MD - Notification Template
+  table: mdTemplate
+  description: 'Versioned, effective-dated, bilingual templates (WF-FR-014). Merge
+    fields: #tin# #taxpayerName# #caseRef# #amountAtStake# #date#.'
+sections:
+- label: Identity
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Template code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: language
+    type: select
+    label: Language
+    static_options:
+    - value: en
+      label: English
+    - value: mt
+      label: Maltese
+    required: true
+  - id: version
+    type: textfield
+    label: Version
+    storeNumeric: true
+  - id: effectiveFrom
+    type: date
+    label: Effective from
+  - id: active
+    type: checkbox
+    label: Active
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+- label: Content
+  columns: 1
+  fields:
+  - id: subject
+    type: textfield
+    label: Subject (merge fields allowed)
+  - id: body
+    type: textarea
+    label: Body (merge fields + MTCA branding)
+    rows: 8

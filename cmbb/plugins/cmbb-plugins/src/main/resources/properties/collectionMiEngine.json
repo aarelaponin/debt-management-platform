@@ -1,0 +1,18 @@
+[
+    {
+        "title": "DMBB Collection MI Engine",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode (runMode on the trigger row drives dispatch)",
+                "type": "selectbox",
+                "required": "True",
+                "value": "RUN",
+                "options": [
+                    { "value": "RUN", "label": "RUN — dispatch on cmCollectionMiRun.runMode (ROLLUP/SUGGEST/RECONCILE)" }
+                ]
+            },
+            { "name": "recordId", "label": "Trigger record id (blank = auto)", "type": "textfield", "required": "False" }
+        ]
+    }
+]

@@ -1,0 +1,14 @@
+userview_delta:
+  userviewId: cmbbConsole
+  name: CMBB Console
+  categories:
+  - label: SLA
+    permission_role: cmbb_user
+    menus:
+    - type: datalist
+      datalistId: list_cmDeadline
+      label: SLA clocks
+    - type: crud
+      formDefId: cmSweepRun
+      datalistId: list_cmSweepRun
+      label: Sweep runs (trigger/log)

@@ -1,0 +1,38 @@
+form:
+  id: mmStatute
+  name: CM - Statutory Period
+  table: mmStatute
+  description: 'CMBB metamodel: Statutory Period (CAD-CMBB s2.2)'
+sections:
+- label: Period
+  columns: 2
+  fields:
+  - id: taxType
+    type: textfield
+    label: Tax type code
+    required: true
+  - id: kind
+    type: select
+    label: Kind
+    static_options:
+    - value: OBJECTION_WINDOW
+      label: Objection window
+    - value: COLLECTION_LIMITATION
+      label: Collection limitation
+    - value: CURE_PERIOD
+      label: Cure period
+    required: true
+  - id: days
+    type: textfield
+    label: Days
+    storeNumeric: true
+  - id: years
+    type: textfield
+    label: Years
+    storeNumeric: true
+  - id: effectiveFrom
+    type: date
+    label: Effective from
+  - id: effectiveTo
+    type: date
+    label: Effective to

@@ -1,0 +1,10 @@
+# CMBB-F03 workflow delta — NO new XPDL (CAD: envelope is the only process).
+# guardOpen becomes a two-tool MultiTools chain: validate, then allocate.
+# Stage-3 requirement: gen_workflow.py learns `tools:` (list) on tool
+# activities; WF-cmCaseEnvelope.spec.yml guardOpen amended accordingly.
+activity: guardOpen
+tools:
+- className: com.fiscaladmin.mtca.cmbb.TransitionGuard
+  properties: {phase: OPEN, caseId: '#variable.caseId#'}
+- className: com.fiscaladmin.mtca.cmbb.AllocationEngine
+  properties: {mode: ASSIGN, caseId: '#variable.caseId#'}

@@ -1,0 +1,23 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: DM administration
+    permission_role: dm_policy_admin
+    menus:
+    - type: crud
+      formDefId: mdDebtCat
+      datalistId: list_mdDebtCat
+      label: Debt categories
+    - type: crud
+      formDefId: mdInstrument
+      datalistId: list_mdInstrument
+      label: Enforcement instruments
+    - type: crud
+      formDefId: mmStrategy
+      datalistId: list_mmStrategy
+      label: Collection strategies
+    - type: crud
+      formDefId: mmEscStep
+      datalistId: list_mmEscStep
+      label: Escalation steps

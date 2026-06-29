@@ -1,0 +1,19 @@
+userview_delta:
+  userviewId: cmbbConsole
+  name: CMBB Console
+  categories:
+  - label: Documents
+    permission_role: cmbb_user
+    menus:
+    - type: crud
+      formDefId: cmDoc
+      datalistId: list_cmDoc
+      label: Case documents (register)
+    - type: crud
+      formDefId: cmDocGen
+      datalistId: list_cmDocGen
+      label: Generate documents (ADG)
+    - type: crud
+      formDefId: cmPostal
+      datalistId: list_cmPostal
+      label: Postal tracking

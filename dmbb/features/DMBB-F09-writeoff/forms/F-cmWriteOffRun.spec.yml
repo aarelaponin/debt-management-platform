@@ -1,0 +1,33 @@
+form:
+  id: cmWriteOffRun
+  name: DM - Write-Off Sweep Run
+  table: cmWriteOffRun
+  description: 'WriteOffEngine SWEEP trigger + audit log (DM-FR-042/044/045). sweepMode: AUTO_C1 (auto-write-off every open C1 debt case, no human intervention), STATUTORY_BULK (bulk write-off debts older than the statutory period), C2_PASSIVE (mark C2 debts passive-collection). asOf (blank = now) gives deterministic statutory-age time-travel.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.WriteOffEngine
+  properties:
+    mode: SWEEP
+  runOn: create
+sections:
+- label: Run
+  columns: 2
+  fields:
+  - id: sweepMode
+    type: textfield
+    label: Sweep mode (AUTO_C1/STATUTORY_BULK/C2_PASSIVE)
+    required: true
+  - id: asOf
+    type: textfield
+    label: As-of (ISO yyyy-MM-ddTHH:mm:ss; blank = now)
+  - id: processedCount
+    type: textfield
+    label: Debt cases scanned (set by engine)
+    storeNumeric: true
+  - id: writtenOffCount
+    type: textfield
+    label: Write-offs posted (set by engine)
+    storeNumeric: true
+  - id: result
+    type: textarea
+    label: Summary (set by engine)
+    rows: 2

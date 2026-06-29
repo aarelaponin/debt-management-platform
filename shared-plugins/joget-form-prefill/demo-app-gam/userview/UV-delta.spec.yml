@@ -1,0 +1,10 @@
+userview_delta:
+  userviewId: pfGamConsole
+  name: GAM Prefill Demo
+  categories:
+  - label: Operations
+    menus:
+    - type: crud
+      formDefId: pfGamCust
+      datalistId: list_pfGamCust
+      label: Customer Prefill Demo

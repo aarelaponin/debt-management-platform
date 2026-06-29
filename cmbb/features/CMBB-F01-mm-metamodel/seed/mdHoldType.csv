@@ -1,0 +1,6 @@
+code,name
+COLLECTION,Collection hold
+DISBURSEMENT,Disbursement hold
+OFFSET,Offset exclusion
+CORR_SUPPRESS,Correspondence suppression
+ENF_SUPPRESS,Enforcement suppression

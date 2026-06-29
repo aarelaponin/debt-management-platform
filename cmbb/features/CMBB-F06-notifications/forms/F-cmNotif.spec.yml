@@ -1,0 +1,50 @@
+form:
+  id: cmNotif
+  name: CM - Outbound Notification Log
+  table: cmNotif
+  description: 'WF-FR-016: one row per outbound communication. Written by NotificationDispatcher
+    only.'
+sections:
+- label: Notification
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: eventId
+    type: hidden
+    label: originating cmEvent id
+  - id: tin
+    type: textfield
+    label: TIN
+  - id: recipient
+    type: textfield
+    label: Recipient
+  - id: channel
+    type: textfield
+    label: Channel
+  - id: template
+    type: textfield
+    label: Template code
+  - id: summary
+    type: textfield
+    label: Content summary
+  - id: status
+    type: select
+    label: Delivery status
+    static_options:
+    - value: SENT
+      label: Sent
+    - value: DELIVERED
+      label: Delivered
+    - value: FAILED
+      label: Failed
+    - value: BOUNCED
+      label: Bounced
+    - value: QUEUED_PRINT
+      label: Queued for print
+    - value: SUPPRESSED
+      label: Suppressed (hold)
+  - id: sentAt
+    type: textfield
+    label: Send timestamp (ISO)

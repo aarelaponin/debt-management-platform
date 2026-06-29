@@ -1,0 +1,6 @@
+code,name,language,version,effectiveFrom,active,subject,body
+TPL-REMINDER,Payment reminder,en,1,,true,Payment reminder - case #caseRef#,Dear #taxpayerName#, our records show an overdue balance of #amountAtStake# on case #caseRef#. Please pay within the period stated.
+TPL-DEMAND,Demand notice,en,1,,true,Demand for payment - case #caseRef#,Dear #taxpayerName#, this is a formal demand for #amountAtStake# (case #caseRef#). Non-payment may lead to enforcement.
+TPL-FINAL,Final demand,en,1,,true,Final demand - case #caseRef#,Dear #taxpayerName#, FINAL demand for #amountAtStake# on case #caseRef#. Enforcement will follow without further notice.
+TPL-GARNISH,Garnishing notice,en,1,,true,Bank garnishing - case #caseRef#,Notice of bank garnishing for case #caseRef#, amount #amountAtStake#.
+TPL-SEIZURE,Seizure notice,en,1,,true,Property seizure - case #caseRef#,Notice of property seizure for case #caseRef#, amount #amountAtStake#.

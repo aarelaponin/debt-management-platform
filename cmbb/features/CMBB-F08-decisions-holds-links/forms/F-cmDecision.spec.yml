@@ -1,0 +1,113 @@
+form:
+  id: cmDecision
+  name: CM - Case Decision
+  table: cmDecision
+  description: 'GCMF §3.3-7 / DPM D6: reasoned, authority-gated decision. On create
+    the DecisionEngine resolves the required authority level (mmAuthority) and sets
+    the outcome. Reasons mandatory.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.DecisionEngine
+  properties:
+    mode: DECIDE
+  runOn: create
+sections:
+- label: Decision
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: caseRef
+    type: textfield
+    label: Case reference
+    required: true
+  - id: tin
+    type: textfield
+    label: TIN
+  - id: decisionType
+    type: select
+    label: Decision type
+    lookup:
+      formDefId: mdDecisionType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: actionType
+    type: textfield
+    label: Action type (matches mmAuthority)
+    required: true
+  - id: amount
+    type: textfield
+    label: Amount at stake
+    storeNumeric: true
+  - id: outcome
+    type: select
+    label: Proposed outcome
+    static_options:
+    - value: ACCEPT
+      label: Accept / grant
+    - value: REJECT
+      label: Reject / deny
+    - value: PARTIAL
+      label: Partial
+    required: true
+  - id: approverLevel
+    type: select
+    label: Approver level
+    static_options:
+    - value: OFFICER
+      label: Officer
+    - value: SENIOR
+      label: Senior officer
+    - value: SUPERVISOR
+      label: Supervisor
+    - value: MANAGER
+      label: Manager
+    - value: DIRECTOR
+      label: Director
+    - value: COMMISSIONER
+      label: Commissioner
+    required: true
+  - id: decidedBy
+    type: textfield
+    label: Decided by (username)
+  - id: bodyType
+    type: select
+    label: Body type
+    static_options:
+    - value: SINGLE
+      label: Single officer
+    - value: SUPERVISOR
+      label: Supervisor
+    - value: COLLEGIAL
+      label: Collegial body
+  - id: approvalsCount
+    type: textfield
+    label: Approvals collected (collegial)
+    storeNumeric: true
+  - id: decisionStatus
+    type: select
+    label: Status (set by engine)
+    static_options:
+    - value: PROPOSED
+      label: Proposed
+    - value: UNDER_APPROVAL
+      label: Under approval
+    - value: APPROVED
+      label: Approved
+    - value: REJECTED
+      label: Rejected (insufficient authority)
+  - id: eSignRef
+    type: textfield
+    label: e-Signature reference
+  - id: result
+    type: textfield
+    label: Engine result (set by engine)
+- label: Reasons
+  columns: 1
+  fields:
+  - id: reasons
+    type: textarea
+    label: Reasoned grounds (mandatory)
+    required: true

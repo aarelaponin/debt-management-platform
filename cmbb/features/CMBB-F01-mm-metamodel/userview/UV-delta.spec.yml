@@ -1,0 +1,84 @@
+userview_delta:
+  userviewId: cmbbConsole
+  name: CMBB Console
+  create_if_missing: true
+  theme: default
+  categories:
+  - label: Case-type administration
+    permission_role: cmbb_admin
+    menus:
+    - type: crud
+      formDefId: mmCaseType
+      datalistId: list_mmCaseType
+      label: Case Type
+    - type: crud
+      formDefId: mmState
+      datalistId: list_mmState
+      label: Lifecycle State
+    - type: crud
+      formDefId: mmTransition
+      datalistId: list_mmTransition
+      label: Lifecycle Transition
+    - type: crud
+      formDefId: mmAlloc
+      datalistId: list_mmAlloc
+      label: Allocation Policy
+    - type: crud
+      formDefId: mmCoi
+      datalistId: list_mmCoi
+      label: COI / Independence Rule
+    - type: crud
+      formDefId: mmSla
+      datalistId: list_mmSla
+      label: SLA / Deadline Clock
+    - type: crud
+      formDefId: mmAuthority
+      datalistId: list_mmAuthority
+      label: Authority Matrix Row
+    - type: crud
+      formDefId: mmHoldPolicy
+      datalistId: list_mmHoldPolicy
+      label: Hold Policy
+    - type: crud
+      formDefId: mmTaskRule
+      datalistId: list_mmTaskRule
+      label: Task Auto-Generation Rule
+    - type: crud
+      formDefId: mmCalendar
+      datalistId: list_mmCalendar
+      label: Calendar
+    - type: crud
+      formDefId: mmStatute
+      datalistId: list_mmStatute
+      label: Statutory Period
+    - type: crud
+      formDefId: mmDocReq
+      datalistId: list_mmDocReq
+      label: Required Document per State
+    - type: crud
+      formDefId: mmLinkType
+      datalistId: list_mmLinkType
+      label: Link Type
+    - type: crud
+      formDefId: mmNotifRule
+      datalistId: list_mmNotifRule
+      label: Notification Rule
+  - label: Reference data
+    permission_role: cmbb_admin
+    menus:
+    - type: crud
+      formDefId: mdChannel
+      datalistId: list_mdChannel
+      label: Channel
+    - type: crud
+      formDefId: mdDecisionType
+      datalistId: list_mdDecisionType
+      label: Decision Type
+    - type: crud
+      formDefId: mdHoldType
+      datalistId: list_mdHoldType
+      label: Hold Type
+    - type: crud
+      formDefId: mdDocClass
+      datalistId: list_mdDocClass
+      label: Document Class

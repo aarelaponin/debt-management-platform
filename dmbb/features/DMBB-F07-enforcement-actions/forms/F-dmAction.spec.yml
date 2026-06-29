@@ -1,0 +1,98 @@
+form:
+  id: dmAction
+  name: DM - Enforcement Action
+  table: dmAction
+  listColumns: [tin, instrument, status, amount, recoveredAmount, costAmount, executionMode]
+  description: 'DMBB enforcement-action record (DM-FR-029..038, all 14 Malta instruments). On create the EnforcementActionEngine INITIATE gates by proportional matrix (mdInstrument.minCategory + proportionalityMinAmount, BR-DM-031/033) and the F05 eligibility contract (no full-amount objection; no ENFORCEMENT_SUPPRESS hold when disputeHoldSensitive), generates the document, executes by mdInstrument.executionMode (ADMINISTRATIVE/JUDICIAL/FIELD — incl. GarnishingConnector for BANK_GARNISH), posts a legal-fee dmCharge when costRecorded, and writes the lifecycle status back. debtCaseId links to the cmCase debt case.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.EnforcementActionEngine
+  properties:
+    mode: INITIATE
+  runOn: create
+sections:
+- label: Action
+  columns: 2
+  fields:
+  - id: debtCaseId
+    type: textfield
+    label: Debt case id (cmCase id)
+    required: true
+  - id: tin
+    type: textfield
+    label: TIN
+    required: true
+  - id: instrument
+    type: select
+    label: Instrument
+    required: true
+    lookup:
+      formDefId: mdInstrument
+      idColumn: code
+      labelColumn: name
+      extraCondition: "c_enabled = 'true'"
+  - id: amount
+    type: textfield
+    label: Action amount (debt being enforced)
+    storeNumeric: true
+  - id: legalRef
+    type: textfield
+    label: Legal / authority reference
+  - id: status
+    type: textfield
+    label: Status
+    value: INITIATED
+    managed: true
+- label: Execution (set by engine)
+  columns: 2
+  fields:
+  - id: category
+    type: textfield
+    label: Debt category (copied from case)
+    managed: true
+  - id: executionMode
+    type: textfield
+    label: Execution mode (copied from instrument)
+    managed: true
+  - id: authorityLevel
+    type: textfield
+    label: Authority level (copied from instrument)
+    managed: true
+  - id: docRef
+    type: textfield
+    label: Generated document ref
+    managed: true
+  - id: externalRef
+    type: textfield
+    label: External ref (bank/court/register)
+    managed: true
+  - id: responseStatus
+    type: textfield
+    label: Response status (SUCCESS/PARTIAL/FAILURE)
+    managed: true
+  - id: recoveredAmount
+    type: textfield
+    label: Recovered amount (informational writeback)
+    storeNumeric: true
+    managed: true
+  - id: costAmount
+    type: textfield
+    label: Legal fee posted (dmCharge)
+    storeNumeric: true
+    managed: true
+  - id: auctionDate
+    type: textfield
+    label: Auction date (property seizure)
+    managed: true
+  - id: saleProceeds
+    type: textfield
+    label: Sale proceeds (auction)
+    storeNumeric: true
+    managed: true
+  - id: initiatedBy
+    type: textfield
+    label: Initiated by
+    managed: true
+  - id: asOf
+    type: textfield
+    label: As-of
+    managed: true

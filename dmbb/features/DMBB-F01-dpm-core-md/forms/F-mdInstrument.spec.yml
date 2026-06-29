@@ -1,0 +1,91 @@
+form:
+  id: mdInstrument
+  name: DM - Enforcement Instrument (DPM D3)
+  table: mdInstrument
+  listColumns: [code, name, minCategory, executionMode, authorityLevel, enabled]
+  description: 'DPM D3 enforcement instrument catalogue as DATA, not enum (BR-DM-031). Malta-14 enabled; foreign instruments present-disabled. minCategory carries Table-4 applicability (cumulative).'
+sections:
+- label: Instrument
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: minCategory
+    type: textfield
+    label: Min category (lowest band it applies from, e.g. C2)
+  - id: executionMode
+    type: select
+    label: Execution mode
+    static_options:
+    - value: ADMINISTRATIVE
+      label: Administrative
+    - value: FIELD
+      label: Field
+    - value: JUDICIAL
+      label: Judicial
+  - id: authorityLevel
+    type: select
+    label: Authority level
+    static_options:
+    - value: OFFICER
+      label: Officer
+    - value: SENIOR
+      label: Senior officer
+    - value: SUPERVISOR
+      label: Supervisor
+    - value: DIRECTOR
+      label: Director
+  - id: legalBasis
+    type: textfield
+    label: Legal basis
+  - id: proportionalityMinAmount
+    type: textfield
+    label: Proportionality min amount (debt-size lower bound)
+    storeNumeric: true
+  - id: maxAmount
+    type: textfield
+    label: Debt-size upper bound (blank = unbounded) [DM-FR-039]
+    storeNumeric: true
+  - id: taxpayerType
+    type: textfield
+    label: Applicable taxpayer type (blank = all) [DM-FR-039]
+  - id: instructions
+    type: textarea
+    label: Specific instructions [DM-FR-039]
+    rows: 2
+  - id: docTemplate
+    type: textfield
+    label: Document template code
+  - id: costRecorded
+    type: select
+    label: Records a cost?
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+    - value: 'false'
+      label: 'No'
+  - id: disputeHoldSensitive
+    type: select
+    label: Suppressed by dispute/enforcement hold?
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+    - value: 'false'
+      label: 'No'
+  - id: enabled
+    type: select
+    label: Enabled (Malta-14 = yes)
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+    - value: 'false'
+      label: 'No (present-disabled)'
+  - id: countryProfile
+    type: textfield
+    label: Country profile

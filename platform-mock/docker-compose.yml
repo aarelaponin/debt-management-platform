@@ -1,0 +1,72 @@
+# MTCA DM environment — mock data platform + Mayan EDMS
+# Usage:  cd platform-mock && cp .env.example .env (edit) && docker compose --project-name mtca up -d
+# NEVER use `docker compose down -v` — volumes hold the data (see docs/Mayan-EDMS.md §1.2)
+services:
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    container_name: mtca-clickhouse
+    restart: unless-stopped
+    ports:
+      - "8123:8123"   # HTTP interface
+      - "9000:9000"   # native protocol (JDBC)
+    environment:
+      CLICKHOUSE_DB: mtca_ors
+      CLICKHOUSE_USER: mtca
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - mtca_clickhouse_data:/var/lib/clickhouse
+      - ./ddl:/docker-entrypoint-initdb.d:ro   # A2: schema + sta_v1 views + read-only role
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+
+  mayan-postgresql:
+    image: postgres:14-alpine
+    container_name: mtca-mayan-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mayan
+      POSTGRES_USER: mayan
+      POSTGRES_PASSWORD: ${MAYAN_DATABASE_PASSWORD}
+    volumes:
+      - mtca_mayan_pg:/var/lib/postgresql/data
+
+  mayan-redis:
+    image: redis:7-alpine
+    container_name: mtca-mayan-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${MAYAN_REDIS_PASSWORD} --databases 3 --maxmemory-policy allkeys-lru
+
+  mayan-rabbitmq:
+    image: rabbitmq:3.13-alpine
+    container_name: mtca-mayan-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: mayan
+      RABBITMQ_DEFAULT_PASS: ${MAYAN_RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: mayan
+    volumes:
+      - mtca_mayan_rabbitmq:/var/lib/rabbitmq
+
+  mayan:
+    image: mayanedms/mayanedms:s4.11    # pinned series — keep compose/.env/image from same series
+    container_name: mtca-mayan
+    restart: unless-stopped
+    depends_on: [mayan-postgresql, mayan-redis, mayan-rabbitmq]
+    ports:
+      - "8880:8000"   # avoids Joget/Tomcat range (8080-8089)
+    environment:
+      MAYAN_DATABASES: "{'default':{'ENGINE':'django.db.backends.postgresql','NAME':'mayan','PASSWORD':'${MAYAN_DATABASE_PASSWORD}','USER':'mayan','HOST':'mayan-postgresql'}}"
+      MAYAN_CELERY_BROKER_URL: "amqp://mayan:${MAYAN_RABBITMQ_PASSWORD}@mayan-rabbitmq:5672/mayan"
+      MAYAN_CELERY_RESULT_BACKEND: "redis://:${MAYAN_REDIS_PASSWORD}@mayan-redis:6379/1"
+      MAYAN_LOCK_MANAGER_BACKEND: "mayan.apps.lock_manager.backends.redis_lock.RedisLock"
+      MAYAN_LOCK_MANAGER_BACKEND_ARGUMENTS: "{'redis_url':'redis://:${MAYAN_REDIS_PASSWORD}@mayan-redis:6379/2'}"
+    volumes:
+      - mtca_mayan_app:/var/lib/mayan
+
+volumes:
+  mtca_clickhouse_data:
+  mtca_mayan_pg:
+  mtca_mayan_rabbitmq:
+  mtca_mayan_app:

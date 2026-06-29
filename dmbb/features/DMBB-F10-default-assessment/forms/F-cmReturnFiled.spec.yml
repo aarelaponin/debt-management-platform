@@ -1,0 +1,29 @@
+form:
+  id: cmReturnFiled
+  name: DM - Return Filed (replace default)
+  table: cmReturnFiled
+  description: 'DefaultAssessmentEngine REPLACE trigger (DM-FR-055, BR-DM-053): a taxpayer files an actual return in response to a default assessment. The engine reverses the default (status REPLACED), records the filed amount + variance, and emits RISK_PROFILE_UPDATE carrying the variance for the external risk engine.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.DefaultAssessmentEngine
+  properties:
+    mode: REPLACE
+  runOn: create
+sections:
+- label: Filed return
+  columns: 2
+  fields:
+  - id: defAssessId
+    type: textfield
+    label: Default assessment id (dmDefAssess)
+    required: true
+  - id: filedAmount
+    type: textfield
+    label: Filed return amount
+    storeNumeric: true
+    required: true
+  - id: filedDate
+    type: textfield
+    label: Filed date
+  - id: result
+    type: textfield
+    label: Result (set by engine)

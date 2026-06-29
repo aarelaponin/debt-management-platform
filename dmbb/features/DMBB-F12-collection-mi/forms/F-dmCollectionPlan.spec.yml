@@ -1,0 +1,48 @@
+form:
+  id: dmCollectionPlan
+  name: DM - Collection Plan
+  table: dmCollectionPlan
+  description: 'DMBB debt-collection plan (DM-FR-047, BR-DM-042): scope (local/national), period, and a dmPlanTarget child grid of target recovery amounts by debt category / tax type. The CollectionMiEngine ROLLUP fills plan-vs-actual; SUGGEST seeds targets from current stock × recovery rate (BR-DM-043).'
+sections:
+- label: Plan
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Plan code
+    required: true
+  - id: name
+    type: textfield
+    label: Plan name
+  - id: scope
+    type: select
+    label: Scope
+    static_options:
+    - value: NATIONAL
+      label: National
+    - value: LOCAL
+      label: Local / regional
+  - id: region
+    type: textfield
+    label: Region (if local)
+  - id: period
+    type: textfield
+    label: Period (e.g. 2026-Q3)
+  - id: status
+    type: textfield
+    label: Status
+    value: DRAFT
+- label: Targets
+  columns: 1
+  fields:
+  - id: targets
+    type: grid
+    label: Target recovery by category
+    formDefId: dmPlanTarget
+    foreignKey: planId
+    columns:
+    - {value: category, label: Category, width: 90px}
+    - {value: taxType, label: Tax type, width: 90px}
+    - {value: targetAmount, label: Target, width: 110px}
+    - {value: actualAmount, label: Actual, width: 110px}
+    - {value: attainmentPct, label: 'Attain %', width: 90px}

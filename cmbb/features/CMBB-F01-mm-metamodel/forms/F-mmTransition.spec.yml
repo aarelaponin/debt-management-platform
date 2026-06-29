@@ -1,0 +1,36 @@
+form:
+  id: mmTransition
+  name: CM - Lifecycle Transition
+  table: mmTransition
+  description: 'CMBB metamodel: Lifecycle Transition (CAD-CMBB s2.2)'
+sections:
+- label: Transition
+  columns: 2
+  fields:
+  - id: caseType
+    type: select
+    label: Case type
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: fromState
+    type: textfield
+    label: From state code
+    required: true
+  - id: toState
+    type: textfield
+    label: To state code
+    required: true
+  - id: guardRefs
+    type: textfield
+    label: Guard refs (comma-separated)
+  - id: actorRoles
+    type: textfield
+    label: Actor roles
+  - id: version
+    type: textfield
+    label: Lifecycle version
+    storeNumeric: true

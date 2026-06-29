@@ -1,0 +1,33 @@
+form:
+  id: cmEnfActionRun
+  name: DM - Enforcement Sweep Run
+  table: cmEnfActionRun
+  description: 'EnforcementActionEngine SWEEP trigger + audit log (DM-FR-030, BR-DM-046). Cron or console POSTs a row with a sweepMode: PUBLISH (generate the debtor list for eligible cases), AGENT_ALERT (flag agents past their reporting interval), RELEASE (unpublish + lift measures on resolved cases), CONFIRM (poll pending external/judicial actions). asOf (blank = now) gives deterministic time-travel.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.EnforcementActionEngine
+  properties:
+    mode: SWEEP
+  runOn: create
+sections:
+- label: Run
+  columns: 2
+  fields:
+  - id: sweepMode
+    type: textfield
+    label: Sweep mode (PUBLISH/AGENT_ALERT/RELEASE/CONFIRM)
+    required: true
+  - id: asOf
+    type: textfield
+    label: As-of (ISO yyyy-MM-ddTHH:mm:ss; blank = now)
+  - id: processedCount
+    type: textfield
+    label: Records processed (set by engine)
+    storeNumeric: true
+  - id: actedCount
+    type: textfield
+    label: Records acted on (set by engine)
+    storeNumeric: true
+  - id: result
+    type: textarea
+    label: Detail (set by engine)
+    rows: 2

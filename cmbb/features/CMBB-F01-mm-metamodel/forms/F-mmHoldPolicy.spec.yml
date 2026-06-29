@@ -1,0 +1,61 @@
+form:
+  id: mmHoldPolicy
+  name: CM - Hold Policy
+  table: mmHoldPolicy
+  description: 'CMBB metamodel: Hold Policy (CAD-CMBB s2.2)'
+sections:
+- label: Policy
+  columns: 2
+  fields:
+  - id: caseType
+    type: select
+    label: Case type
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: holdType
+    type: select
+    label: Hold type
+    lookup:
+      formDefId: mdHoldType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: scope
+    type: select
+    label: Scope
+    static_options:
+    - value: COLLECTION
+      label: Collection
+    - value: DISBURSEMENT
+      label: Disbursement
+    - value: OFFSET
+      label: Offset exclusion
+    - value: CORRESPONDENCE_SUPPRESS
+      label: Correspondence suppression
+    - value: ENFORCEMENT_SUPPRESS
+      label: Enforcement suppression
+    required: true
+  - id: disputeEffect
+    type: select
+    label: Dispute effect
+    static_options:
+    - value: FULL_SUSPEND
+      label: Full suspension
+    - value: NO_NEW_INSTRUMENTS
+      label: No new instruments
+    - value: CONTINUE
+      label: Continue
+- label: Automation
+  columns: 1
+  fields:
+  - id: autoAssertRule
+    type: textarea
+    label: Auto-assert rule
+  - id: autoReleaseRule
+    type: textarea
+    label: Auto-release rule

@@ -1,0 +1,39 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Enforcement
+    permission_role: dm_officer
+    menus:
+    - type: crud
+      formDefId: dmAction
+      datalistId: list_dmAction
+      label: Enforcement actions
+    - type: crud
+      formDefId: dmAgent
+      datalistId: list_dmAgent
+      label: Agent appointments
+    - type: crud
+      formDefId: dmDebtorPub
+      datalistId: list_dmDebtorPub
+      label: Published debtors
+    - type: crud
+      formDefId: dmCharge
+      datalistId: list_dmCharge
+      label: Enforcement charges
+    # UX-QA3: cmEnfActionRun batch trigger moved to "Operations — batch runs"
+  - label: Enforcement config
+    permission_role: dm_policy_admin
+    menus:
+    - type: crud
+      formDefId: mdLegalFee
+      datalistId: list_mdLegalFee
+      label: Legal fee schedule
+    - type: crud
+      formDefId: mdAgentFee
+      datalistId: list_mdAgentFee
+      label: Agent fee schedule
+    - type: crud
+      formDefId: mdPublishRule
+      datalistId: list_mdPublishRule
+      label: Publication rules

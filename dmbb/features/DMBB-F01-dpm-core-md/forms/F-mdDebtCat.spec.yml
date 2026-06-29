@@ -1,0 +1,33 @@
+form:
+  id: mdDebtCat
+  name: DM - Debt Category (DPM D1)
+  table: mdDebtCat
+  description: 'DPM D1 debt-category bands (DM-FR-004, BR-DM-003). Configurable amount thresholds; seeded to the sta_v1 banding so the assigned category matches GoldMartClient.debtCategory.'
+sections:
+- label: Category band
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code (C1..C6)
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: bandOrder
+    type: textfield
+    label: Band order (1=lowest)
+    storeNumeric: true
+  - id: minAmount
+    type: textfield
+    label: Min consolidated amount (inclusive)
+    storeNumeric: true
+  - id: maxAmount
+    type: textfield
+    label: Max amount (exclusive; blank = unbounded)
+    storeNumeric: true
+  - id: description
+    type: textarea
+    label: Description
+    rows: 2

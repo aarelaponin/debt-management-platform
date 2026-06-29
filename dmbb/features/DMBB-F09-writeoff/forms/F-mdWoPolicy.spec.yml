@@ -1,0 +1,35 @@
+form:
+  id: mdWoPolicy
+  name: DM - Write-Off Policy
+  table: mdWoPolicy
+  description: 'DPM write-off policy thresholds (DM-FR-042/045, BR-DM-038): C1 auto-write-off ceiling, C2 passive-collection band, and the statutory collection period in years. Read by WriteOffEngine SWEEP.'
+sections:
+- label: Policy
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: c1Max
+    type: textfield
+    label: C1 auto-write-off ceiling (e.g. 30)
+    storeNumeric: true
+  - id: c2Min
+    type: textfield
+    label: C2 band lower (e.g. 30)
+    storeNumeric: true
+  - id: c2Max
+    type: textfield
+    label: C2 band upper (e.g. 100)
+    storeNumeric: true
+  - id: statutoryYears
+    type: textfield
+    label: Statutory collection period (years)
+    storeNumeric: true
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

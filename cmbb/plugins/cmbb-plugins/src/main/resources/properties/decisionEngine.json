@@ -1,0 +1,37 @@
+[
+    {
+        "title": "CMBB Decision Engine",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "options": [
+                    {
+                        "value": "DECIDE",
+                        "label": "DECIDE — authority-gate a cmDecision"
+                    },
+                    {
+                        "value": "LINK",
+                        "label": "LINK — record a cmLink (+ reciprocal)"
+                    },
+                    {
+                        "value": "INFO_REQUEST",
+                        "label": "INFO_REQUEST — park case, open PROVIDE_INFO task"
+                    },
+                    {
+                        "value": "INFO_RESPONSE",
+                        "label": "INFO_RESPONSE — resume case, close task"
+                    }
+                ]
+            },
+            {
+                "name": "recordId",
+                "label": "Record id (blank = newest unprocessed)",
+                "type": "textfield",
+                "required": "False"
+            }
+        ]
+    }
+]

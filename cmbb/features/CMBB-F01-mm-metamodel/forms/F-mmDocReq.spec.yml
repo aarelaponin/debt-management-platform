@@ -1,0 +1,37 @@
+form:
+  id: mmDocReq
+  name: CM - Required Document per State
+  table: mmDocReq
+  description: 'CMBB metamodel: Required Document per State (CAD-CMBB s2.2)'
+sections:
+- label: Requirement
+  columns: 2
+  fields:
+  - id: caseType
+    type: select
+    label: Case type
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: stateCode
+    type: textfield
+    label: State code
+    required: true
+  - id: docClass
+    type: select
+    label: Document class
+    lookup:
+      formDefId: mdDocClass
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: required
+    type: checkbox
+    label: Required
+    static_options:
+    - value: 'true'
+      label: 'Yes'

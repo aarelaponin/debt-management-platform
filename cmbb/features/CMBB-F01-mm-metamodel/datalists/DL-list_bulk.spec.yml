@@ -1,0 +1,111 @@
+bulk_companion_lists:
+  description: list_* companion datalist for every metamodel/MD form (CRUD admin grids)
+  forms:
+  - formDefId: mmCaseType
+    listId: list_mmCaseType
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmState
+    listId: list_mmState
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmTransition
+    listId: list_mmTransition
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmAlloc
+    listId: list_mmAlloc
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmCoi
+    listId: list_mmCoi
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmSla
+    listId: list_mmSla
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmAuthority
+    listId: list_mmAuthority
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmHoldPolicy
+    listId: list_mmHoldPolicy
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmTaskRule
+    listId: list_mmTaskRule
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmCalendar
+    listId: list_mmCalendar
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmStatute
+    listId: list_mmStatute
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmDocReq
+    listId: list_mmDocReq
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmLinkType
+    listId: list_mmLinkType
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mmNotifRule
+    listId: list_mmNotifRule
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mdChannel
+    listId: list_mdChannel
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mdDecisionType
+    listId: list_mdDecisionType
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mdHoldType
+    listId: list_mdHoldType
+    columns: all-fields
+    actions:
+    - edit
+    - delete
+  - formDefId: mdDocClass
+    listId: list_mdDocClass
+    columns: all-fields
+    actions:
+    - edit
+    - delete

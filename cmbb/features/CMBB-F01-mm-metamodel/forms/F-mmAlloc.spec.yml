@@ -1,0 +1,47 @@
+form:
+  id: mmAlloc
+  name: CM - Allocation Policy
+  table: mmAlloc
+  description: 'CMBB metamodel: Allocation Policy (CAD-CMBB s2.2)'
+sections:
+- label: Policy
+  columns: 2
+  fields:
+  - id: caseType
+    type: select
+    label: Case type
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: supervisorMode
+    type: select
+    label: Supervisor mode
+    static_options:
+    - value: NONE
+      label: None
+    - value: REVIEW
+      label: Review
+    - value: APPROVE
+      label: Approve
+  - id: teamSupport
+    type: checkbox
+    label: Team support
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+- label: Rules
+  columns: 1
+  fields:
+  - id: criteria
+    type: textarea
+    label: 'Criteria (JSON: skill, workload, geography, round-robin)'
+  - id: reallocationRule
+    type: textarea
+    label: Re-allocation rule (justification + approval)

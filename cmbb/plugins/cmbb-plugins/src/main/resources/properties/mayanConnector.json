@@ -1,0 +1,33 @@
+[
+    {
+        "title": "CMBB Mayan Connector",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "options": [
+                    {
+                        "value": "PUSH",
+                        "label": "PUSH \u2014 register uploaded document (cmDoc)"
+                    },
+                    {
+                        "value": "GENERATE",
+                        "label": "GENERATE \u2014 ADG order (cmDocGen)"
+                    },
+                    {
+                        "value": "POSTAL",
+                        "label": "POSTAL \u2014 dispatch tracking (cmPostal)"
+                    }
+                ]
+            },
+            {
+                "name": "recordId",
+                "label": "Record id (blank = auto)",
+                "type": "textfield",
+                "required": "False"
+            }
+        ]
+    }
+]

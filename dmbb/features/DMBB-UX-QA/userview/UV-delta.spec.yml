@@ -1,0 +1,50 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Detail views
+    permission_role: dm_officer
+    menus:
+    - type: datalist
+      datalistId: list_enfActions
+      label: Enforcement actions
+    - type: datalist
+      datalistId: list_instalments
+      label: Instalment agreements
+  # UX-QA3: the batch sweep/run/check triggers (cron/admin ops, not officer day-to-day) consolidated
+  # out of their scattered officer categories into one admin Operations category.
+  - label: Operations — batch runs
+    permission_role: dm_policy_admin
+    menus:
+    - type: crud
+      formDefId: cmIdentRun
+      datalistId: list_cmIdentRun
+      label: Identification run
+    - type: crud
+      formDefId: cmEscalateRun
+      datalistId: list_cmEscalateRun
+      label: Escalation sweep
+    - type: crud
+      formDefId: cmInstComplianceRun
+      datalistId: list_cmInstComplianceRun
+      label: Instalment compliance sweep
+    - type: crud
+      formDefId: cmEnfActionRun
+      datalistId: list_cmEnfActionRun
+      label: Enforcement sweep
+    - type: crud
+      formDefId: cmWriteOffRun
+      datalistId: list_cmWriteOffRun
+      label: Write-off sweep
+    - type: crud
+      formDefId: cmDefAssessRun
+      datalistId: list_cmDefAssessRun
+      label: Default-assessment escalation run
+    - type: crud
+      formDefId: cmCollectionMiRun
+      datalistId: list_cmCollectionMiRun
+      label: Collection MI run
+    - type: crud
+      formDefId: cmStrategyCheck
+      datalistId: list_cmStrategyCheck
+      label: Strategy consistency check

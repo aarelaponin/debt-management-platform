@@ -1,0 +1,22 @@
+datalist:
+  id: list_cmCase_unassigned
+  name: 'Queue: Unassigned cases (supervisor)'
+  binder:
+    formDefId: cmCase
+  extraCondition: "c_assignmentStatus = 'UNASSIGNED'"
+  columns:
+  - {id: caseRef, label: Case ref}
+  - id: caseType
+    label: Type
+    formatter: {type: optionsValue, formDefId: mmCaseType, idColumn: c_code, labelColumn: c_name}
+  - {id: tin, label: TIN}
+  - {id: category, label: Category}
+  - {id: priority, label: Priority}
+  - id: dateCreated
+    label: Created
+    formatter: {type: date, format: dd/MM/yyyy}
+  sort: {column: dateCreated, desc: false}
+notes: >
+  WF-FR-007 supervisor routing target only; the full queue surface
+  (BR-WF-004 sort, SLA lights) is CMBB-F04. Gated to dm_supervisor in UV
+  delta.

@@ -1,0 +1,39 @@
+form:
+  id: dmAgentRpt
+  name: DM - Agent Activity Report (child)
+  table: dmAgentRpt
+  description: 'DMBB-owned 1:many activity report of a dmAgent appointment (BR-DM-046). On create the EnforcementActionEngine AGENT_REPORT records the recovered amount, computes commission (recovered x commissionRate, BR-DM-045), accumulates recoveredTotal/commissionTotal on the parent appointment, and stamps lastReportDate. agentApptId is the FormGrid foreignKey to the parent dmAgent id.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.EnforcementActionEngine
+  properties:
+    mode: AGENT_REPORT
+  runOn: create
+sections:
+- label: Report
+  columns: 2
+  fields:
+  - id: agentApptId
+    type: hidden
+    label: Appointment id (FK)
+  - id: reportDate
+    type: textfield
+    label: Report date (ISO yyyy-MM-dd)
+  - id: actionsTaken
+    type: textarea
+    label: Actions taken
+    rows: 2
+  - id: recoveredAmount
+    type: textfield
+    label: Recovered amount
+    storeNumeric: true
+  - id: evidenceRef
+    type: textfield
+    label: Evidence ref (Mayan)
+  - id: nextActions
+    type: textarea
+    label: Next planned actions
+    rows: 2
+  - id: commissionAmount
+    type: textfield
+    label: Commission on this recovery (set by engine)
+    storeNumeric: true

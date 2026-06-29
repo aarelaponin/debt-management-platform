@@ -1,0 +1,22 @@
+[
+    {
+        "title": "DMBB Debt Identification Job",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "value": "IDENTIFY",
+                "options": [
+                    { "value": "IDENTIFY", "label": "IDENTIFY — scan Gold + create DM cases (cmIdentRun)" }
+                ]
+            },
+            { "name": "recordId", "label": "cmIdentRun record id (blank = auto)", "type": "textfield", "required": "False" },
+            { "name": "minAmount", "label": "Min consolidated debt to identify", "type": "textfield", "value": "0" },
+            { "name": "readerUrl", "label": "sta_v1 JDBC URL", "type": "textfield", "value": "jdbc:clickhouse://localhost:8123/sta_v1" },
+            { "name": "readerUser", "label": "sta_v1 user", "type": "textfield", "value": "sta_reader" },
+            { "name": "readerPass", "label": "sta_v1 password", "type": "password", "value": "sta_reader_dev" }
+        ]
+    }
+]

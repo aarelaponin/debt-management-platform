@@ -1,0 +1,31 @@
+# ── Secrets / environment ────────────────────────────────────────────────
+# Never commit live secrets. .env.example IS tracked (it documents the shape).
+**/.env
+*.pem
+*.key
+*secret*
+*credential*
+
+# ── Build output ─────────────────────────────────────────────────────────
+# Maven bundles (the JARs are built from src/ via `mvn clean package`).
+**/target/
+*.jwa
+
+# ── Generated artefacts (derived; regenerate, don't commit) ──────────────
+# Forms/datalists/userviews are generated from the *.spec.yml sources via
+# scripts/gen_*.py — the specs are the source of truth, not the output.
+**/generated/
+
+# ── Python caches ────────────────────────────────────────────────────────
+**/__pycache__/
+*.pyc
+
+# ── IDE / OS ─────────────────────────────────────────────────────────────
+.idea/
+*.iml
+.DS_Store
+
+# ── Scratch ──────────────────────────────────────────────────────────────
+*.log
+*.bak
+~$*

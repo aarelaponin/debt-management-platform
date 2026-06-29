@@ -1,0 +1,53 @@
+form:
+  id: cmInfoRequest
+  name: CM - Pending Information Request
+  table: cmInfoRequest
+  description: 'GCMF §3.3-6 / REF-FR-031: request information from the taxpayer.
+    On create the DecisionEngine parks the case (OnHold envelope), opens a
+    PROVIDE_INFO task and queues a taxpayer notice. No re-initiation on response.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.DecisionEngine
+  properties:
+    mode: INFO_REQUEST
+  runOn: create
+sections:
+- label: Request
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: caseRef
+    type: textfield
+    label: Case reference
+    required: true
+  - id: tin
+    type: textfield
+    label: TIN
+  - id: infoNeeded
+    type: textarea
+    label: Information requested
+    required: true
+  - id: dueDays
+    type: textfield
+    label: Response window (days)
+    storeNumeric: true
+  - id: status
+    type: select
+    label: Status (set by engine)
+    static_options:
+    - value: OPEN
+      label: Open (awaiting response)
+    - value: RESPONDED
+      label: Responded
+    - value: EXPIRED
+      label: Expired
+  - id: priorState
+    type: textfield
+    label: Pre-hold state (set by engine)
+  - id: taskId
+    type: textfield
+    label: Linked task id (set by engine)
+  - id: result
+    type: textfield
+    label: Engine result (set by engine)

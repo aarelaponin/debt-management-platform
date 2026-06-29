@@ -1,0 +1,49 @@
+form:
+  id: cmDeadline
+  name: CM - Case Deadline (clock)
+  table: cmDeadline
+  description: 'SLA clock instance per case x mmSla row (CAD case_deadline; WF-FR-010..012). Managed by DeadlineEngine only.'
+sections:
+- label: Clock
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: clockCode
+    type: textfield
+    label: Clock code (mmSla)
+  - id: startedAt
+    type: textfield
+    label: Started at (ISO)
+  - id: dueAt
+    type: textfield
+    label: Due at (ISO)
+  - id: warnAt
+    type: textfield
+    label: Warn at (ISO, warnPct)
+  - id: critAt
+    type: textfield
+    label: Critical at (ISO, critPct)
+  - id: status
+    type: select
+    label: Status
+    static_options:
+    - {value: RUNNING, label: Running}
+    - {value: PAUSED, label: Paused}
+    - {value: MET, label: Met}
+    - {value: BREACHED, label: Breached}
+  - id: pausedAt
+    type: textfield
+    label: Paused at (ISO)
+  - id: pausedDays
+    type: textfield
+    label: Accumulated paused days
+    storeNumeric: true
+  - id: escalationLevel
+    type: textfield
+    label: Escalation level (0..maxLevels)
+    storeNumeric: true
+  - id: lastSweepAt
+    type: textfield
+    label: Last sweep (ISO)

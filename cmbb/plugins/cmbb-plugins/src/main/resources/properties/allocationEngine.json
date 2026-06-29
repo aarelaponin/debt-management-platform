@@ -1,0 +1,29 @@
+[
+    {
+        "title": "CMBB Allocation Engine",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "options": [
+                    { "value": "ASSIGN", "label": "ASSIGN — rule-based assignment (guardOpen chain)" },
+                    { "value": "REASSIGN", "label": "REASSIGN — process cmReassign order (form post-processor)" }
+                ]
+            },
+            {
+                "name": "caseId",
+                "label": "Case record id (ASSIGN; blank = origin process id)",
+                "type": "textfield",
+                "required": "False"
+            },
+            {
+                "name": "recordId",
+                "label": "cmReassign record id (REASSIGN; blank = auto-resolve)",
+                "type": "textfield",
+                "required": "False"
+            }
+        ]
+    }
+]

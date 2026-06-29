@@ -1,0 +1,29 @@
+form:
+  id: mdLegalFee
+  name: DM - Legal Fee Schedule
+  table: mdLegalFee
+  description: 'DPM legal-fee schedule per enforcement instrument (DM-FR-038, BR-DM-010). Read by EnforcementActionEngine INITIATE to raise a dmCharge when the instrument is costRecorded. Configurable per instrument and charge category.'
+sections:
+- label: Legal fee
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: instrument
+    type: textfield
+    label: Instrument code (mdInstrument; blank = default)
+  - id: feeAmount
+    type: textfield
+    label: Fee amount
+    storeNumeric: true
+  - id: chargeCategory
+    type: textfield
+    label: Charge category (separate ledger charge type)
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

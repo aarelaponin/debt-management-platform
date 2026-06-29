@@ -1,0 +1,18 @@
+[
+    {
+        "title": "DMBB Debtors List Engine",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "value": "EXTRACT",
+                "options": [
+                    { "value": "EXTRACT", "label": "EXTRACT — build a registry extract (dmDebtorsExtract)" }
+                ]
+            },
+            { "name": "recordId", "label": "Trigger record id (blank = auto)", "type": "textfield", "required": "False" }
+        ]
+    }
+]

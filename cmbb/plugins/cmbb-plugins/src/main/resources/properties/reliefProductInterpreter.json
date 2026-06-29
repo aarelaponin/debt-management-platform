@@ -1,0 +1,19 @@
+[
+    {
+        "title": "DMBB Relief Product Interpreter",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "value": "APPLY",
+                "options": [
+                    { "value": "APPLY", "label": "APPLY — process a new instalment application (dmInstAgr)" },
+                    { "value": "COMPLIANCE", "label": "COMPLIANCE — evaluate schedules (cmInstComplianceRun)" }
+                ]
+            },
+            { "name": "recordId", "label": "Trigger record id (blank = auto)", "type": "textfield", "required": "False" }
+        ]
+    }
+]

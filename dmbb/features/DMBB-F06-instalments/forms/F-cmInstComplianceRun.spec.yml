@@ -1,0 +1,33 @@
+form:
+  id: cmInstComplianceRun
+  name: DM - Instalment Compliance Run
+  table: cmInstComplianceRun
+  description: 'ReliefProductInterpreter COMPLIANCE trigger + audit log (DM-FR-025..027). Cron or console POSTs a row; the engine evaluates every ACTIVE instalment plan line vs paid within grace (BR-DM-025), flags AT_RISK, and on >= threshold consecutive misses auto-cancels (BR-DM-027) -> releases the ENFORCEMENT_SUPPRESS hold and opens a recovery debt case (BR-DM-029). asOf (blank = now) gives deterministic time-travel.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.ReliefProductInterpreter
+  properties:
+    mode: COMPLIANCE
+  runOn: create
+sections:
+- label: Run
+  columns: 2
+  fields:
+  - id: asOf
+    type: textfield
+    label: As-of (ISO yyyy-MM-ddTHH:mm:ss; blank = now)
+  - id: evaluatedCount
+    type: textfield
+    label: Active plans evaluated (set by engine)
+    storeNumeric: true
+  - id: cancelledCount
+    type: textfield
+    label: Plans auto-cancelled (set by engine)
+    storeNumeric: true
+  - id: atRiskCount
+    type: textfield
+    label: Plans flagged at-risk (set by engine)
+    storeNumeric: true
+  - id: result
+    type: textarea
+    label: Detail (set by engine)
+    rows: 2

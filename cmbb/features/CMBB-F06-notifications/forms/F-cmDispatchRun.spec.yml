@@ -1,0 +1,21 @@
+form:
+  id: cmDispatchRun
+  name: CM - Notification Dispatch Run
+  table: cmDispatchRun
+  description: Dispatcher trigger + audit log (FIS A1). Cron POSTs a row; result written
+    back.
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.NotificationDispatcher
+  properties:
+    mode: DISPATCH
+  runOn: create
+sections:
+- label: Run
+  columns: 2
+  fields:
+  - id: note
+    type: textfield
+    label: Note (optional)
+  - id: result
+    type: textfield
+    label: Result (set by engine)

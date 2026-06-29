@@ -1,0 +1,22 @@
+[
+    {
+        "title": "CMBB Event Emitter",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "value": "VERIFY",
+                "options": [
+                    { "value": "VERIFY", "label": "VERIFY — audit chain + KPI (cmChainCheck post-processor)" },
+                    { "value": "PROBE", "label": "PROBE — Gold mart read (cmGoldProbe post-processor)" }
+                ]
+            },
+            { "name": "recordId", "label": "Trigger record id (blank = auto)", "type": "textfield", "required": "False" },
+            { "name": "readerUrl", "label": "sta_v1 JDBC URL", "type": "textfield", "value": "jdbc:clickhouse://localhost:8123/sta_v1" },
+            { "name": "readerUser", "label": "sta_v1 user", "type": "textfield", "value": "sta_reader" },
+            { "name": "readerPass", "label": "sta_v1 password", "type": "password", "value": "sta_reader_dev" }
+        ]
+    }
+]

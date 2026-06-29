@@ -1,0 +1,34 @@
+form:
+  id: mdAgentFee
+  name: DM - Agent Fee Schedule
+  table: mdAgentFee
+  description: 'DPM agent fee schedule per debt category (DM-FR-037, BR-DM-045): fixed appointment fee + percentage commission on recovered amounts, plus the reporting interval (BR-DM-046). Read by EnforcementActionEngine AGENT_APPOINT/AGENT_REPORT/AGENT_ALERT.'
+sections:
+- label: Agent fee
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: category
+    type: textfield
+    label: Debt category (C4/C5; blank = default)
+  - id: appointmentFee
+    type: textfield
+    label: Appointment fee (fixed)
+    storeNumeric: true
+  - id: commissionRate
+    type: textfield
+    label: Commission rate (fraction of recovered, e.g. 0.10)
+    storeNumeric: true
+  - id: reportingIntervalDays
+    type: textfield
+    label: Reporting interval (days)
+    storeNumeric: true
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

@@ -1,0 +1,29 @@
+form:
+  id: cmDefAssessRun
+  name: DM - Default Assessment Escalation Run
+  table: cmDefAssessRun
+  description: 'DefaultAssessmentEngine ESCALATE trigger (DM-FR-056): for ASSESSED default assessments with no filing past the configurable non-filing grace period, the engine creates a DM debt case from the assessment amount and starts the enforcement envelope. asOf (blank = now) drives the deterministic grace clock.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.DefaultAssessmentEngine
+  properties:
+    mode: ESCALATE
+  runOn: create
+sections:
+- label: Run
+  columns: 2
+  fields:
+  - id: asOf
+    type: textfield
+    label: As-of (ISO yyyy-MM-ddTHH:mm:ss; blank = now)
+  - id: processedCount
+    type: textfield
+    label: Assessments scanned (set by engine)
+    storeNumeric: true
+  - id: escalatedCount
+    type: textfield
+    label: Cases created (set by engine)
+    storeNumeric: true
+  - id: result
+    type: textarea
+    label: Summary (set by engine)
+    rows: 2

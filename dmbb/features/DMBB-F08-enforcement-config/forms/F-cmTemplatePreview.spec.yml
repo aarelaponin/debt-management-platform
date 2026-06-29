@@ -1,0 +1,43 @@
+form:
+  id: cmTemplatePreview
+  name: DM - Template Preview
+  table: cmTemplatePreview
+  description: 'EnforcementConfigEngine PREVIEW trigger (DM-FR-040 preview-before-generation + DM-FR-041 consolidation). On create the engine loads the named mdTemplate and the debt case, populates merge fields from taxpayer/case/line data, and renders subject + body honouring the consolidation mode (mdNoticeRule default, overridable here). Renders only — it does not send.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.EnforcementConfigEngine
+  properties:
+    mode: PREVIEW
+  runOn: create
+sections:
+- label: Preview request
+  columns: 2
+  fields:
+  - id: templateCode
+    type: textfield
+    label: Template code (mdTemplate)
+    required: true
+  - id: debtCaseId
+    type: textfield
+    label: Debt case id (cmCase id)
+    required: true
+  - id: consolidationMode
+    type: textfield
+    label: Consolidation override (blank = mdNoticeRule default)
+- label: Rendered preview (set by engine)
+  columns: 1
+  fields:
+  - id: noticeCount
+    type: textfield
+    label: Notices that would be generated (set by engine)
+    storeNumeric: true
+  - id: renderedSubject
+    type: textfield
+    label: Rendered subject (set by engine)
+  - id: renderedBody
+    type: textarea
+    label: Rendered body (set by engine)
+    rows: 5
+  - id: result
+    type: textarea
+    label: Detail (set by engine)
+    rows: 2

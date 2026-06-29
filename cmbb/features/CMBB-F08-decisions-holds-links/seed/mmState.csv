@@ -1,0 +1,4 @@
+id,caseType,code,name,envelopeState,isTerminal,version,active
+TESTD-NEW,TESTD,NEW,New,New,,1,true
+TESTD-OPEN,TESTD,OPEN,Open,Open,,1,true
+TESTD-CLOSED,TESTD,CLOSED,Closed,Closed,true,1,true

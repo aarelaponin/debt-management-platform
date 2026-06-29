@@ -1,0 +1,103 @@
+form:
+  id: dmInstAgr
+  name: DM - Instalment Agreement
+  table: dmInstAgr
+  loadBinder: prefill        # configurable FormPrefillLoadBinder — config in prefill: below
+  prefill:
+    keySources:
+      - {source: requestParam, name: tin}
+    formId: cmCase
+    matchField: tin
+    filters:
+      - {field: caseType, op: eq, value: DM}
+      - {field: currentState, op: ne, value: CLOSED}
+    orderBy: amountAtStake
+    orderNumeric: true
+    related:
+      - {formId: dmDebt, keyFrom: id, alias: debt}
+    mappings:
+      - {from: key, to: tin}
+      - {from: id, to: debtCaseId}
+      - {from: 'debt.consolidatedAmount', to: totalDebt}
+  listColumns: [tin, totalDebt, durationMonths, monthlyAmount, status, complianceStatus]
+  description: 'DMBB instalment agreement (DM-FR-021..028). A taxpayer applies to settle a debt case in instalments; on create the ReliefProductInterpreter (APPLY) checks eligibility (category in product set, single active plan BR-DM-018, min instalment BR-DM-020), builds the dmInstLine schedule with projected reduced-rate interest, and either auto-approves within params (BR-DM-021 -> ACTIVE + ENFORCEMENT_SUPPRESS hold) or routes to authority (UNDER_REVIEW). debtCaseId links the plan to its cmCase debt case.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.ReliefProductInterpreter
+  properties:
+    mode: APPLY
+  runOn: create
+sections:
+- label: Application
+  columns: 2
+  fields:
+  # Prefilled by FormPrefillLoadBinder (loadBinder: prefill) from the debtor's open DM
+  # case when launched via "Set up instalment plan" (?tin=). tin/debtCaseId/totalDebt are
+  # filled at render; tin stays editable (not readonly) so the data-API create path the
+  # acceptance tests use still persists it. Officer only picks the duration.
+  - id: tin
+    type: textfield
+    label: TIN
+    required: true
+  - id: debtCaseId
+    type: textfield
+    label: Debt case (resolved from the taxpayer)
+    managed: true
+  - id: totalDebt
+    type: textfield
+    label: Total debt to settle (from the case)
+    storeNumeric: true
+    managed: true
+  - id: durationMonths
+    type: textfield
+    label: Requested duration (months)
+    storeNumeric: true
+    required: true
+  - id: status
+    type: textfield
+    label: Status
+    value: APPLIED
+    managed: true
+- label: Decision (set by engine)
+  columns: 2
+  fields:
+  - id: monthlyAmount
+    type: textfield
+    label: Monthly instalment
+    storeNumeric: true
+    managed: true
+  - id: totalInterest
+    type: textfield
+    label: Projected reduced-rate interest
+    storeNumeric: true
+    managed: true
+  - id: approvalRef
+    type: textfield
+    label: Approval ref (AUTO or authority decision)
+    managed: true
+  - id: complianceStatus
+    type: textfield
+    label: Compliance status
+    managed: true
+  - id: consecutiveMissed
+    type: textfield
+    label: Consecutive missed instalments
+    storeNumeric: true
+    managed: true
+  - id: recoveryCaseRef
+    type: textfield
+    label: Recovery case ref (on default)
+    managed: true
+- label: Schedule
+  columns: 1
+  fields:
+  - id: schedule
+    type: grid
+    label: Instalment schedule
+    formDefId: dmInstLine
+    foreignKey: instAgrId
+    columns:
+    - {value: seq, label: '#', width: 50px}
+    - {value: dueDate, label: Due date, width: 120px}
+    - {value: expectedAmount, label: Expected, width: 110px}
+    - {value: paidAmount, label: Paid, width: 110px}
+    - {value: status, label: Status, width: 90px}

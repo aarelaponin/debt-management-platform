@@ -1,0 +1,10 @@
+userview_delta:
+  userviewId: pfDemoConsole
+  name: Prefill Demo
+  categories:
+  - label: Operations
+    menus:
+    - type: crud
+      formDefId: pfDemo
+      datalistId: list_pfDemo
+      label: Prefill Demo

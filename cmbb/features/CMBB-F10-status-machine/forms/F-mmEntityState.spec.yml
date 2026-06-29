@@ -1,0 +1,55 @@
+form:
+  id: mmEntityState
+  name: CM - Entity Status (state machine)
+  table: mmEntityState
+  listColumns: [entity, scope, code, name, isInitial, isTerminal, active]
+  description: 'CMBB metamodel (ADR-003): one status of a subject/child entity lifecycle, scoped for
+    per-tax-type configurability. Read by StatusManager via MmConfigService (FormDataDao, never SQL).
+    scope resolution: taxType > caseType > DEFAULT (most-specific wins, wholesale).'
+sections:
+- label: Entity status
+  columns: 2
+  fields:
+  - id: entity
+    type: select
+    label: Entity
+    required: true
+    static_options:
+    - {value: dmDebt, label: dmDebt (stage)}
+    - {value: dmInstAgr, label: dmInstAgr (status)}
+    - {value: dmInstLine, label: dmInstLine (status)}
+    - {value: dmAction, label: dmAction (status)}
+    - {value: dmAgent, label: dmAgent (status)}
+    - {value: dmWriteOff, label: dmWriteOff (status)}
+    - {value: dmDefAssess, label: dmDefAssess (status)}
+  - id: scope
+    type: textfield
+    label: Scope (taxType / caseType / DEFAULT)
+    required: true
+  - id: code
+    type: textfield
+    label: Status code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: isInitial
+    type: checkbox
+    label: Initial status
+    static_options:
+    - {value: 'true', label: 'Yes'}
+  - id: isTerminal
+    type: checkbox
+    label: Terminal status
+    static_options:
+    - {value: 'true', label: 'Yes'}
+  - id: version
+    type: textfield
+    label: Lifecycle version
+    storeNumeric: true
+  - id: active
+    type: checkbox
+    label: Active
+    static_options:
+    - {value: 'true', label: 'Yes'}

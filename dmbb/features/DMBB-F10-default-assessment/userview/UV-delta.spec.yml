@@ -1,0 +1,27 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Default assessments
+    permission_role: dm_officer
+    menus:
+    - type: crud
+      formDefId: dmDefAssess
+      datalistId: list_dmDefAssess
+      label: Default assessments
+    - type: crud
+      formDefId: cmReturnFiled
+      datalistId: list_cmReturnFiled
+      label: Returns filed (replace)
+    # UX-QA3: cmDefAssessRun batch trigger moved to "Operations — batch runs"
+  - label: Default assessment config
+    permission_role: dm_policy_admin
+    menus:
+    - type: crud
+      formDefId: mdEstMethod
+      datalistId: list_mdEstMethod
+      label: Estimation methods
+    - type: crud
+      formDefId: mdDefAssessPolicy
+      datalistId: list_mdDefAssessPolicy
+      label: Assessment policy

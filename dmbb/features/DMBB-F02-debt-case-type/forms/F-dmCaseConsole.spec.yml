@@ -1,0 +1,75 @@
+form:
+  id: dmCaseConsole
+  name: DM - Debt Case
+  table: cmCase
+  listColumns: [caseRef, tin, category, amountAtStake, currentState, assignee]
+  description: 'DMBB debt-case composite screen over the CMBB-owned cmCase spine table (ADR-001 V2b). Spine subset + dmDebt 1:1 subform + dmLine grid. CrudMenu add = manual creation (DM-FR-003); managed fields are engine-set.'
+sections:
+- label: Case
+  columns: 2
+  fields:
+  - id: caseRef
+    type: textfield
+    label: Case reference
+    managed: true
+  - id: caseType
+    type: select
+    label: Case type
+    static_options:
+    - value: DM
+      label: Debt case
+  - id: tin
+    type: textfield
+    label: TIN
+    required: true
+  - id: origin
+    type: select
+    label: Origin
+    static_options:
+    - value: MANUAL
+      label: Manual
+    - value: SYSTEM
+      label: System detection
+    - value: ESCALATION
+      label: Escalation
+  - id: category
+    type: textfield
+    label: Debt category (C1-C6)
+    managed: true
+  - id: amountAtStake
+    type: textfield
+    label: Amount at stake
+    storeNumeric: true
+    managed: true
+  - id: currentState
+    type: textfield
+    label: Current state
+    managed: true
+  - id: assignee
+    type: textfield
+    label: Assignee
+    managed: true
+- label: Debt detail
+  columns: 1
+  fields:
+  - id: debtDetail
+    type: subform
+    label: Debt detail
+    formDefId: dmDebt
+- label: Debt lines
+  columns: 1
+  fields:
+  - id: debtLines
+    type: grid
+    label: Debt lines
+    formDefId: dmLine
+    foreignKey: caseId
+    columns:
+    - {value: taxType, label: Tax type, width: 80px}
+    - {value: yofa, label: Year, width: 60px}
+    - {value: amount, label: Total, width: 95px}
+    - {value: principal, label: Principal, width: 95px}
+    - {value: interest, label: Interest, width: 90px}
+    - {value: penalty, label: Penalty, width: 90px}
+    - {value: disputed, label: Disputed, width: 90px}
+    - {value: enforceable, label: Enforceable, width: 100px}

@@ -1,0 +1,4 @@
+id,code,category,appointmentFee,commissionRate,reportingIntervalDays,countryProfile,active
+AF-C4,AF-C4,C4,200,0.10,7,MLT,true
+AF-C5,AF-C5,C5,200,0.12,7,MLT,true
+AF-DEFAULT,AF-DEFAULT,,200,0.10,7,MLT,true

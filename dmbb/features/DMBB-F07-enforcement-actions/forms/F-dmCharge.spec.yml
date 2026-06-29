@@ -1,0 +1,34 @@
+form:
+  id: dmCharge
+  name: DM - Enforcement Charge (legal fee)
+  table: dmCharge
+  description: 'DMBB record of a separate charge raised by an enforcement action (DM-FR-038, BR-DM-010) — the hand-off record for the external ledger posting (SAD I-4, informational on the DMBB side). Written by the EnforcementActionEngine; chargeType LEGAL_FEE / AGENT_FEE, linked to the case and the action.'
+sections:
+- label: Charge
+  columns: 2
+  fields:
+  - id: debtCaseId
+    type: textfield
+    label: Debt case id (cmCase id)
+  - id: tin
+    type: textfield
+    label: TIN
+  - id: chargeType
+    type: textfield
+    label: Charge type (LEGAL_FEE/AGENT_FEE)
+  - id: instrument
+    type: textfield
+    label: Instrument / source
+  - id: actionId
+    type: textfield
+    label: Source action/appointment id
+  - id: amount
+    type: textfield
+    label: Amount
+    storeNumeric: true
+  - id: postedDate
+    type: textfield
+    label: Recorded date
+  - id: status
+    type: textfield
+    label: Status (RECORDED/POSTED)

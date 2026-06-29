@@ -1,0 +1,41 @@
+id,entity,scope,fromStatus,toStatus,guardRefs,actorRoles,version
+tr-line-dm-1,dmInstLine,DM,pending,paid,,,1
+tr-line-dm-2,dmInstLine,DM,pending,missed,,,1
+tr-line-dm-3,dmInstLine,DM,missed,paid,,,1
+tr-act-dm-1,dmAction,DM,INITIATED,EXECUTED,,,1
+tr-act-dm-2,dmAction,DM,INITIATED,SUBMITTED,,,1
+tr-act-dm-3,dmAction,DM,INITIATED,BLOCKED,,,1
+tr-act-dm-4,dmAction,DM,INITIATED,REFERRED,,,1
+tr-act-dm-5,dmAction,DM,SUBMITTED,CONFIRMED,,,1
+tr-act-dm-6,dmAction,DM,SUBMITTED,FAILED,,,1
+tr-act-dm-7,dmAction,DM,INITIATED,FAILED,,,1
+tr-wo-dm-1,dmWriteOff,DM,SUBMITTED,UNDER_REVIEW,,,1
+tr-wo-dm-2,dmWriteOff,DM,SUBMITTED,POSTED,,,1
+tr-wo-dm-3,dmWriteOff,DM,UNDER_REVIEW,APPROVED,evidencePresent,,1
+tr-wo-dm-4,dmWriteOff,DM,UNDER_REVIEW,REJECTED,,,1
+tr-wo-dm-5,dmWriteOff,DM,APPROVED,POSTED,,,1
+tr-wo-dm-6,dmWriteOff,DM,SUBMITTED,REJECTED,,,1
+tr-wo-dm-7,dmWriteOff,DM,UNDER_REVIEW,POSTED,,,1
+tr-da-dm-1,dmDefAssess,DM,DRAFT,ASSESSED,,,1
+tr-da-dm-2,dmDefAssess,DM,DRAFT,NEEDS_JUSTIFICATION,,,1
+tr-da-dm-3,dmDefAssess,DM,NEEDS_JUSTIFICATION,ASSESSED,,,1
+tr-da-dm-4,dmDefAssess,DM,ASSESSED,REPLACED,,,1
+tr-da-dm-5,dmDefAssess,DM,ASSESSED,ESCALATED,,,1
+tr-da-dm-6,dmDefAssess,DM,DRAFT,REPLACED,,,1
+tr-da-dm-7,dmDefAssess,DM,NEEDS_JUSTIFICATION,REPLACED,,,1
+tr-ia-dm-1,dmInstAgr,DM,APPLIED,ACTIVE,,,1
+tr-ia-dm-2,dmInstAgr,DM,APPLIED,UNDER_REVIEW,,,1
+tr-ia-dm-3,dmInstAgr,DM,APPLIED,REJECTED,,,1
+tr-ia-dm-4,dmInstAgr,DM,UNDER_REVIEW,ACTIVE,,,1
+tr-ia-dm-5,dmInstAgr,DM,UNDER_REVIEW,REJECTED,,,1
+tr-ia-dm-6,dmInstAgr,DM,ACTIVE,COMPLETED,,,1
+tr-ia-dm-7,dmInstAgr,DM,ACTIVE,CANCELLED,,,1
+tr-debt-dm-1,dmDebt,DM,Identified,Reminder,,,1
+tr-debt-dm-2,dmDebt,DM,Reminder,Demand notice,,,1
+tr-debt-dm-3,dmDebt,DM,Demand notice,Final demand,,,1
+tr-debt-dm-4,dmDebt,DM,Final demand,Bank garnishing,,,1
+tr-debt-dm-5,dmDebt,DM,Bank garnishing,Field enforcement,,,1
+tr-debt-vat-1,dmDebt,VAT,Identified,Demand notice,,,1
+tr-debt-vat-2,dmDebt,VAT,Demand notice,Final demand,,,1
+tr-debt-vat-3,dmDebt,VAT,Final demand,Bank garnishing,,,1
+tr-debt-vat-4,dmDebt,VAT,Bank garnishing,Field enforcement,,,1

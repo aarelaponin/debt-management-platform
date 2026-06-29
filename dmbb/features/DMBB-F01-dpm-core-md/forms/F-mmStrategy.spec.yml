@@ -1,0 +1,51 @@
+form:
+  id: mmStrategy
+  name: DM - Collection Strategy (DPM D2)
+  table: mmStrategy
+  description: 'DPM D2 collection strategy header: (segment × category) → ordered escalation steps (mmEscStep). Effective-dated + versioned (grandfathering, bind-at-case-creation).'
+sections:
+- label: Strategy
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: segment
+    type: select
+    label: Taxpayer segment
+    static_options:
+    - value: ALL
+      label: All
+    - value: COMPANY
+      label: Company
+    - value: INDIVIDUAL
+      label: Individual
+  - id: categoryFloor
+    type: textfield
+    label: Applies from category (floor, e.g. C2)
+  - id: effectiveFrom
+    type: date
+    label: Effective from
+  - id: effectiveTo
+    type: date
+    label: Effective to (blank = open)
+  - id: version
+    type: textfield
+    label: Version
+  - id: active
+    type: select
+    label: Active
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+    - value: 'false'
+      label: 'No'
+  - id: description
+    type: textarea
+    label: Description
+    rows: 2

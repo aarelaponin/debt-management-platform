@@ -1,0 +1,14 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  # ADR-004 §6 — the configuration workspace entry. Maps to the operational
+  # "Collection settings" tier (gen_userview BUCKET); the Workflows CRUD opens the
+  # 6-section dmWorkflow workspace (Definition + editable escalation ladder + concern tabs).
+  - label: Workflow configuration
+    permission_role: dm_collection_admin
+    menus:
+    - type: crud
+      formDefId: dmWorkflow
+      datalistId: list_dmWorkflow
+      label: Workflows

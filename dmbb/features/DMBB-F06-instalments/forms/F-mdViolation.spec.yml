@@ -1,0 +1,31 @@
+form:
+  id: mdViolation
+  name: DM - Instalment Default Policy
+  table: mdViolation
+  description: 'DPM default policy for instalment compliance (DM-FR-025..027, BR-DM-025..027). Grace days before a due line counts as missed, and the consecutive-miss threshold that auto-cancels a plan. Read by ReliefProductInterpreter COMPLIANCE.'
+sections:
+- label: Default policy
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: graceDays
+    type: textfield
+    label: Grace days after due date
+    storeNumeric: true
+  - id: consecutiveMissThreshold
+    type: textfield
+    label: Consecutive misses that cancel the plan
+    storeNumeric: true
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

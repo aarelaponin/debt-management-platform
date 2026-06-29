@@ -1,0 +1,31 @@
+form:
+  id: cmIdentRun
+  name: DM - Identification Run
+  table: cmIdentRun
+  description: 'DebtIdentificationJob IDENTIFY trigger + audit log (DM-FR-001/002). Cron or console POSTs a row; the job scans sta_v1, consolidates per TIN, dedups, and creates+starts a DM case per new debtor. Results written back.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.DebtIdentificationJob
+  properties:
+    mode: IDENTIFY
+  runOn: create
+sections:
+- label: Run
+  columns: 2
+  fields:
+  - id: minAmount
+    type: textfield
+    label: Min consolidated debt to identify (blank = property default)
+    storeNumeric: true
+  - id: createdCount
+    type: textfield
+    label: Cases created (set by engine)
+  - id: skippedCount
+    type: textfield
+    label: Skipped - dedup/below-threshold (set by engine)
+  - id: failedCount
+    type: textfield
+    label: Failed (set by engine)
+  - id: result
+    type: textarea
+    label: Detail (set by engine)
+    rows: 3

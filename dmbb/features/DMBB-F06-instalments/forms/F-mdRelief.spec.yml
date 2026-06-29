@@ -1,0 +1,42 @@
+form:
+  id: mdRelief
+  name: DM - Relief Product (instalment policy)
+  table: mdRelief
+  description: 'DPM relief-product config for instalment agreements (DM-FR-021, BR-DM-019..021). Eligible debt categories, minimum instalment, and the auto-approval envelope (total < autoThreshold AND duration <= autoMaxMonths). Read by ReliefProductInterpreter APPLY.'
+sections:
+- label: Relief product
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: categories
+    type: textfield
+    label: Eligible categories (CSV, e.g. C3,C4,C5)
+  - id: minInstalment
+    type: textfield
+    label: Minimum monthly instalment
+    storeNumeric: true
+  - id: autoThreshold
+    type: textfield
+    label: Auto-approval debt ceiling
+    storeNumeric: true
+  - id: autoMaxMonths
+    type: textfield
+    label: Auto-approval max duration (months)
+    storeNumeric: true
+  - id: maxDurationMonths
+    type: textfield
+    label: Maximum allowed duration (months)
+    storeNumeric: true
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

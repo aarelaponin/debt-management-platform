@@ -1,0 +1,18 @@
+userview_delta:
+  userviewId: cmbbConsole
+  name: CMBB Console
+  categories:
+  - label: Allocation
+    permission_role: dm_supervisor
+    menus:
+    - type: crud
+      formDefId: mdOfficerProfile
+      datalistId: list_mdOfficerProfile
+      label: Officer profiles
+    - type: crud
+      formDefId: cmReassign
+      datalistId: list_cmReassign
+      label: Reassignment (single/bulk)
+    - type: datalist
+      datalistId: list_cmCase_unassigned
+      label: Unassigned cases (queue)

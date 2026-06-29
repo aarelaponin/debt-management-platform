@@ -1,0 +1,25 @@
+datalist:
+  id: list_instalmentCompliance
+  name: Instalment compliance (MI)
+  binder:
+    type: jdbc
+    primaryKey: status
+    sql: >-
+      SELECT COALESCE(NULLIF(g.c_status,''),'-') AS status,
+             COUNT(*) AS agreements,
+             SUM(COALESCE(NULLIF(g.c_totaldebt,'')::numeric,0)) AS total_debt,
+             ROUND(100.0 * SUM(CASE WHEN g.c_status='ACTIVE' THEN 1 ELSE 0 END)
+                   / NULLIF(COUNT(*),0), 1) AS active_pct
+      FROM app_fd_dminstagr g
+      WHERE ('#requestParam.fstat#' = '' OR COALESCE(NULLIF(g.c_status,''),'-') = '#requestParam.fstat#')
+      GROUP BY g.c_status ORDER BY agreements DESC
+  columns:
+  - {id: status, label: Plan status, drill: {to: list_instalments, hrefColumn: status, hrefParam: fstat}}
+  - {id: agreements, label: Agreements}
+  - {id: total_debt, label: Total debt}
+  - {id: active_pct, label: 'Active % (overall)'}
+  filters:
+  - {id: status, label: Plan status, type: select, param: fstat, options: [ACTIVE, UNDER_REVIEW, REJECTED, CANCELLED, APPLIED]}
+  rowActions:
+  - {label: View agreements, to: list_instalments, hrefColumn: status, hrefParam: fstat}
+notes: 'DM-FR-048 (instalment compliance rate) / RPT-FR-011. Over dmInstAgr (F06): ACTIVE/UNDER_REVIEW/REJECTED/CANCELLED mix.'

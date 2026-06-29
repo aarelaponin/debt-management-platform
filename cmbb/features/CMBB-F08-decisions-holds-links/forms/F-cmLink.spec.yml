@@ -1,0 +1,56 @@
+form:
+  id: cmLink
+  name: CM - Case Link
+  table: cmLink
+  description: 'GCMF §3.3-10 / E4: a typed relation between this case and another
+    case (or decision). On create the DecisionEngine validates the link type against
+    mmLinkType.targetCaseTypes and writes the reciprocal row.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.DecisionEngine
+  properties:
+    mode: LINK
+  runOn: create
+sections:
+- label: Link
+  columns: 2
+  fields:
+  - id: fromCaseId
+    type: hidden
+    label: fromCaseId
+  - id: fromCaseRef
+    type: textfield
+    label: From case reference
+    required: true
+  - id: linkType
+    type: select
+    label: Link type
+    lookup:
+      formDefId: mmLinkType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: toCaseRef
+    type: textfield
+    label: To case reference
+    required: true
+  - id: toCaseId
+    type: textfield
+    label: To case id (resolved by engine)
+  - id: decisionId
+    type: textfield
+    label: Related decision id (optional)
+  - id: reciprocal
+    type: select
+    label: Reciprocal written (set by engine)
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+    - value: 'false'
+      label: 'No (target not yet present)'
+  - id: note
+    type: textarea
+    label: Note
+  - id: result
+    type: textfield
+    label: Engine result (set by engine)

@@ -1,0 +1,17 @@
+[
+    {
+        "title": "DMBB Payment Engine",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "value": "POST",
+                "options": [
+                    { "value": "POST", "label": "POST — record a payment and reduce the debt (dmPayment)" }
+                ]
+            },
+            { "name": "recordId", "label": "Trigger record id (blank = auto)", "type": "textfield", "required": "False" }
+        ]
+    }
+]

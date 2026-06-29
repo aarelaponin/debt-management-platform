@@ -1,0 +1,36 @@
+form:
+  id: cmInfoResponse
+  name: CM - Pending Information Response
+  table: cmInfoResponse
+  description: 'GCMF §3.3-6: record the taxpayer response to a pending-information
+    request. On create the DecisionEngine resumes the case to its pre-hold state and
+    closes the PROVIDE_INFO task — the case is never re-initiated.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.DecisionEngine
+  properties:
+    mode: INFO_RESPONSE
+  runOn: create
+sections:
+- label: Response
+  columns: 2
+  fields:
+  - id: requestId
+    type: textfield
+    label: Information request id
+    required: true
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: caseRef
+    type: textfield
+    label: Case reference
+  - id: responseSummary
+    type: textarea
+    label: Response summary
+    required: true
+  - id: receivedBy
+    type: textfield
+    label: Received by
+  - id: result
+    type: textfield
+    label: Engine result (set by engine)

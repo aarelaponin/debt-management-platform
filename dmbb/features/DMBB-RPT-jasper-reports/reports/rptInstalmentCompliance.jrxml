@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="rptInstalmentCompliance" language="java" pageWidth="595" pageHeight="842"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <style name="Bold" fontName="SansSerif" fontSize="10">
+        <conditionalStyle>
+            <conditionExpression><![CDATA["TOTAL".equals($F{line_type})]]></conditionExpression>
+            <style isBold="true" backcolor="#EEEEEE" mode="Opaque"><box><topPen lineWidth="0.5"/></box></style>
+        </conditionalStyle>
+    </style>
+    <queryString>
+        <![CDATA[
+        SELECT status, line_type, agreements, total_debt, sortkey FROM (
+          SELECT COALESCE(NULLIF(g.c_status,''),'-') AS status, 'DETAIL' AS line_type, COUNT(*)::int AS agreements,
+                 COALESCE(SUM(COALESCE(NULLIF(g.c_totaldebt,'')::numeric,0)),0) AS total_debt, 1 AS sortkey
+          FROM app_fd_dminstagr g GROUP BY 1
+          UNION ALL
+          SELECT 'TOTAL','TOTAL', COUNT(*)::int,
+                 COALESCE(SUM(COALESCE(NULLIF(g.c_totaldebt,'')::numeric,0)),0), 9
+          FROM app_fd_dminstagr g
+        ) q ORDER BY sortkey, agreements DESC
+        ]]>
+    </queryString>
+    <field name="status" class="java.lang.String"/>
+    <field name="line_type" class="java.lang.String"/>
+    <field name="agreements" class="java.lang.Integer"/>
+    <field name="total_debt" class="java.math.BigDecimal"/>
+    <title>
+        <band height="58">
+            <staticText><reportElement x="0" y="0" width="555" height="24"/><textElement><font fontName="SansSerif" size="16" isBold="true"/></textElement><text><![CDATA[MTCA — Instalment Compliance Report]]></text></staticText>
+            <staticText><reportElement x="0" y="26" width="400" height="14"/><textElement><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[Instalment agreements by status (RPT-FR-011)]]></text></staticText>
+            <textField pattern="dd MMM yyyy HH:mm"><reportElement x="355" y="26" width="200" height="14"/><textElement textAlignment="Right"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression></textField>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="20">
+            <staticText><reportElement x="0" y="0" width="275" height="18"/><textElement verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Plan status]]></text></staticText>
+            <staticText><reportElement x="275" y="0" width="120" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Agreements]]></text></staticText>
+            <staticText><reportElement x="395" y="0" width="160" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Total debt (EUR)]]></text></staticText>
+            <line><reportElement x="0" y="18" width="555" height="1"/></line>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="18">
+            <textField><reportElement style="Bold" x="0" y="0" width="275" height="16"/><textElement verticalAlignment="Middle"/><textFieldExpression class="java.lang.String"><![CDATA[$F{status}]]></textFieldExpression></textField>
+            <textField><reportElement style="Bold" x="275" y="0" width="120" height="16"/><textElement textAlignment="Right" verticalAlignment="Middle"/><textFieldExpression class="java.lang.Integer"><![CDATA[$F{agreements}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.00"><reportElement style="Bold" x="395" y="0" width="160" height="16"/><textElement textAlignment="Right" verticalAlignment="Middle"/><textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{total_debt}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="16"><textField><reportElement x="355" y="0" width="200" height="14"/><textElement textAlignment="Right"><font fontName="SansSerif" size="8"/></textElement><textFieldExpression class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression></textField></band>
+    </pageFooter>
+</jasperReport>

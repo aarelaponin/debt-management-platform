@@ -1,0 +1,32 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  # DASH: left OPEN (no permission_role) — these read-only MI aggregate lists are the data source
+  # the three role-gated dashboards fetch same-origin, so every dashboard tier must read them.
+  - label: Collection MI
+    menus:
+    - type: crud
+      formDefId: dmCollectionPlan
+      datalistId: list_dmCollectionPlan
+      label: Collection plans
+    # UX-QA3: cmCollectionMiRun batch trigger moved to "Operations — batch runs"
+    - type: datalist
+      datalistId: list_debtByCategory
+      label: Debt by category
+    - type: datalist
+      datalistId: list_debtAging
+      label: Debt aging analysis
+    - type: datalist
+      datalistId: list_recoveryByAction
+      label: Recovery by action
+    - type: datalist
+      datalistId: list_instalmentCompliance
+      label: Instalment compliance
+  - label: Collection MI config
+    permission_role: dm_policy_admin
+    menus:
+    - type: crud
+      formDefId: mdCollectionParam
+      datalistId: list_mdCollectionParam
+      label: Recovery rate parameters

@@ -1,0 +1,85 @@
+form:
+  id: dmWriteOff
+  name: DM - Write-Off Record
+  table: dmWriteOff
+  listColumns: [tin, amount, woType, status, approvalLevel, postedDate]
+  description: 'DMBB write-off record linked to a DM debt case (DM-FR-042..046). On create the WriteOffEngine SUBMIT applies the evidence guard (BR-DM-039) and delegation routing (BR-DM-037): a C1_AUTO write-off posts immediately, an APPROVED request is evidence-checked and routed to an approver level by amount (then posted via cmWriteOffApprove). On posting the debt case is closed and dmDebt.writeOffStatus is stamped — the case + history are preserved (DM-FR-046).'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.WriteOffEngine
+  properties:
+    mode: SUBMIT
+  runOn: create
+sections:
+- label: Request
+  columns: 2
+  fields:
+  - id: debtCaseId
+    type: textfield
+    label: Debt case id (cmCase id)
+    required: true
+  - id: tin
+    type: textfield
+    label: TIN
+    required: true
+  - id: amount
+    type: textfield
+    label: Write-off amount
+    storeNumeric: true
+    required: true
+  - id: woType
+    type: select
+    label: Write-off type
+    static_options:
+    - value: APPROVED
+      label: Approved (manual, evidence + approval)
+    - value: C1_AUTO
+      label: C1 automatic (uneconomic)
+    - value: STATUTORY
+      label: Statutory expiry (bulk)
+    - value: CLOSURE
+      label: Account-closure hand-off (STA)
+  - id: ground
+    type: select
+    label: Ground
+    lookup:
+      formDefId: mdWoGround
+      idColumn: code
+      labelColumn: name
+  - id: status
+    type: textfield
+    label: Status
+    value: SUBMITTED
+    managed: true
+- label: Evidence (BR-DM-039)
+  columns: 1
+  fields:
+  - id: enforcementHistorySummary
+    type: textarea
+    label: Enforcement history summary
+    rows: 2
+  - id: evidenceRef
+    type: textfield
+    label: Evidence of inability to collect (ref)
+  - id: rationale
+    type: textarea
+    label: Decision rationale
+    rows: 2
+  - id: closureRef
+    type: textfield
+    label: STA closure-case reference (DM-FR-044)
+- label: Decision (set by engine)
+  managed: true
+  columns: 2
+  fields:
+  - id: approvalLevel
+    type: textfield
+    label: Required approval level (DMO/SDO/DIRECTOR)
+  - id: approver
+    type: textfield
+    label: Approver
+  - id: postedDate
+    type: textfield
+    label: Posted date
+  - id: asOf
+    type: textfield
+    label: As-of

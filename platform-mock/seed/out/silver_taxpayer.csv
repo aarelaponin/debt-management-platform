@@ -1,0 +1,301 @@
+tin,tpform,name,reg_date,status,locality,email,phone
+100000H,I,Charles Azzopardi,2022-02-08,ACTIVE,Marsa,100000h@example.mt,+356 21683594
+100010A,C,Harbour Malta Hospitality Ltd,2017-08-22,ACTIVE,Gzira,100010a@example.mt,+356 21363199
+100014B,C,Calypso Malta Services Ltd,2024-06-06,ACTIVE,Birkirkara,100014b@example.mt,+356 21114544
+100022L,I,George Mifsud,2006-04-18,ACTIVE,Zabbar,100022l@example.mt,+356 21310742
+100028B,I,George Galea,2020-09-06,ACTIVE,Valletta,100028b@example.mt,+356 21288348
+100036G,C,Luzzu Luzzu Services Ltd,2005-12-22,ACTIVE,Rabat,100036g@example.mt,+356 21428919
+100045G,I,Charles Caruana,2018-07-10,ACTIVE,Valletta,100045g@example.mt,+356 21954526
+100052B,I,Charles Farrugia,1999-10-18,ACTIVE,Mosta,100052b@example.mt,+356 21864141
+100058G,I,Joseph Grech,1995-01-04,ACTIVE,Sliema,100058g@example.mt,+356 21444742
+100066A,I,Josephine Borg,2024-12-22,ACTIVE,Sliema,100066a@example.mt,+356 21815159
+100071A,I,Charles Grech,2020-03-10,ACTIVE,Gzira,100071a@example.mt,+356 21429123
+100077B,I,Charles Micallef,2009-02-08,ACTIVE,Rabat,100077b@example.mt,+356 21504579
+100086G,C,Luzzu Mediterranean Holdings Ltd,2001-12-10,ACTIVE,Rabat,100086g@example.mt,+356 21335770
+100091L,C,Atlas Calypso Imports Ltd,2014-07-22,ACTIVE,Zabbar,100091l@example.mt,+356 21963710
+100098M,C,Luzzu Falcon Services Ltd,2000-07-26,ACTIVE,Mosta,100098m@example.mt,+356 21954105
+100105A,I,Carmen Bugeja,2020-10-05,ACTIVE,Qormi,100105a@example.mt,+356 21140674
+100114G,I,Carmen Borg,1997-03-14,ACTIVE,Gzira,100114g@example.mt,+356 21838649
+100123B,I,Paul Grech,2024-01-22,ACTIVE,Zabbar,100123b@example.mt,+356 21429282
+100126L,I,David Mifsud,2006-01-13,ACTIVE,Victoria,100126l@example.mt,+356 21225918
+100133A,C,Falcon Malta Hospitality Ltd,2017-08-03,DEREGISTERED,Birkirkara,100133a@example.mt,+356 21277261
+100144G,I,Doris Grech,2009-02-01,ACTIVE,Marsa,100144g@example.mt,+356 21520771
+100147L,I,Mario Vella,2003-05-07,ACTIVE,Floriana,100147l@example.mt,+356 21913926
+100157B,I,Rita Camilleri,2010-12-13,ACTIVE,Zabbar,100157b@example.mt,+356 21257757
+100162M,I,Antoinette Micallef,1996-05-25,ACTIVE,Gzira,100162m@example.mt,+356 21846308
+100168L,C,Harbour Harbour Trading Ltd,2009-10-03,ACTIVE,Qormi,100168l@example.mt,+356 21827006
+100178B,I,David Galea,2005-08-11,ACTIVE,Valletta,100178b@example.mt,+356 21884386
+100183L,I,Charles Farrugia,1999-08-03,DEREGISTERED,Sliema,100183l@example.mt,+356 21429619
+100192M,C,Malta Luzzu Holdings Ltd,1996-01-28,ACTIVE,Floriana,100192m@example.mt,+356 21171592
+100196L,I,Charles Farrugia,2019-12-28,ACTIVE,Rabat,100196l@example.mt,+356 21219573
+100204G,C,Malta Phoenix Holdings Ltd,2023-02-13,DEREGISTERED,Zabbar,100204g@example.mt,+356 21607753
+100212M,I,Mario Grech,2016-03-12,ACTIVE,Zabbar,100212m@example.mt,+356 21861180
+100217H,I,Josephine Azzopardi,2013-08-23,ACTIVE,Birkirkara,100217h@example.mt,+356 21516336
+100228G,I,Mario Galea,2007-09-04,ACTIVE,Rabat,100228g@example.mt,+356 21285891
+100232A,I,John Caruana,2012-12-16,ACTIVE,Mosta,100232a@example.mt,+356 21138202
+100238A,I,Maria Camilleri,2022-03-22,ACTIVE,Birkirkara,100238a@example.mt,+356 21513200
+100246A,I,Maria Borg,1998-08-05,ACTIVE,Birkirkara,100246a@example.mt,+356 21887794
+100255A,I,Maria Farrugia,2000-05-20,ACTIVE,Rabat,100255a@example.mt,+356 21760793
+100262G,C,Mediterranean Phoenix Trading Ltd,2008-11-25,ACTIVE,Floriana,100262g@example.mt,+356 21496746
+100267M,I,John Camilleri,2003-05-24,ACTIVE,Qormi,100267m@example.mt,+356 21394586
+100273M,I,Maria Grech,2002-11-12,ACTIVE,Sliema,100273m@example.mt,+356 21636135
+100284A,I,David Borg,1997-12-04,ACTIVE,Birkirkara,100284a@example.mt,+356 21820560
+100288A,C,Crown Harbour Hospitality Ltd,2000-10-27,ACTIVE,Marsa,100288a@example.mt,+356 21511709
+100296B,I,Angela Micallef,2023-02-16,ACTIVE,Sliema,100296b@example.mt,+356 21140036
+100304L,I,Carmen Mifsud,2020-12-13,ACTIVE,Floriana,100304l@example.mt,+356 21765678
+100310H,C,Crown Crown Holdings Ltd,2001-03-19,ACTIVE,Qormi,100310h@example.mt,+356 21862746
+100317L,I,Carmen Azzopardi,2024-06-10,ACTIVE,Sliema,100317l@example.mt,+356 21532310
+100326G,I,Antoinette Camilleri,2023-06-07,ACTIVE,Gzira,100326g@example.mt,+356 21783626
+100332G,I,Carmen Grech,2004-12-18,ACTIVE,Qormi,100332g@example.mt,+356 21681260
+100338M,I,John Zammit,1996-10-25,ACTIVE,Victoria,100338m@example.mt,+356 21401924
+100346A,I,Rita Spiteri,2009-07-11,ACTIVE,Zabbar,100346a@example.mt,+356 21848187
+100353H,I,Angela Micallef,1998-01-02,DEREGISTERED,Rabat,100353h@example.mt,+356 21293670
+100361B,I,Paul Mifsud,2010-01-21,ACTIVE,Floriana,100361b@example.mt,+356 21639307
+100366G,I,John Borg,2013-11-06,ACTIVE,Rabat,100366g@example.mt,+356 21867676
+100372B,C,Luzzu Atlas Services Ltd,1999-02-04,DEREGISTERED,Mosta,100372b@example.mt,+356 21518358
+100382G,I,Angela Caruana,2014-05-05,ACTIVE,Victoria,100382g@example.mt,+356 21499316
+100388B,I,Maria Vella,2001-12-12,ACTIVE,Floriana,100388b@example.mt,+356 21140437
+100392L,C,Island Phoenix Construction Ltd,1997-11-08,ACTIVE,Marsa,100392l@example.mt,+356 21153799
+100400L,C,Phoenix Atlas Imports Ltd,1998-01-09,ACTIVE,Birkirkara,100400l@example.mt,+356 21727000
+100410B,I,Mario Vella,2010-09-20,ACTIVE,Birkirkara,100410b@example.mt,+356 21278020
+100415B,I,Antoinette Borg,2007-02-02,ACTIVE,Gzira,100415b@example.mt,+356 21940938
+100420L,I,Rita Vella,2013-07-03,ACTIVE,Gzira,100420l@example.mt,+356 21201247
+100430G,I,Angela Micallef,2000-05-01,ACTIVE,Gzira,100430g@example.mt,+356 21525332
+100435H,I,Mario Zammit,1999-07-19,ACTIVE,Valletta,100435h@example.mt,+356 21824068
+100441B,I,Carmen Bugeja,2024-01-10,ACTIVE,Victoria,100441b@example.mt,+356 21343166
+100449A,C,Mediterranean Atlas Holdings Ltd,2011-12-11,ACTIVE,Qormi,100449a@example.mt,+356 21616387
+100458G,C,Atlas Crown Construction Ltd,2009-05-25,ACTIVE,Valletta,100458g@example.mt,+356 21277360
+100465L,I,Joseph Caruana,1999-07-05,ACTIVE,Floriana,100465l@example.mt,+356 21826949
+100472G,C,Harbour Mediterranean Services Ltd,2022-02-05,ACTIVE,Qormi,100472g@example.mt,+356 21116265
+100477H,C,Falcon Atlas Hospitality Ltd,2006-08-05,ACTIVE,Qormi,100477h@example.mt,+356 21217823
+100485L,C,Mediterranean Luzzu Hospitality Ltd,2007-12-09,ACTIVE,Zabbar,100485l@example.mt,+356 21955296
+100494A,C,Crown Luzzu Holdings Ltd,2009-09-14,ACTIVE,Qormi,100494a@example.mt,+356 21636504
+100501M,I,John Zammit,1996-12-10,ACTIVE,Qormi,100501m@example.mt,+356 21327571
+100504L,I,Rita Spiteri,2006-02-07,DEREGISTERED,Zabbar,100504l@example.mt,+356 21826209
+100511L,I,Maria Camilleri,1998-02-19,ACTIVE,Mosta,100511l@example.mt,+356 21721438
+100521A,C,Falcon Harbour Imports Ltd,2006-04-11,ACTIVE,Rabat,100521a@example.mt,+356 21214400
+100525M,I,David Galea,2010-09-23,ACTIVE,Mosta,100525m@example.mt,+356 21573447
+100536M,C,Mediterranean Phoenix Trading Ltd,2012-03-02,ACTIVE,Zabbar,100536m@example.mt,+356 21225021
+100541A,I,John Caruana,1995-12-23,ACTIVE,Floriana,100541a@example.mt,+356 21395871
+100549G,I,Doris Zammit,2002-04-09,ACTIVE,Zabbar,100549g@example.mt,+356 21447906
+100554M,I,Rita Bugeja,2003-10-02,ACTIVE,Valletta,100554m@example.mt,+356 21252323
+100563B,C,Mediterranean Falcon Holdings Ltd,1995-09-09,ACTIVE,Birkirkara,100563b@example.mt,+356 21457332
+100567B,I,Mario Farrugia,2024-12-28,ACTIVE,Floriana,100567b@example.mt,+356 21691344
+100575L,I,Charles Micallef,2000-06-13,ACTIVE,Zabbar,100575l@example.mt,+356 21257998
+100583H,C,Mediterranean Atlas Imports Ltd,1995-08-13,ACTIVE,Qormi,100583h@example.mt,+356 21307979
+100591B,C,Mediterranean Atlas Services Ltd,2017-08-28,ACTIVE,Qormi,100591b@example.mt,+356 21373410
+100596M,C,Mediterranean Malta Imports Ltd,2000-01-12,ACTIVE,Floriana,100596m@example.mt,+356 21954302
+100603A,I,Joseph Borg,1995-10-12,ACTIVE,Floriana,100603a@example.mt,+356 21280946
+100613B,C,Malta Falcon Imports Ltd,2020-04-11,ACTIVE,Birkirkara,100613b@example.mt,+356 21376899
+100619M,C,Luzzu Malta Services Ltd,1997-07-02,ACTIVE,Zabbar,100619m@example.mt,+356 21248383
+100626H,C,Crown Harbour Services Ltd,2013-03-14,ACTIVE,Sliema,100626h@example.mt,+356 21566607
+100632M,I,Angela Bugeja,2021-10-28,ACTIVE,Mosta,100632m@example.mt,+356 21229398
+100637H,C,Malta Falcon Trading Ltd,1999-07-10,ACTIVE,Mosta,100637h@example.mt,+356 21625629
+100644G,C,Falcon Mediterranean Holdings Ltd,2018-02-09,ACTIVE,Qormi,100644g@example.mt,+356 21470373
+100651A,I,Antoinette Azzopardi,2012-07-13,ACTIVE,Floriana,100651a@example.mt,+356 21946473
+100660M,I,George Spiteri,1998-03-18,ACTIVE,Floriana,100660m@example.mt,+356 21277497
+100666G,C,Phoenix Calypso Holdings Ltd,1997-08-11,ACTIVE,Qormi,100666g@example.mt,+356 21882748
+100676H,C,Phoenix Calypso Services Ltd,2003-05-11,ACTIVE,Floriana,100676h@example.mt,+356 21727027
+100679L,I,Carmen Caruana,1996-05-02,ACTIVE,Sliema,100679l@example.mt,+356 21295740
+100690M,C,Crown Island Services Ltd,2021-12-23,ACTIVE,Qormi,100690m@example.mt,+356 21892158
+100694M,I,David Mifsud,2003-03-05,ACTIVE,Mosta,100694m@example.mt,+356 21921728
+100701B,I,Rita Farrugia,2015-11-03,ACTIVE,Qormi,100701b@example.mt,+356 21233784
+100707B,I,John Zammit,2006-03-02,ACTIVE,Floriana,100707b@example.mt,+356 21936299
+100717M,C,Phoenix Island Holdings Ltd,1997-09-15,ACTIVE,Zabbar,100717m@example.mt,+356 21853047
+100725A,I,David Mifsud,2022-11-26,ACTIVE,Qormi,100725a@example.mt,+356 21175330
+100728H,C,Mediterranean Harbour Hospitality Ltd,1999-01-22,ACTIVE,Zabbar,100728h@example.mt,+356 21174190
+100735H,I,Joseph Camilleri,2007-07-10,DEREGISTERED,Gzira,100735h@example.mt,+356 21189871
+100742G,C,Falcon Phoenix Construction Ltd,2016-04-05,ACTIVE,Sliema,100742g@example.mt,+356 21418265
+100751H,C,Island Crown Hospitality Ltd,2011-05-19,ACTIVE,Marsa,100751h@example.mt,+356 21107516
+100760B,I,Doris Caruana,2001-07-15,ACTIVE,Rabat,100760b@example.mt,+356 21922485
+100767M,I,Rita Borg,2024-03-20,ACTIVE,Zabbar,100767m@example.mt,+356 21706058
+100772G,I,Charles Micallef,2018-01-23,ACTIVE,Gzira,100772g@example.mt,+356 21360262
+100779A,I,Charles Farrugia,2017-04-01,ACTIVE,Mosta,100779a@example.mt,+356 21671236
+100785G,C,Harbour Crown Imports Ltd,1998-06-06,ACTIVE,Sliema,100785g@example.mt,+356 21260703
+100791G,C,Crown Harbour Services Ltd,2022-05-06,DEREGISTERED,Birkirkara,100791g@example.mt,+356 21522014
+100802G,C,Phoenix Harbour Trading Ltd,2009-02-25,ACTIVE,Gzira,100802g@example.mt,+356 21810913
+100809A,C,Atlas Luzzu Hospitality Ltd,2012-07-08,ACTIVE,Floriana,100809a@example.mt,+356 21474785
+100812L,C,Falcon Island Holdings Ltd,2001-10-18,ACTIVE,Sliema,100812l@example.mt,+356 21203689
+100823M,I,George Camilleri,2002-03-19,ACTIVE,Victoria,100823m@example.mt,+356 21303602
+100830A,I,Carmen Caruana,2008-11-26,ACTIVE,Marsa,100830a@example.mt,+356 21664462
+100834L,C,Harbour Atlas Holdings Ltd,2008-12-22,ACTIVE,Victoria,100834l@example.mt,+356 21716266
+100841A,I,Paul Micallef,2008-04-05,ACTIVE,Birkirkara,100841a@example.mt,+356 21959905
+100849G,I,Mario Zammit,2012-05-16,ACTIVE,Qormi,100849g@example.mt,+356 21292263
+100854A,I,Joseph Farrugia,2023-07-07,ACTIVE,Gzira,100854a@example.mt,+356 21482646
+100865G,I,Antoinette Vella,2017-08-04,ACTIVE,Victoria,100865g@example.mt,+356 21288476
+100869G,I,George Borg,2011-03-14,ACTIVE,Rabat,100869g@example.mt,+356 21301042
+100875L,C,Crown Malta Hospitality Ltd,1998-07-10,ACTIVE,Rabat,100875l@example.mt,+356 21148354
+100884A,I,Josephine Zammit,2010-11-12,ACTIVE,Marsa,100884a@example.mt,+356 21221881
+100890B,C,Crown Island Holdings Ltd,2019-04-26,ACTIVE,Victoria,100890b@example.mt,+356 21100744
+100900G,C,Crown Crown Holdings Ltd,2009-04-09,ACTIVE,Victoria,100900g@example.mt,+356 21966051
+100905H,I,Paul Grech,2023-02-16,ACTIVE,Valletta,100905h@example.mt,+356 21737587
+100912B,C,Calypso Malta Construction Ltd,2004-01-10,ACTIVE,Floriana,100912b@example.mt,+356 21144744
+100918G,C,Island Calypso Holdings Ltd,2006-05-01,ACTIVE,Marsa,100918g@example.mt,+356 21926694
+100928A,I,Antoinette Mifsud,2015-01-11,ACTIVE,Victoria,100928a@example.mt,+356 21195209
+100933L,C,Phoenix Island Construction Ltd,2009-10-28,ACTIVE,Marsa,100933l@example.mt,+356 21185166
+100938L,I,Doris Zammit,2001-05-27,ACTIVE,Zabbar,100938l@example.mt,+356 21407870
+100949M,C,Atlas Malta Holdings Ltd,2012-12-20,ACTIVE,Zabbar,100949m@example.mt,+356 21104774
+100956B,C,Luzzu Calypso Hospitality Ltd,2010-10-23,ACTIVE,Floriana,100956b@example.mt,+356 21237619
+100962H,I,Charles Azzopardi,1996-12-21,ACTIVE,Gzira,100962h@example.mt,+356 21718598
+100970M,I,Maria Micallef,1996-04-24,ACTIVE,Zabbar,100970m@example.mt,+356 21757128
+100976G,I,Josephine Grech,2016-09-22,ACTIVE,Gzira,100976g@example.mt,+356 21738080
+100980L,I,Charles Borg,2000-02-02,ACTIVE,Sliema,100980l@example.mt,+356 21938313
+100989A,C,Island Crown Trading Ltd,2012-08-01,DEREGISTERED,Sliema,100989a@example.mt,+356 21606165
+100994B,C,Luzzu Falcon Trading Ltd,1998-11-02,ACTIVE,Mosta,100994b@example.mt,+356 21350217
+101005B,C,Island Calypso Holdings Ltd,2005-01-24,ACTIVE,Marsa,101005b@example.mt,+356 21947729
+101009M,I,Rita Borg,2005-07-15,ACTIVE,Qormi,101009m@example.mt,+356 21962218
+101015L,I,John Camilleri,1998-02-11,DEREGISTERED,Victoria,101015l@example.mt,+356 21435398
+101026H,I,Doris Bugeja,1997-06-26,ACTIVE,Gzira,101026h@example.mt,+356 21185927
+101029H,C,Falcon Mediterranean Services Ltd,1995-10-20,ACTIVE,Gzira,101029h@example.mt,+356 21249989
+101037B,C,Island Falcon Holdings Ltd,2017-06-12,ACTIVE,Birkirkara,101037b@example.mt,+356 21784544
+101047L,I,Carmen Grech,2007-11-09,ACTIVE,Zabbar,101047l@example.mt,+356 21313168
+101052G,C,Luzzu Malta Hospitality Ltd,2000-08-16,ACTIVE,Marsa,101052g@example.mt,+356 21673719
+101058M,I,Antoinette Mifsud,2010-11-13,ACTIVE,Zabbar,101058m@example.mt,+356 21580134
+101064B,C,Luzzu Luzzu Imports Ltd,2010-12-13,ACTIVE,Rabat,101064b@example.mt,+356 21462703
+101072M,C,Falcon Falcon Imports Ltd,2018-09-05,ACTIVE,Zabbar,101072m@example.mt,+356 21838464
+101080B,I,Josephine Bugeja,2016-02-13,ACTIVE,Rabat,101080b@example.mt,+356 21109148
+101087L,C,Luzzu Island Holdings Ltd,2014-07-09,ACTIVE,Gzira,101087l@example.mt,+356 21783050
+101094H,I,Angela Mifsud,2000-08-20,ACTIVE,Zabbar,101094h@example.mt,+356 21804633
+101101M,I,Doris Zammit,2015-04-15,ACTIVE,Sliema,101101m@example.mt,+356 21300580
+101107L,I,Maria Vella,2021-07-04,ACTIVE,Zabbar,101107l@example.mt,+356 21672444
+101117L,I,George Borg,2005-09-12,ACTIVE,Qormi,101117l@example.mt,+356 21870909
+101123M,I,Angela Mifsud,2020-06-26,ACTIVE,Floriana,101123m@example.mt,+356 21296879
+101131H,I,Carmen Caruana,2020-10-24,ACTIVE,Victoria,101131h@example.mt,+356 21969782
+101136G,I,Doris Camilleri,2023-03-21,ACTIVE,Mosta,101136g@example.mt,+356 21306625
+101141M,C,Crown Harbour Construction Ltd,1996-08-12,ACTIVE,Valletta,101141m@example.mt,+356 21167723
+101151M,I,Charles Azzopardi,2019-03-07,ACTIVE,Sliema,101151m@example.mt,+356 21289220
+101157L,I,David Bugeja,2019-05-17,ACTIVE,Rabat,101157l@example.mt,+356 21985818
+101166A,I,Joseph Spiteri,2009-03-01,ACTIVE,Valletta,101166a@example.mt,+356 21806349
+101171A,C,Island Harbour Hospitality Ltd,1999-03-22,ACTIVE,Victoria,101171a@example.mt,+356 21798150
+101178M,I,Carmen Mifsud,2014-06-07,ACTIVE,Marsa,101178m@example.mt,+356 21755303
+101184H,I,David Grech,2014-11-07,ACTIVE,Zabbar,101184h@example.mt,+356 21263607
+101190A,C,Luzzu Phoenix Imports Ltd,2007-06-10,ACTIVE,Zabbar,101190a@example.mt,+356 21806791
+101198H,C,Phoenix Luzzu Trading Ltd,2008-01-20,ACTIVE,Mosta,101198h@example.mt,+356 21899179
+101207A,C,Crown Malta Trading Ltd,2019-11-27,DEREGISTERED,Floriana,101207a@example.mt,+356 21948139
+101211H,I,Paul Farrugia,2021-07-18,ACTIVE,Qormi,101211h@example.mt,+356 21834717
+101219M,I,David Galea,2011-06-19,ACTIVE,Gzira,101219m@example.mt,+356 21622922
+101228G,C,Falcon Crown Imports Ltd,2010-06-15,ACTIVE,Mosta,101228g@example.mt,+356 21401614
+101236A,I,George Galea,2002-10-15,ACTIVE,Marsa,101236a@example.mt,+356 21423841
+101243B,C,Phoenix Island Trading Ltd,2008-10-15,ACTIVE,Zabbar,101243b@example.mt,+356 21189386
+101248H,C,Calypso Crown Hospitality Ltd,2020-12-03,DEREGISTERED,Gzira,101248h@example.mt,+356 21182625
+101253H,I,Maria Galea,2005-10-19,ACTIVE,Victoria,101253h@example.mt,+356 21913299
+101260H,I,Josephine Spiteri,2015-05-02,ACTIVE,Marsa,101260h@example.mt,+356 21527344
+101269L,I,David Attard,2005-05-12,ACTIVE,Mosta,101269l@example.mt,+356 21569595
+101276A,C,Malta Phoenix Holdings Ltd,2009-02-13,ACTIVE,Mosta,101276a@example.mt,+356 21498795
+101282M,I,Maria Spiteri,1998-11-20,ACTIVE,Zabbar,101282m@example.mt,+356 21190305
+101289G,C,Falcon Atlas Imports Ltd,2020-07-24,DEREGISTERED,Victoria,101289g@example.mt,+356 21417636
+101296A,I,Maria Attard,2006-04-19,ACTIVE,Sliema,101296a@example.mt,+356 21821558
+101305H,I,George Galea,2017-06-24,ACTIVE,Birkirkara,101305h@example.mt,+356 21416958
+101310H,C,Malta Luzzu Hospitality Ltd,2020-11-22,ACTIVE,Mosta,101310h@example.mt,+356 21264417
+101320B,C,Island Calypso Services Ltd,1998-09-04,ACTIVE,Gzira,101320b@example.mt,+356 21258933
+101323H,I,Paul Galea,2019-05-23,ACTIVE,Qormi,101323h@example.mt,+356 21819902
+101333G,I,Antoinette Vella,2009-03-06,ACTIVE,Mosta,101333g@example.mt,+356 21152459
+101338B,I,Paul Camilleri,2007-04-27,ACTIVE,Marsa,101338b@example.mt,+356 21721700
+101346A,C,Falcon Crown Imports Ltd,1998-02-08,ACTIVE,Zabbar,101346a@example.mt,+356 21395861
+101352G,C,Calypso Phoenix Construction Ltd,2019-01-27,ACTIVE,Marsa,101352g@example.mt,+356 21907267
+101358B,C,Luzzu Falcon Trading Ltd,1999-05-12,ACTIVE,Rabat,101358b@example.mt,+356 21894229
+101369H,I,Maria Mifsud,2014-07-09,ACTIVE,Victoria,101369h@example.mt,+356 21684359
+101376B,I,John Galea,2020-08-10,ACTIVE,Marsa,101376b@example.mt,+356 21681743
+101383B,I,Doris Farrugia,2022-03-28,ACTIVE,Marsa,101383b@example.mt,+356 21602906
+101389L,I,Rita Mifsud,2000-12-07,ACTIVE,Valletta,101389l@example.mt,+356 21128181
+101396L,C,Falcon Phoenix Services Ltd,1996-07-13,ACTIVE,Victoria,101396l@example.mt,+356 21621025
+101401M,C,Falcon Mediterranean Services Ltd,2012-09-03,ACTIVE,Zabbar,101401m@example.mt,+356 21822145
+101410B,I,Maria Vella,1995-07-19,ACTIVE,Qormi,101410b@example.mt,+356 21283077
+101415M,I,Josephine Borg,1997-11-25,ACTIVE,Gzira,101415m@example.mt,+356 21333786
+101422G,I,Charles Vella,2018-02-19,ACTIVE,Rabat,101422g@example.mt,+356 21173009
+101431A,I,Angela Spiteri,2001-02-19,DEREGISTERED,Valletta,101431a@example.mt,+356 21431007
+101439M,C,Mediterranean Harbour Imports Ltd,2008-07-05,ACTIVE,Gzira,101439m@example.mt,+356 21594639
+101444L,C,Atlas Crown Imports Ltd,2021-07-11,ACTIVE,Rabat,101444l@example.mt,+356 21407476
+101452H,I,David Zammit,2018-06-23,ACTIVE,Victoria,101452h@example.mt,+356 21496450
+101457A,I,Rita Grech,2014-11-26,ACTIVE,Mosta,101457a@example.mt,+356 21800682
+101463M,I,Antoinette Grech,2009-11-17,ACTIVE,Mosta,101463m@example.mt,+356 21587165
+101474M,I,Carmen Spiteri,2013-09-07,ACTIVE,Valletta,101474m@example.mt,+356 21783315
+101477A,I,Joseph Farrugia,1998-11-26,ACTIVE,Birkirkara,101477a@example.mt,+356 21714316
+101485A,C,Malta Atlas Imports Ltd,1998-05-04,ACTIVE,Valletta,101485a@example.mt,+356 21394956
+101491B,I,Mario Caruana,2004-12-09,ACTIVE,Gzira,101491b@example.mt,+356 21242829
+101499H,I,David Attard,2016-01-18,ACTIVE,Mosta,101499h@example.mt,+356 21734869
+101509G,I,Doris Galea,1998-02-24,ACTIVE,Qormi,101509g@example.mt,+356 21796311
+101516G,I,Maria Borg,2005-08-19,ACTIVE,Gzira,101516g@example.mt,+356 21404453
+101520M,I,John Farrugia,2021-11-10,ACTIVE,Mosta,101520m@example.mt,+356 21983249
+101530L,I,Carmen Mifsud,2004-03-17,ACTIVE,Qormi,101530l@example.mt,+356 21297951
+101537B,I,David Farrugia,2004-05-06,ACTIVE,Rabat,101537b@example.mt,+356 21879525
+101540A,I,Doris Vella,2000-12-03,ACTIVE,Sliema,101540a@example.mt,+356 21117787
+101549M,I,Rita Farrugia,2007-06-08,ACTIVE,Victoria,101549m@example.mt,+356 21797404
+101556B,C,Calypso Phoenix Hospitality Ltd,2000-07-07,ACTIVE,Rabat,101556b@example.mt,+356 21779379
+101563B,I,Charles Galea,2024-11-25,ACTIVE,Sliema,101563b@example.mt,+356 21737717
+101568H,I,Carmen Micallef,2008-11-05,ACTIVE,Victoria,101568h@example.mt,+356 21838414
+101578L,C,Malta Luzzu Construction Ltd,2011-10-10,ACTIVE,Zabbar,101578l@example.mt,+356 21966940
+101584A,I,Paul Farrugia,2015-06-23,ACTIVE,Valletta,101584a@example.mt,+356 21543708
+101589M,I,Mario Bugeja,2019-03-12,ACTIVE,Floriana,101589m@example.mt,+356 21295366
+101598L,I,Mario Camilleri,2011-12-12,ACTIVE,Gzira,101598l@example.mt,+356 21106945
+101606M,C,Crown Harbour Imports Ltd,2012-12-27,ACTIVE,Gzira,101606m@example.mt,+356 21887595
+101614M,C,Phoenix Island Hospitality Ltd,2024-03-17,ACTIVE,Victoria,101614m@example.mt,+356 21837147
+101617B,I,Antoinette Mifsud,2024-07-14,ACTIVE,Mosta,101617b@example.mt,+356 21594985
+101626A,I,Carmen Micallef,2015-02-04,ACTIVE,Valletta,101626a@example.mt,+356 21974731
+101632G,I,Rita Camilleri,2019-07-03,ACTIVE,Marsa,101632g@example.mt,+356 21301666
+101638A,I,Josephine Zammit,2007-05-28,ACTIVE,Gzira,101638a@example.mt,+356 21250215
+101647G,I,David Bugeja,2011-08-25,ACTIVE,Marsa,101647g@example.mt,+356 21987194
+101656H,I,Angela Attard,1997-08-10,ACTIVE,Gzira,101656h@example.mt,+356 21856222
+101662L,I,Rita Grech,2012-04-20,ACTIVE,Sliema,101662l@example.mt,+356 21525194
+101669G,I,Charles Attard,2009-11-06,ACTIVE,Gzira,101669g@example.mt,+356 21599162
+101674B,I,Doris Camilleri,2023-02-11,ACTIVE,Gzira,101674b@example.mt,+356 21754764
+101680L,I,Doris Borg,2024-01-06,ACTIVE,Birkirkara,101680l@example.mt,+356 21775128
+101690G,I,Paul Micallef,2005-06-25,ACTIVE,Sliema,101690g@example.mt,+356 21198673
+101694G,I,Angela Spiteri,2019-01-14,ACTIVE,Zabbar,101694g@example.mt,+356 21276790
+101704B,I,Paul Farrugia,2010-08-19,ACTIVE,Victoria,101704b@example.mt,+356 21417937
+101709L,I,Antoinette Caruana,1999-02-21,ACTIVE,Rabat,101709l@example.mt,+356 21762284
+101718L,I,Rita Galea,1999-12-12,ACTIVE,Qormi,101718l@example.mt,+356 21685244
+101723L,I,Paul Caruana,1998-04-26,ACTIVE,Sliema,101723l@example.mt,+356 21931001
+101729H,I,Carmen Spiteri,1996-09-04,ACTIVE,Marsa,101729h@example.mt,+356 21892277
+101739L,I,Joseph Azzopardi,2004-05-02,ACTIVE,Zabbar,101739l@example.mt,+356 21446813
+101747B,C,Harbour Phoenix Services Ltd,2004-03-13,ACTIVE,Mosta,101747b@example.mt,+356 21859748
+101753M,C,Luzzu Falcon Hospitality Ltd,2023-02-22,ACTIVE,Zabbar,101753m@example.mt,+356 21313109
+101761L,I,David Bugeja,1998-08-14,ACTIVE,Gzira,101761l@example.mt,+356 21666041
+101768G,C,Calypso Luzzu Hospitality Ltd,1997-09-09,ACTIVE,Mosta,101768g@example.mt,+356 21708739
+101771M,I,Carmen Attard,2014-05-06,ACTIVE,Qormi,101771m@example.mt,+356 21658918
+101780H,I,Antoinette Vella,1996-07-06,ACTIVE,Birkirkara,101780h@example.mt,+356 21813147
+101789A,C,Malta Malta Holdings Ltd,2015-10-23,ACTIVE,Floriana,101789a@example.mt,+356 21727946
+101795A,I,Doris Micallef,2004-05-12,ACTIVE,Victoria,101795a@example.mt,+356 21571011
+101801H,I,Rita Azzopardi,1996-09-24,ACTIVE,Victoria,101801h@example.mt,+356 21282119
+101809G,I,Mario Galea,2020-12-10,ACTIVE,Victoria,101809g@example.mt,+356 21432455
+101813L,C,Malta Harbour Imports Ltd,2003-01-04,ACTIVE,Floriana,101813l@example.mt,+356 21202057
+101820A,C,Luzzu Malta Trading Ltd,2009-11-02,ACTIVE,Marsa,101820a@example.mt,+356 21226544
+101827L,I,Mario Zammit,2010-03-07,ACTIVE,Floriana,101827l@example.mt,+356 21886736
+101836B,C,Atlas Atlas Trading Ltd,2024-11-16,ACTIVE,Birkirkara,101836b@example.mt,+356 21817708
+101841L,I,Antoinette Zammit,2003-07-15,ACTIVE,Sliema,101841l@example.mt,+356 21871304
+101850B,I,Angela Bugeja,2014-01-11,DEREGISTERED,Rabat,101850b@example.mt,+356 21170767
+101856A,I,Doris Zammit,2012-11-14,ACTIVE,Victoria,101856a@example.mt,+356 21541530
+101863B,I,Charles Caruana,2010-10-18,ACTIVE,Marsa,101863b@example.mt,+356 21383548
+101872A,C,Harbour Falcon Hospitality Ltd,1996-12-23,ACTIVE,Victoria,101872a@example.mt,+356 21537108
+101877H,C,Phoenix Atlas Imports Ltd,2012-05-19,ACTIVE,Qormi,101877h@example.mt,+356 21377334
+101886L,I,Josephine Caruana,2010-06-24,DEREGISTERED,Birkirkara,101886l@example.mt,+356 21379431
+101893L,C,Malta Atlas Services Ltd,2018-10-23,ACTIVE,Rabat,101893l@example.mt,+356 21635664
+101898B,C,Crown Harbour Construction Ltd,2022-07-17,ACTIVE,Zabbar,101898b@example.mt,+356 21838797
+101905A,C,Falcon Malta Services Ltd,2004-10-18,ACTIVE,Qormi,101905a@example.mt,+356 21741774
+101914H,I,Angela Mifsud,2024-08-17,ACTIVE,Victoria,101914h@example.mt,+356 21577694
+101920G,I,Rita Farrugia,2020-07-26,ACTIVE,Qormi,101920g@example.mt,+356 21985833
+101928L,C,Phoenix Mediterranean Hospitality Ltd,2020-01-07,ACTIVE,Rabat,101928l@example.mt,+356 21118793
+101935L,C,Harbour Falcon Holdings Ltd,2002-06-23,ACTIVE,Floriana,101935l@example.mt,+356 21161220
+101941H,I,Paul Mifsud,1997-12-08,ACTIVE,Zabbar,101941h@example.mt,+356 21298671
+101949H,C,Atlas Phoenix Services Ltd,2007-08-16,ACTIVE,Mosta,101949h@example.mt,+356 21516275
+101956B,I,Angela Vella,1995-04-10,ACTIVE,Gzira,101956b@example.mt,+356 21189153
+101960L,C,Luzzu Mediterranean Construction Ltd,2020-03-17,ACTIVE,Valletta,101960l@example.mt,+356 21793453
+101970G,I,Carmen Spiteri,2019-08-07,ACTIVE,Rabat,101970g@example.mt,+356 21958004
+101976G,I,Carmen Vella,2001-04-05,ACTIVE,Zabbar,101976g@example.mt,+356 21578253
+101985B,C,Island Atlas Hospitality Ltd,2013-12-06,ACTIVE,Valletta,101985b@example.mt,+356 21861418
+101991G,C,Phoenix Crown Holdings Ltd,2012-01-22,ACTIVE,Birkirkara,101991g@example.mt,+356 21599728
+101995G,C,Harbour Malta Trading Ltd,2021-02-26,ACTIVE,Gzira,101995g@example.mt,+356 21920574
+102004L,C,Luzzu Calypso Construction Ltd,1996-02-26,ACTIVE,Marsa,102004l@example.mt,+356 21318098
+102013B,I,Rita Bugeja,2014-06-19,ACTIVE,Marsa,102013b@example.mt,+356 21992225
+102020M,I,George Caruana,1999-05-28,ACTIVE,Victoria,102020m@example.mt,+356 21371474
+102027M,I,Doris Mifsud,2005-07-09,ACTIVE,Victoria,102027m@example.mt,+356 21696889
+102030B,C,Mediterranean Falcon Holdings Ltd,1996-04-18,ACTIVE,Sliema,102030b@example.mt,+356 21124200
+102041M,C,Falcon Mediterranean Services Ltd,2010-11-24,ACTIVE,Floriana,102041m@example.mt,+356 21609675
+102045A,I,Joseph Caruana,2019-02-22,ACTIVE,Marsa,102045a@example.mt,+356 21386263
+102055H,C,Malta Atlas Holdings Ltd,2003-12-03,ACTIVE,Gzira,102055h@example.mt,+356 21281284
+102058H,I,Carmen Vella,2019-08-03,ACTIVE,Mosta,102058h@example.mt,+356 21614630
+102068H,C,Harbour Falcon Construction Ltd,1998-02-07,ACTIVE,Victoria,102068h@example.mt,+356 21328548
+102075L,I,Angela Zammit,2024-12-06,ACTIVE,Victoria,102075l@example.mt,+356 21805414
+102080L,C,Island Mediterranean Hospitality Ltd,2003-04-26,ACTIVE,Birkirkara,102080l@example.mt,+356 21308007
+102086L,I,David Borg,2014-11-04,ACTIVE,Valletta,102086l@example.mt,+356 21539848
+102095M,C,Crown Falcon Holdings Ltd,2018-01-10,ACTIVE,Gzira,102095m@example.mt,+356 21753060

@@ -1,0 +1,2 @@
+code,name,owningBb,idFormat,ttScope,active,description
+TEST,Acceptance test case type,CMBB,TT-??????,PARTY,true,Seeded for acceptance tests only

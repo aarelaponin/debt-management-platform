@@ -1,0 +1,18 @@
+[
+    {
+        "title": "DMBB Escalation Engine",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "value": "SWEEP",
+                "options": [
+                    { "value": "SWEEP", "label": "SWEEP — walk the strategy ladder (cmEscalateRun)" }
+                ]
+            },
+            { "name": "recordId", "label": "cmEscalateRun record id (blank = auto)", "type": "textfield", "required": "False" }
+        ]
+    }
+]

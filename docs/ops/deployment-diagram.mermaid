@@ -1,0 +1,22 @@
+flowchart TB
+  subgraph HOST["macOS dev machine"]
+    CLIENTS["browser · psql · IDE"]
+    subgraph JDX9["Joget DX 9.0.7 Enterprise — jdx9 (Tomcat 11, OpenJDK 21 pinned)<br/>http :8089 · glowroot :4019 · shutdown :8019"]
+      CMBB["app: cmbb"]
+      DMBB["app: dmbb"]
+      PLG["plugins: GoldMartClient · MayanConnector · OutcomeWriteback"]
+    end
+    PG["PostgreSQL 16 — pg1 :5432<br/>jwdb_mtca (also jwdb_gam, jwdb)"]
+    subgraph DOCKER["Docker compose — project mtca"]
+      CH["ClickHouse 24.8 — mock Gold<br/>mtca_ors · sta_v1 views · :8123/:9000"]
+      WB["writeback API (planned, A2)<br/>REST → fact_case_outcomes"]
+      MAYAN["Mayan EDMS s4.11 · :8880<br/>REST API v4 · OCR/preview workers<br/>internal: pg14 · redis · rabbitmq"]
+    end
+  end
+  CLIENTS -->|":8089"| JDX9
+  JDX9 -->|"JDBC :5432 (form data, Joget API only)"| PG
+  PLG -->|"(1) JDBC reads sta_v1"| CH
+  PLG -.->|"(2) REST outcome writeback (idempotent)"| WB
+  WB -.-> CH
+  PLG -->|"REST v4 — documents (P15)"| MAYAN
+  PG -.->|"(3) app_fd_* ingestion — designed, built later"| CH

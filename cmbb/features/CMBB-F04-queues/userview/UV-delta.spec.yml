@@ -1,0 +1,17 @@
+userview_delta:
+  userviewId: cmbbConsole
+  name: CMBB Console
+  categories:
+  - label: Queues
+    permission_role: cmbb_user
+    menus:
+    - type: datalist
+      datalistId: list_worklist
+      label: My work list
+    - type: datalist
+      datalistId: list_queue
+      label: Work queue
+    - type: crud
+      formDefId: mdPriorityBand
+      datalistId: list_mdPriorityBand
+      label: Priority bands (config)

@@ -1,0 +1,138 @@
+form:
+  id: dmWorkflow
+  name: DM - Collection Workflow (ADR-004)
+  table: dmWorkflow
+  listColumns: [code, name, taxType, segment, industry, validFrom, validTo, status]
+  description: >-
+    ADR-004 collection workflow workspace. One place to design a workflow: its selector
+    (tenant x taxType x segment x industry, blank = ANY) and validity window (Definition),
+    and its escalation ladder (mmEscStep.workflowCode) edited in place. The ladder row is the
+    single point where each stage carries its notice template, enforcement instrument, grace
+    and proportionality threshold — the Lifecycle, Notices, Enforcement and Relief tabs orient
+    the configurer to those columns. Resolved most-specific (tax > segment > industry),
+    effective-dated, overlap-checked per exact selector tuple.
+sections:
+- label: Definition
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: tenant
+    type: textfield
+    label: Tenant (country)
+    required: true
+  - id: taxType
+    type: select
+    label: Tax type (blank = Any)
+    static_options:
+    - {value: '', label: Any}
+    - {value: VAT, label: VAT}
+    - {value: CIT, label: CIT}
+    - {value: FSS, label: FSS}
+    - {value: SSC, label: SSC}
+    - {value: PIT, label: PIT}
+  - id: segment
+    type: textfield
+    label: Taxpayer segment (blank = Any)
+  - id: industry
+    type: textfield
+    label: Industry (blank = Any)
+  - id: categoryFloor
+    type: textfield
+    label: Applies from category (floor, e.g. C2)
+  - id: validFrom
+    type: date
+    label: Valid from
+    required: true
+  - id: validTo
+    type: date
+    label: Valid to (blank = open)
+  - id: status
+    type: select
+    label: Status
+    static_options:
+    - {value: Draft, label: Draft}
+    - {value: Active, label: Active}
+    - {value: Superseded, label: Superseded}
+  - id: version
+    type: textfield
+    label: Version
+    storeNumeric: true
+  - id: description
+    type: textarea
+    label: Description
+    rows: 2
+- label: Escalation ladder
+  columns: 1
+  fields:
+  - id: ladderIntro
+    type: html
+    html: >-
+      <div style="padding:6px 2px;color:#555"><b>Escalation ladder</b> — the ordered steps this
+      workflow drives. Each row is one stage: its <i>trigger days</i> (cumulative), the
+      <i>notice template</i> issued, the enforcement <i>instrument</i> (blank = a reminder/notice
+      only), the <i>grace</i> days, and the proportionality <i>threshold</i>. Edit rows here;
+      the engine resolves this ladder by the workflow's selector.</div>
+  - id: ladderGrid
+    type: grid
+    label: Steps
+    formDefId: mmEscStep
+    foreignKey: workflowCode
+    columns:
+    - {value: seq, label: 'Seq', width: 60px}
+    - {value: stepName, label: Stage, width: 150px}
+    - {value: triggerDays, label: 'Trigger (cum. days)', width: 130px}
+    - {value: noticeTemplate, label: Notice template, width: 140px}
+    - {value: instrument, label: Enforcement instrument, width: 160px}
+    - {value: graceDays, label: Grace, width: 80px}
+    - {value: proportionalityMinAmount, label: 'Min amount', width: 110px}
+    - {value: exitCondition, label: Exit condition, width: 150px}
+- label: Lifecycle & stages
+  columns: 1
+  fields:
+  - id: lifecycleNote
+    type: html
+    html: >-
+      <div style="padding:6px 2px;color:#555"><b>Lifecycle &amp; stages.</b> The stages this
+      workflow's debt passes through are the <b>Stage</b> column of the Escalation ladder, in
+      <b>Seq</b> order. A tax-specific workflow expresses divergence here — e.g. a VAT workflow
+      simply omits the <i>Reminder</i> stage, so VAT debt escalates straight to the Demand notice.
+      To add, remove or reorder a stage, edit the ladder rows on the Escalation ladder tab.</div>
+- label: Notices
+  columns: 1
+  fields:
+  - id: noticesNote
+    type: html
+    html: >-
+      <div style="padding:6px 2px;color:#555"><b>Notices.</b> Each ladder step names the notice
+      template (<i>Notice template</i> column) issued when that stage fires; the dispatcher renders
+      and sends it. The template catalogue and channel rules live under
+      <i>Collection settings &rsaquo; Notice consolidation rules</i> and the template previews.</div>
+- label: Enforcement
+  columns: 1
+  fields:
+  - id: enforcementNote
+    type: html
+    html: >-
+      <div style="padding:6px 2px;color:#555"><b>Enforcement.</b> A ladder step becomes an
+      enforcement action when its <i>Enforcement instrument</i> is set (e.g. bank garnishing,
+      property seizure); a blank instrument is a reminder/notice only. The set of legal instruments
+      a workflow may use is governed by the legislative catalogue under
+      <i>Legal &amp; reference &rsaquo; Enforcement instruments</i>.</div>
+- label: Relief & instalments
+  columns: 1
+  fields:
+  - id: reliefNote
+    type: html
+    html: >-
+      <div style="padding:6px 2px;color:#555"><b>Relief &amp; instalments.</b> Proportionality is
+      tuned per step via the <i>Grace</i> days and the <i>Min amount</i> threshold on the ladder
+      (an enforcement step below its threshold is held). Relief products and instalment projection
+      parameters that a taxpayer may be offered are operational config under
+      <i>Collection settings &rsaquo; Relief products</i>.</div>

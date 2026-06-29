@@ -1,0 +1,2 @@
+id,code,name,graceDays,consecutiveMissThreshold,countryProfile,active
+VIO-MLT-STD,VIO-MLT-STD,Standard instalment default policy (MLT),3,2,MLT,true

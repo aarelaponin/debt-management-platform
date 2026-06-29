@@ -1,0 +1,20 @@
+[
+    {
+        "title": "DMBB Default Assessment Engine",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "value": "ASSESS",
+                "options": [
+                    { "value": "ASSESS", "label": "ASSESS — estimate + reasonableness (dmDefAssess)" },
+                    { "value": "REPLACE", "label": "REPLACE — a filed return replaces the default (cmReturnFiled)" },
+                    { "value": "ESCALATE", "label": "ESCALATE — no filing → create a debt case (cmDefAssessRun)" }
+                ]
+            },
+            { "name": "recordId", "label": "Trigger record id (blank = auto)", "type": "textfield", "required": "False" }
+        ]
+    }
+]

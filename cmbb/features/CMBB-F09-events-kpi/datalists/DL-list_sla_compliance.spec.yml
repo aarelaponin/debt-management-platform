@@ -1,0 +1,42 @@
+datalist:
+  id: list_sla_compliance
+  name: SLA compliance (by case type)
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: >-
+      SELECT ct.case_type AS id,
+             ct.case_type,
+             ct.closed_total,
+             ct.closed_total - ct.breached AS met,
+             ct.breached,
+             CASE WHEN ct.closed_total = 0 THEN 0
+                  ELSE ROUND(100.0 * (ct.closed_total - ct.breached) / ct.closed_total, 1)
+             END AS compliance_pct
+      FROM (
+        SELECT COALESCE(NULLIF(c.c_casetype,''),'-') AS case_type,
+               COUNT(*) AS closed_total,
+               COUNT(*) FILTER (WHERE EXISTS (
+                   SELECT 1 FROM app_fd_cmdeadline d
+                   WHERE d.c_caseid = c.id AND d.c_status = 'BREACHED')) AS breached
+        FROM app_fd_cmcase c
+        WHERE COALESCE(c.c_currentstate,'') IN
+              (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal = 'true')
+        GROUP BY COALESCE(NULLIF(c.c_casetype,''),'-')
+      ) ct
+      ORDER BY compliance_pct ASC, ct.closed_total DESC
+  columns:
+  - id: case_type
+    label: Case type
+  - id: closed_total
+    label: Closed cases
+  - id: met
+    label: Met SLA
+  - id: breached
+    label: Breached
+  - id: compliance_pct
+    label: Compliance %
+  filters:
+  - id: case_type
+    label: Case type
+notes: 'WF-FR-011 compliance % (deferred from F05). met = closed cases with no BREACHED cmDeadline; breached = any BREACHED clock. JdbcDataListBinder = sanctioned raw-SQL slot (P3); runs on the Joget app DB (jwdb_mtca). Filter name = SQL alias (F04 precedent).'

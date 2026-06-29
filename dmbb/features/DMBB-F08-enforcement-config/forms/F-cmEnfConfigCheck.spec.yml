@@ -1,0 +1,32 @@
+form:
+  id: cmEnfConfigCheck
+  name: DM - Enforcement Config Check
+  table: cmEnfConfigCheck
+  description: 'EnforcementConfigEngine VALIDATE trigger + audit log (DM-FR-039 "testable before production deployment"). On create the engine checks every enabled mdInstrument: required DM-FR-039 attributes present, docTemplate resolves to an active mdTemplate, and costRecorded instruments have an mdLegalFee. Sets valid / issueCount / issues.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.EnforcementConfigEngine
+  properties:
+    mode: VALIDATE
+  runOn: create
+sections:
+- label: Check
+  columns: 2
+  fields:
+  - id: scope
+    type: textfield
+    label: Scope (blank = all enabled instruments)
+  - id: valid
+    type: textfield
+    label: Valid (set by engine)
+  - id: issueCount
+    type: textfield
+    label: Issue count (set by engine)
+    storeNumeric: true
+  - id: issues
+    type: textarea
+    label: Issues (set by engine)
+    rows: 4
+  - id: result
+    type: textarea
+    label: Detail (set by engine)
+    rows: 2

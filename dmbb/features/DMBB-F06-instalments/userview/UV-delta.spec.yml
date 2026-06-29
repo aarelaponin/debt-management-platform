@@ -1,0 +1,27 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Instalments
+    permission_role: dm_officer
+    menus:
+    - type: crud
+      formDefId: dmInstAgr
+      datalistId: list_dmInstAgr
+      label: Instalment agreements
+    # UX-QA3: cmInstComplianceRun batch trigger moved to "Operations — batch runs"
+  - label: Relief config
+    permission_role: dm_policy_admin
+    menus:
+    - type: crud
+      formDefId: mdRelief
+      datalistId: list_mdRelief
+      label: Relief products
+    - type: crud
+      formDefId: mdViolation
+      datalistId: list_mdViolation
+      label: Default policies
+    - type: crud
+      formDefId: mdProjRate
+      datalistId: list_mdProjRate
+      label: Projected rates

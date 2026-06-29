@@ -1,0 +1,50 @@
+form:
+  id: cmPostal
+  name: CM - Postal Dispatch Tracking
+  table: cmPostal
+  description: 'WF-FR-019: dispatch/delivery/returned tracking for QUEUED_PRINT notifications.
+    RETURNED auto-creates address verification task.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.MayanConnector
+  properties:
+    mode: POSTAL
+  runOn: create
+sections:
+- label: Dispatch
+  columns: 2
+  fields:
+  - id: notifId
+    type: textfield
+    label: Notification log id (cmNotif)
+  - id: caseRef
+    type: textfield
+    label: Case reference
+  - id: method
+    type: select
+    label: Delivery method
+    static_options:
+    - value: REGULAR
+      label: Regular mail
+    - value: REGISTERED
+      label: Registered mail
+    - value: JUDICIAL
+      label: Judicial service
+  - id: dispatchedAt
+    type: date
+    label: Dispatch date
+  - id: confirmation
+    type: textfield
+    label: Delivery confirmation ref
+  - id: status
+    type: select
+    label: Status
+    static_options:
+    - value: DISPATCHED
+      label: Dispatched
+    - value: DELIVERED
+      label: Delivered
+    - value: RETURNED
+      label: Returned mail
+  - id: processed
+    type: hidden
+    label: returned-mail actions done flag

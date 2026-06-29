@@ -1,0 +1,36 @@
+datalist:
+  id: list_debtAging
+  name: Debt aging analysis (MI)
+  binder:
+    type: jdbc
+    primaryKey: age_band
+    sql: >-
+      SELECT band AS age_band, COUNT(*) AS cases,
+             SUM(amt) AS total_debt
+      FROM (
+        SELECT c.id,
+               COALESCE(NULLIF(d.c_consolidatedamount,'')::numeric,0) AS amt,
+               CASE
+                 WHEN EXTRACT(day FROM now() - c.datecreated) <= 30  THEN '1: 0-30'
+                 WHEN EXTRACT(day FROM now() - c.datecreated) <= 60  THEN '2: 31-60'
+                 WHEN EXTRACT(day FROM now() - c.datecreated) <= 90  THEN '3: 61-90'
+                 WHEN EXTRACT(day FROM now() - c.datecreated) <= 180 THEN '4: 91-180'
+                 WHEN EXTRACT(day FROM now() - c.datecreated) <= 365 THEN '5: 181-365'
+                 ELSE '6: >365'
+               END AS band
+        FROM app_fd_cmcase c JOIN app_fd_dmdebt d ON d.id = c.id
+        WHERE c.c_casetype = 'DM'
+          AND COALESCE(d.c_writeoffstatus,'') <> 'written-off'
+          AND COALESCE(c.c_currentstate,'') NOT IN
+              (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal='true')
+      ) q
+      GROUP BY band ORDER BY band
+  columns:
+  - {id: age_band, label: Age band (days), drill: {to: list_debtorsList, hrefColumn: age_band, hrefParam: fage}}
+  - {id: cases, label: Cases}
+  - {id: total_debt, label: Total debt}
+  filters: []
+  rowActions:
+  - {label: View debtors, to: list_debtorsList, hrefColumn: age_band, hrefParam: fage}
+notes: 'DM-FR-048 (debt aging analysis) / RPT-FR-001/008. Default bands 0-30/31-60/61-90/91-180/181-365/>365;
+  configurable bands recorded as a refinement.'

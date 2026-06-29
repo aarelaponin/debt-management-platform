@@ -1,0 +1,6 @@
+id,code,name,requiresEvidence,requiresApproval,countryProfile,active
+WO-UNECONOMIC,WO-UNECONOMIC,Uneconomic to collect (C1),false,false,MLT,true
+WO-STATUTORY,WO-STATUTORY,Statutory collection period expired,false,false,MLT,true
+WO-INSOLVENCY,WO-INSOLVENCY,Insolvency / bankruptcy,true,true,MLT,true
+WO-MGMT,WO-MGMT,Management decision,true,true,MLT,true
+WO-CLOSURE,WO-CLOSURE,Account closure (STA hand-off),true,true,MLT,true

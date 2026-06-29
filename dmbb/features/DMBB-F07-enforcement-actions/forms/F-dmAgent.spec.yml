@@ -1,0 +1,79 @@
+form:
+  id: dmAgent
+  name: DM - Agent (Warrant) Appointment
+  table: dmAgent
+  listColumns: [tin, agentId, agentName, status, recoveredTotal, commissionTotal]
+  description: 'DMBB agent/warrant appointment (DM-FR-037, BR-DM-044). On create the EnforcementActionEngine AGENT_APPOINT gates category C4-C5, computes the appointment fee from mdAgentFee, records an appointment dmCharge, and tracks recovered/commission totals as dmAgentRpt reports come in. debtCaseId links to the cmCase debt case; the report grid is dmAgentRpt.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.EnforcementActionEngine
+  properties:
+    mode: AGENT_APPOINT
+  runOn: create
+sections:
+- label: Appointment
+  columns: 2
+  fields:
+  - id: debtCaseId
+    type: textfield
+    label: Debt case id (cmCase id)
+    required: true
+  - id: tin
+    type: textfield
+    label: TIN
+    required: true
+  - id: agentId
+    type: textfield
+    label: Agent id (approved register)
+    required: true
+  - id: agentName
+    type: textfield
+    label: Agent name
+  - id: scope
+    type: textarea
+    label: Scope (debts/assets/geography)
+    rows: 2
+  - id: authorityLimit
+    type: textfield
+    label: Authority limit
+    storeNumeric: true
+  - id: status
+    type: textfield
+    label: Status (APPOINTED on submit; set by engine)
+    value: APPOINTED
+- label: Tracking (set by engine)
+  columns: 2
+  fields:
+  - id: category
+    type: textfield
+    label: Debt category (copied from case)
+  - id: appointmentFee
+    type: textfield
+    label: Appointment fee (mdAgentFee)
+    storeNumeric: true
+  - id: commissionRate
+    type: textfield
+    label: Commission rate (mdAgentFee)
+    storeNumeric: true
+  - id: recoveredTotal
+    type: textfield
+    label: Recovered total (accumulated)
+    storeNumeric: true
+  - id: commissionTotal
+    type: textfield
+    label: Commission total (accumulated)
+    storeNumeric: true
+  - id: lastReportDate
+    type: textfield
+    label: Last report date
+- label: Activity reports
+  columns: 1
+  fields:
+  - id: reports
+    type: grid
+    label: Agent reports
+    formDefId: dmAgentRpt
+    foreignKey: agentApptId
+    columns:
+    - {value: reportDate, label: Date, width: 110px}
+    - {value: recoveredAmount, label: Recovered, width: 110px}
+    - {value: actionsTaken, label: Actions, width: 200px}

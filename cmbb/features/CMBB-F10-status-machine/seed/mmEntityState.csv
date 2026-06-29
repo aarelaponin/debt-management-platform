@@ -1,0 +1,38 @@
+id,entity,scope,code,name,isInitial,isTerminal,version,active
+es-line-dm-pending,dmInstLine,DM,pending,Pending,true,,1,true
+es-line-dm-paid,dmInstLine,DM,paid,Paid,,true,1,true
+es-line-dm-missed,dmInstLine,DM,missed,Missed,,true,1,true
+es-act-dm-initiated,dmAction,DM,INITIATED,Initiated,true,,1,true
+es-act-dm-submitted,dmAction,DM,SUBMITTED,Submitted,,,1,true
+es-act-dm-executed,dmAction,DM,EXECUTED,Executed,,true,1,true
+es-act-dm-confirmed,dmAction,DM,CONFIRMED,Confirmed,,true,1,true
+es-act-dm-blocked,dmAction,DM,BLOCKED,Blocked,,true,1,true
+es-act-dm-failed,dmAction,DM,FAILED,Failed,,true,1,true
+es-act-dm-referred,dmAction,DM,REFERRED,Referred,,true,1,true
+es-wo-dm-submitted,dmWriteOff,DM,SUBMITTED,Submitted,true,,1,true
+es-wo-dm-review,dmWriteOff,DM,UNDER_REVIEW,Under review,,,1,true
+es-wo-dm-approved,dmWriteOff,DM,APPROVED,Approved,,,1,true
+es-wo-dm-posted,dmWriteOff,DM,POSTED,Posted,,true,1,true
+es-wo-dm-rejected,dmWriteOff,DM,REJECTED,Rejected,,true,1,true
+es-da-dm-draft,dmDefAssess,DM,DRAFT,Draft,true,,1,true
+es-da-dm-assessed,dmDefAssess,DM,ASSESSED,Assessed,,,1,true
+es-da-dm-needjust,dmDefAssess,DM,NEEDS_JUSTIFICATION,Needs justification,,,1,true
+es-da-dm-replaced,dmDefAssess,DM,REPLACED,Replaced,,true,1,true
+es-da-dm-escalated,dmDefAssess,DM,ESCALATED,Escalated,,true,1,true
+es-ia-dm-applied,dmInstAgr,DM,APPLIED,Applied,true,,1,true
+es-ia-dm-review,dmInstAgr,DM,UNDER_REVIEW,Under review,,,1,true
+es-ia-dm-active,dmInstAgr,DM,ACTIVE,Active,,,1,true
+es-ia-dm-completed,dmInstAgr,DM,COMPLETED,Completed,,true,1,true
+es-ia-dm-cancelled,dmInstAgr,DM,CANCELLED,Cancelled,,true,1,true
+es-ia-dm-rejected,dmInstAgr,DM,REJECTED,Rejected,,true,1,true
+es-debt-dm-identified,dmDebt,DM,Identified,Identified,true,,1,true
+es-debt-dm-reminder,dmDebt,DM,Reminder,Reminder,,,1,true
+es-debt-dm-demand,dmDebt,DM,Demand notice,Demand notice,,,1,true
+es-debt-dm-final,dmDebt,DM,Final demand,Final demand,,,1,true
+es-debt-dm-garnish,dmDebt,DM,Bank garnishing,Bank garnishing,,,1,true
+es-debt-dm-enforcement,dmDebt,DM,Field enforcement,Field enforcement,,true,1,true
+es-debt-vat-identified,dmDebt,VAT,Identified,Identified,true,,1,true
+es-debt-vat-demand,dmDebt,VAT,Demand notice,Demand notice,,,1,true
+es-debt-vat-final,dmDebt,VAT,Final demand,Final demand,,,1,true
+es-debt-vat-garnish,dmDebt,VAT,Bank garnishing,Bank garnishing,,,1,true
+es-debt-vat-enforcement,dmDebt,VAT,Field enforcement,Field enforcement,,true,1,true

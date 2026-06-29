@@ -1,0 +1,50 @@
+form:
+  id: cmReassign
+  name: CM - Case Reassignment
+  table: cmReassign
+  description: 'Single/bulk reassignment order (WF-FR-008, BR-WF-006/007). Post-processor runs AllocationEngine REASSIGN.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.AllocationEngine
+  properties:
+    mode: REASSIGN
+    recordId: '#currentRecordId#'
+  runOn: create
+sections:
+- label: Scope (single case OR bulk filter)
+  columns: 2
+  fields:
+  - id: caseRef
+    type: textfield
+    label: Case reference (single reassignment)
+  - id: filterOfficer
+    type: textfield
+    label: 'Bulk filter: current officer'
+  - id: filterCaseType
+    type: select
+    label: 'Bulk filter: case type'
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+  - id: filterCategory
+    type: textfield
+    label: 'Bulk filter: debt category'
+- label: Target & justification
+  columns: 2
+  fields:
+  - id: toOfficer
+    type: select
+    label: New officer (blank = redistribute per BR-WF-007)
+    lookup:
+      formDefId: mdOfficerProfile
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+  - id: reason
+    type: textarea
+    label: Reason (mandatory - BR-WF-006)
+    required: true
+  - id: result
+    type: textfield
+    label: Result (set by engine)

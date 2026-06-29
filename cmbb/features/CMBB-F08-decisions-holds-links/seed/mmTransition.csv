@@ -1,0 +1,3 @@
+id,caseType,fromState,toState,guardRefs,actorRoles,version
+TESTD-NEW-OPEN,TESTD,NEW,OPEN,,cmbb_admin,1
+TESTD-OPEN-CLOSED,TESTD,OPEN,CLOSED,,cmbb_admin,1

@@ -1,0 +1,2 @@
+id,code,name,categories,minInstalment,autoThreshold,autoMaxMonths,maxDurationMonths,countryProfile,active
+REL-MLT-STD,REL-MLT-STD,Standard instalment relief (MLT),"C3,C4,C5",50,5000,12,24,MLT,true

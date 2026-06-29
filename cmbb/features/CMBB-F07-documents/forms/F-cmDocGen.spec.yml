@@ -1,0 +1,42 @@
+form:
+  id: cmDocGen
+  name: CM - Document Generation Order (ADG)
+  table: cmDocGen
+  description: 'WF-FR-017: generate PDF from template, auto-attach to case(s), push
+    to Mayan. Bulk via caseType filter.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.MayanConnector
+  properties:
+    mode: GENERATE
+  runOn: create
+sections:
+- label: Order
+  columns: 2
+  fields:
+  - id: caseRef
+    type: textfield
+    label: Case reference (single)
+  - id: filterCaseType
+    type: select
+    label: 'Bulk: case type'
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+  - id: templateCode
+    type: textfield
+    label: Template code (mdTemplate)
+    required: true
+  - id: docClass
+    type: select
+    label: Document class
+    lookup:
+      formDefId: mdDocClass
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: result
+    type: textfield
+    label: Result (set by engine)

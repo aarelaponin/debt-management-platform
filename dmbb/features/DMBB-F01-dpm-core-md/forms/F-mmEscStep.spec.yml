@@ -1,0 +1,51 @@
+form:
+  id: mmEscStep
+  name: DM - Escalation Step (DPM D2)
+  table: mmEscStep
+  description: 'DPM D2 escalation step: one ordered step of a collection strategy. References strategyCode + instrument by code (validated by the EscalationEngine + DMBB-admin consistency check, F04/F05).'
+sections:
+- label: Step
+  columns: 2
+  fields:
+  - id: strategyCode
+    type: textfield
+    label: Strategy code (FK)
+    required: true
+  - id: workflowCode
+    type: textfield
+    label: Workflow code (FK to dmWorkflow, ADR-004)
+  - id: seq
+    type: textfield
+    label: Sequence (order)
+    storeNumeric: true
+  - id: stepName
+    type: textfield
+    label: Step name
+  - id: triggerDays
+    type: textfield
+    label: Trigger (days after due / previous step)
+    storeNumeric: true
+  - id: triggerEvent
+    type: textfield
+    label: Trigger event (optional, overrides days)
+  - id: instrument
+    type: textfield
+    label: Instrument code (FK to mdInstrument)
+  - id: graceDays
+    type: textfield
+    label: Grace days
+    storeNumeric: true
+  - id: proportionalityMinAmount
+    type: textfield
+    label: Proportionality min amount
+    storeNumeric: true
+  - id: noticeTemplate
+    type: textfield
+    label: Notice template code
+  - id: exitCondition
+    type: textfield
+    label: Exit condition (short expression)
+  - id: description
+    type: textarea
+    label: Description
+    rows: 2

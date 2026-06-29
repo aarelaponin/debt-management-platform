@@ -1,0 +1,50 @@
+# CROSS-PROJECT reuse demo for joget-form-prefill — on the GAM instance (jdx8, db
+# jwdb_gam, banking domain), the SAME JAR built for MTCA, by configuration only.
+# Enter a customer id; name / type / risk / RM prefill from the gamBackOffice customer
+# master (form customerForm, table customer). Note formId != table here, exercised via
+# the explicit `table:` knob. No GAM app is modified — this is an isolated demo app.
+form:
+  id: pfGamCust
+  name: GAM Prefill Reuse Demo
+  table: pfGamCust
+  loadBinder: prefill
+  prefill:
+    keySources:
+      - {source: requestParam, name: customerId}
+    formId: customerForm
+    table: customer
+    matchField: customerId
+    mappings:
+      - {from: key, to: custKey}
+      - {from: displayName, to: custName}
+      - {from: customerType, to: custType}
+      - {from: riskCategory, to: riskCat}
+      - {from: relationshipManager, to: rmCode}
+  listColumns: [custKey, custName, custType]
+sections:
+- label: Customer prefill (from gamBackOffice customer master)
+  columns: 2
+  fields:
+  - id: custKey
+    type: textfield
+    label: Customer ID
+    required: true
+  - id: custName
+    type: textfield
+    label: Customer name (prefilled)
+    managed: true
+  - id: custType
+    type: textfield
+    label: Type (prefilled)
+    managed: true
+  - id: riskCat
+    type: textfield
+    label: Risk category (prefilled)
+    managed: true
+  - id: rmCode
+    type: textfield
+    label: Relationship manager (prefilled)
+    managed: true
+  - id: note
+    type: textfield
+    label: Note (free)

@@ -1,0 +1,4 @@
+id,code,name,priority,industryAvgAmount,fixedAmount,countryProfile,active
+EM-PRIOR,PRIOR_YEAR,Prior-year return data,1,0,0,MLT,true
+EM-INDUSTRY,INDUSTRY_AVG,Industry average (sector/size),2,800,0,MLT,true
+EM-FIXED,FIXED,Fixed formula,3,0,500,MLT,true

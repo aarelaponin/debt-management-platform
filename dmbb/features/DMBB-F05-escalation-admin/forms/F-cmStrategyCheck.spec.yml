@@ -1,0 +1,24 @@
+form:
+  id: cmStrategyCheck
+  name: DM - Strategy Consistency Check
+  table: cmStrategyCheck
+  description: 'EscalationEngine VALIDATE trigger (DM-FR-015, DMBB-admin). POST a row to dry-run the active collection strategies: every step on an ENABLED instrument, full category coverage C2-C6, no overlapping effective windows. Verdict written back.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.EscalationEngine
+  properties:
+    mode: VALIDATE
+  runOn: create
+sections:
+- label: Check
+  columns: 2
+  fields:
+  - id: valid
+    type: textfield
+    label: Valid (set by engine)
+  - id: issueCount
+    type: textfield
+    label: Issue count (set by engine)
+  - id: result
+    type: textarea
+    label: Issues / verdict (set by engine)
+    rows: 3

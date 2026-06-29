@@ -1,0 +1,14 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Debt cases
+    permission_role: dm_officer
+    menus:
+    - type: crud
+      formDefId: dmCaseConsole
+      datalistId: list_dmCaseConsole
+      label: Debt cases
+    # UX-QA 2026-06-13: removed orphan "Debt lines" standalone menu (list_dmLine) — dmLine is a
+    # 1:many child of a debt case (caseId is a hidden FK; no taxpayer column); it renders correctly
+    # nested in the dmCaseConsole subform/grid, which is where it belongs.

@@ -1,0 +1,20 @@
+[
+    {
+        "title": "CMBB Deadline Engine",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "options": [
+                    { "value": "START", "label": "START — create clocks (guardOpen chain)" },
+                    { "value": "CLOSE", "label": "CLOSE — clocks met (guardFinal chain)" },
+                    { "value": "SWEEP", "label": "SWEEP — full pass (cmSweepRun post-processor)" }
+                ]
+            },
+            { "name": "caseId", "label": "Case record id (START/CLOSE)", "type": "textfield", "required": "False" },
+            { "name": "recordId", "label": "cmSweepRun record id (SWEEP; blank = auto)", "type": "textfield", "required": "False" }
+        ]
+    }
+]

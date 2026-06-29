@@ -1,0 +1,33 @@
+form:
+  id: cmChainCheck
+  name: CM - Audit Chain Check
+  table: cmChainCheck
+  description: 'EventEmitter VERIFY trigger + audit log (WF-FR-020 full). Cron or console POSTs a row; ChainVerifyService recomputes the cmEvent hash chain and writes the result back. caseId blank = verify all cases.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.EventEmitter
+  properties:
+    mode: VERIFY
+  runOn: create
+sections:
+- label: Verify
+  columns: 2
+  fields:
+  - id: caseId
+    type: textfield
+    label: Case ID (blank = all cases)
+  - id: result
+    type: textfield
+    label: Result VERIFIED/BROKEN (set by engine)
+  - id: checkedCount
+    type: textfield
+    label: Cases checked (set by engine)
+  - id: firstBadCaseId
+    type: textfield
+    label: First broken case (set by engine)
+  - id: firstBadSeq
+    type: textfield
+    label: First broken seq (set by engine)
+  - id: detail
+    type: textarea
+    label: Detail (set by engine)
+    rows: 3

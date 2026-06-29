@@ -1,0 +1,36 @@
+form:
+  id: mdPublishRule
+  name: DM - Debtor Publication Rule
+  table: mdPublishRule
+  description: 'DPM publication criteria for the public debtors list (DM-FR-030): minimum debt amount, minimum age, prior-notice requirement, target registry, and minimum category. Read by EnforcementActionEngine PUBLISH sweep.'
+sections:
+- label: Publication rule
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: minCategory
+    type: textfield
+    label: Minimum category (C3..C5)
+  - id: minAmount
+    type: textfield
+    label: Minimum debt amount
+    storeNumeric: true
+  - id: minAgeDays
+    type: textfield
+    label: Minimum debt age (days)
+    storeNumeric: true
+  - id: priorNoticeRequired
+    type: textfield
+    label: Prior notice required (true/false)
+  - id: registry
+    type: textfield
+    label: Registry (target)
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

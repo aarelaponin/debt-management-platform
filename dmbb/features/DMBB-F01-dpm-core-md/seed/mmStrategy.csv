@@ -1,0 +1,2 @@
+code,name,segment,categoryFloor,effectiveFrom,effectiveTo,version,active,description
+STD-MLT,Standard Malta collection strategy,ALL,C2,2026-01-01,,1,true,Default MLT ladder: reminder -> demand -> final demand -> enforcement (BR-DM-005..012/030)

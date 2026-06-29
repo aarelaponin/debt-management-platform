@@ -1,0 +1,27 @@
+form:
+  id: cmGoldSnapshot
+  name: CM - Gold Mart Snapshot (cache)
+  table: cmGoldSnapshot
+  description: 'GoldMartClient degraded-read cache (INT-FR-004). One row per TIN (id = tin), refreshed on every successful sta_v1 read; served back with its stale asOf when ClickHouse is unreachable. No postProcessor (engine-written cache).'
+sections:
+- label: Snapshot
+  columns: 2
+  fields:
+  - id: tin
+    type: textfield
+    label: TIN
+  - id: enforceableBalance
+    type: textfield
+    label: Enforceable balance
+  - id: debtCategory
+    type: textfield
+    label: Debt category
+  - id: asaConfidence
+    type: textfield
+    label: ASA confidence
+  - id: asOf
+    type: textfield
+    label: As-of (data freshness)
+  - id: fetchedAt
+    type: textfield
+    label: Fetched at

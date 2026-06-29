@@ -1,0 +1,61 @@
+datalist:
+  id: list_queue
+  name: Work queue (unit / case type)
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: "SELECT c.id,\n       c.c_caseref AS case_ref,\n       c.c_casetype AS case_type,\n       c.c_tin\
+      \ AS tin,\n       COALESCE(NULLIF(c.c_taxpayername,''),'-') AS taxpayer,\n       NULLIF(c.c_amountatstake,'')::numeric\
+      \ AS debt_amount,\n       NULLIF(c.c_riskscore,'')::numeric AS risk_score,\n       COALESCE((SELECT\
+      \ b.c_code FROM app_fd_mdpriorityband b\n                 WHERE NULLIF(b.c_minscore,'')::numeric\n\
+      \                       <= COALESCE(NULLIF(c.c_riskscore,'')::numeric, 40)\n                 ORDER\
+      \ BY NULLIF(b.c_minscore,'')::numeric DESC LIMIT 1),'M') AS priority,\n       GREATEST(0, EXTRACT(day\
+      \ FROM now() - c.datecreated))::int AS days_in_queue,\n       COALESCE(NULLIF(c.c_slastatus,''),'-')\
+      \ AS sla_status,\n       COALESCE(c.c_category,'') AS category,\n       COALESCE(o.c_unit,'') AS\
+      \ unit, COALESCE(dl.due,'-') AS sla_due\nFROM app_fd_cmcase c LEFT JOIN app_fd_mdofficerprofile\
+      \ o ON o.id = c.c_assignee LEFT JOIN (SELECT c_caseid, MIN(NULLIF(c_dueat,'')) AS due FROM app_fd_cmdeadline\
+      \ WHERE c_status IN ('RUNNING','PAUSED','BREACHED') GROUP BY c_caseid) dl ON dl.c_caseid = c.id\
+      \ WHERE COALESCE(c.c_currentstate,'') NOT IN\n      (SELECT s.c_code FROM app_fd_mmstate s WHERE\
+      \ s.c_isterminal='true')\nORDER BY COALESCE(NULLIF(c.c_riskscore,'')::numeric,40) DESC,\n      \
+      \   CASE COALESCE(c.c_slastatus,'') WHEN 'RED' THEN 3 WHEN 'AMBER' THEN 2\n              WHEN 'GREEN'\
+      \ THEN 1 ELSE 0 END DESC,\n         COALESCE(NULLIF(c.c_amountatstake,'')::numeric,0) DESC,\n  \
+      \       c.datecreated ASC"
+  columns:
+  - id: case_ref
+    label: Case ID
+  - id: tin
+    label: TIN
+  - id: taxpayer
+    label: Taxpayer
+  - id: debt_amount
+    label: Debt amount
+  - id: risk_score
+    label: Risk score
+  - id: priority
+    label: Priority
+  - id: days_in_queue
+    label: Days in queue
+  - id: sla_status
+    label: SLA status
+  - id: case_type
+    label: Case type
+  - id: category
+    label: Category
+  - id: unit
+    label: Unit
+  - id: sla_due
+    label: SLA due (countdown)
+  filters:
+  - id: case_type
+    label: Case type
+  - id: category
+    label: Debt category
+  - id: sla_status
+    label: SLA status
+  - id: unit
+    label: Unit
+notes: 'BR-WF-004 default ORDER BY (risk DESC, SLA urgency DESC, amount DESC, entry ASC); column headers
+  give the per-session override. SLA values arrive with F05 (DeadlineEngine writes cmCase.slaStatus).
+  Filter names = SQL aliases (GAM JdbcDataListBinder precedent).
+
+  '

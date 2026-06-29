@@ -1,0 +1,4 @@
+code,name,targetCaseTypes,description
+PARENT,Parent case,TEST,Parent-child consolidation (E4)
+REFERRAL,Referral,TEST,Cross-BB referral (refund->audit pattern)
+CONTINUATION,Continuation,TEST,Appeal->litigation continuation

@@ -1,0 +1,2 @@
+id,code,name,owningBb,idFormat,ttScope,active,description,requireDecision
+TESTD,TESTD,Test decision-gated type,CMBB,TD-??????,PARTY,true,F08 closure-gate acceptance only,true

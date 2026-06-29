@@ -1,0 +1,48 @@
+form:
+  id: mmEntityTransition
+  name: CM - Entity Transition (state machine)
+  table: mmEntityTransition
+  listColumns: [entity, scope, fromStatus, toStatus, guardRefs, actorRoles]
+  description: 'CMBB metamodel (ADR-003): one allowed status transition of a subject/child entity,
+    scoped (taxType > caseType > DEFAULT, wholesale shadowing). Read by StatusManager via
+    MmConfigService (FormDataDao). guardRefs = optional comma-separated pre-condition keys evaluated by
+    the engine (e.g. evidencePresent, noOpenObjection). An empty transition set for a (entity,scope)
+    means no machine is configured → the engine falls back to the next scope, then DEFAULT.'
+sections:
+- label: Transition
+  columns: 2
+  fields:
+  - id: entity
+    type: select
+    label: Entity
+    required: true
+    static_options:
+    - {value: dmDebt, label: dmDebt (stage)}
+    - {value: dmInstAgr, label: dmInstAgr (status)}
+    - {value: dmInstLine, label: dmInstLine (status)}
+    - {value: dmAction, label: dmAction (status)}
+    - {value: dmAgent, label: dmAgent (status)}
+    - {value: dmWriteOff, label: dmWriteOff (status)}
+    - {value: dmDefAssess, label: dmDefAssess (status)}
+  - id: scope
+    type: textfield
+    label: Scope (taxType / caseType / DEFAULT)
+    required: true
+  - id: fromStatus
+    type: textfield
+    label: From status code
+    required: true
+  - id: toStatus
+    type: textfield
+    label: To status code
+    required: true
+  - id: guardRefs
+    type: textfield
+    label: Guard refs (comma-separated, optional)
+  - id: actorRoles
+    type: textfield
+    label: Actor roles (optional)
+  - id: version
+    type: textfield
+    label: Lifecycle version
+    storeNumeric: true

@@ -1,0 +1,20 @@
+form:
+  id: mdDocClass
+  name: CM - Document Class
+  table: mdDocClass
+  description: 'CMBB metamodel: Document Class (CAD-CMBB s2.2)'
+sections:
+- label: MD
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: retentionClass
+    type: textfield
+    label: Retention class

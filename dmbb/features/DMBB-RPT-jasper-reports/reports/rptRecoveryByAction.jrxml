@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="rptRecoveryByAction" language="java" pageWidth="595" pageHeight="842"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <style name="Bold" fontName="SansSerif" fontSize="10">
+        <conditionalStyle>
+            <conditionExpression><![CDATA["TOTAL".equals($F{line_type})]]></conditionExpression>
+            <style isBold="true" backcolor="#EEEEEE" mode="Opaque"><box><topPen lineWidth="0.5"/></box></style>
+        </conditionalStyle>
+    </style>
+    <queryString>
+        <![CDATA[
+        SELECT instrument, line_type, actions, executed, recovered, sortkey FROM (
+          SELECT a.c_instrument AS instrument, 'DETAIL' AS line_type, COUNT(*)::int AS actions,
+                 SUM(CASE WHEN a.c_status IN ('EXECUTED','CONFIRMED') THEN 1 ELSE 0 END)::int AS executed,
+                 COALESCE(SUM(COALESCE(NULLIF(a.c_recoveredamount,'')::numeric,0)),0) AS recovered, 1 AS sortkey
+          FROM app_fd_dmaction a GROUP BY a.c_instrument
+          UNION ALL
+          SELECT 'TOTAL','TOTAL', COUNT(*)::int,
+                 SUM(CASE WHEN a.c_status IN ('EXECUTED','CONFIRMED') THEN 1 ELSE 0 END)::int,
+                 COALESCE(SUM(COALESCE(NULLIF(a.c_recoveredamount,'')::numeric,0)),0), 9
+          FROM app_fd_dmaction a
+        ) q ORDER BY sortkey, recovered DESC
+        ]]>
+    </queryString>
+    <field name="instrument" class="java.lang.String"/>
+    <field name="line_type" class="java.lang.String"/>
+    <field name="actions" class="java.lang.Integer"/>
+    <field name="executed" class="java.lang.Integer"/>
+    <field name="recovered" class="java.math.BigDecimal"/>
+    <title>
+        <band height="58">
+            <staticText><reportElement x="0" y="0" width="555" height="24"/><textElement><font fontName="SansSerif" size="16" isBold="true"/></textElement><text><![CDATA[MTCA — Recovery by Enforcement Action]]></text></staticText>
+            <staticText><reportElement x="0" y="26" width="400" height="14"/><textElement><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[Collection performance by instrument (RPT-FR-005)]]></text></staticText>
+            <textField pattern="dd MMM yyyy HH:mm"><reportElement x="355" y="26" width="200" height="14"/><textElement textAlignment="Right"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression></textField>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="20">
+            <staticText><reportElement x="0" y="0" width="235" height="18"/><textElement verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Instrument]]></text></staticText>
+            <staticText><reportElement x="235" y="0" width="80" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Actions]]></text></staticText>
+            <staticText><reportElement x="315" y="0" width="80" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Executed]]></text></staticText>
+            <staticText><reportElement x="395" y="0" width="160" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Recovered (EUR)]]></text></staticText>
+            <line><reportElement x="0" y="18" width="555" height="1"/></line>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="18">
+            <textField><reportElement style="Bold" x="0" y="0" width="235" height="16"/><textElement verticalAlignment="Middle"/><textFieldExpression class="java.lang.String"><![CDATA[$F{instrument}]]></textFieldExpression></textField>
+            <textField><reportElement style="Bold" x="235" y="0" width="80" height="16"/><textElement textAlignment="Right" verticalAlignment="Middle"/><textFieldExpression class="java.lang.Integer"><![CDATA[$F{actions}]]></textFieldExpression></textField>
+            <textField><reportElement style="Bold" x="315" y="0" width="80" height="16"/><textElement textAlignment="Right" verticalAlignment="Middle"/><textFieldExpression class="java.lang.Integer"><![CDATA[$F{executed}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.00"><reportElement style="Bold" x="395" y="0" width="160" height="16"/><textElement textAlignment="Right" verticalAlignment="Middle"/><textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{recovered}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="16"><textField><reportElement x="355" y="0" width="200" height="14"/><textElement textAlignment="Right"><font fontName="SansSerif" size="8"/></textElement><textFieldExpression class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression></textField></band>
+    </pageFooter>
+</jasperReport>

@@ -1,0 +1,40 @@
+form:
+  id: cmTask
+  name: CM - Case Task
+  table: cmTask
+  description: CMBB case spine (CAD-CMBB s2.2)
+sections:
+- label: Task
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: taskType
+    type: textfield
+    label: Task type
+    required: true
+  - id: title
+    type: textfield
+    label: Title
+    required: true
+  - id: assignee
+    type: textfield
+    label: Assignee
+  - id: dueDate
+    type: date
+    label: Due date
+  - id: status
+    type: select
+    label: Status
+    static_options:
+    - value: OPEN
+      label: Open
+    - value: DONE
+      label: Done
+    - value: CANCELLED
+      label: Cancelled
+    required: true
+  - id: flagRef
+    type: textfield
+    label: Indicator flag ref (E7)

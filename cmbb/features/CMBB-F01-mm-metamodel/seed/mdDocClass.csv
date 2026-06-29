@@ -1,0 +1,6 @@
+code,name,retentionClass
+DEMAND_NOTICE,Demand notice,R5
+INSTALMENT_AGREEMENT,Instalment agreement,R10
+EVIDENCE,Evidence,R10
+CORRESPONDENCE,Correspondence,R5
+DECISION,Decision document,R10

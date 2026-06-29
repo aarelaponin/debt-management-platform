@@ -1,0 +1,53 @@
+form:
+  id: mmNotifRule
+  name: CM - Notification Rule
+  table: mmNotifRule
+  description: 'CMBB metamodel: Notification Rule (CAD-CMBB s2.2)'
+sections:
+- label: Rule
+  columns: 2
+  fields:
+  - id: caseType
+    type: select
+    label: Case type
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: eventType
+    type: textfield
+    label: Trigger event
+    required: true
+  - id: template
+    type: textfield
+    label: Template ref
+    required: true
+  - id: channelDefault
+    type: select
+    label: Default channel
+    lookup:
+      formDefId: mdChannel
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+  - id: respectPreference
+    type: checkbox
+    label: Respect taxpayer preference
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+  - id: consolidationMode
+    type: select
+    label: Consolidation
+    static_options:
+    - value: NONE
+      label: None
+    - value: PER_TIN
+      label: Per TIN
+    - value: PER_TIN_TAXTYPE
+      label: Per TIN and tax type
+  - id: priorityOverride
+    type: textfield
+    label: Priority override channels

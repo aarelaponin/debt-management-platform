@@ -1,0 +1,34 @@
+form:
+  id: dmDebtorPub
+  name: DM - Published Debtor Entry
+  table: dmDebtorPub
+  description: 'DMBB published-debtor list entry (DM-FR-030). Written by the EnforcementActionEngine PUBLISH sweep for eligible cases (category >= C3 past final demand, no active objection/instalment, per mdPublishRule); removedDate set by the RELEASE sweep on debt resolution.'
+sections:
+- label: Publication
+  columns: 2
+  fields:
+  - id: debtCaseId
+    type: textfield
+    label: Debt case id (cmCase id)
+  - id: tin
+    type: textfield
+    label: TIN
+  - id: debtorName
+    type: textfield
+    label: Debtor name
+  - id: debtAmount
+    type: textfield
+    label: Published debt amount
+    storeNumeric: true
+  - id: registry
+    type: textfield
+    label: Registry (MTCA website / national registry)
+  - id: publishedDate
+    type: textfield
+    label: Published date
+  - id: removedDate
+    type: textfield
+    label: Removed date (on resolution)
+  - id: status
+    type: textfield
+    label: Status (PUBLISHED/REMOVED)

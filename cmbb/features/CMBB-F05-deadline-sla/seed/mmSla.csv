@@ -1,0 +1,2 @@
+caseType,clockCode,name,source,kind,durationDays,warnPct,critPct,calendar,pauseOnHold,escalationChain
+TEST,RES,Resolution,SLA,TARGET,10,75,90,MLT,true,"{""notify"":[""assignee"",""supervisor""],""bumpPriority"":true,""maxLevels"":3}"

@@ -1,0 +1,17 @@
+form:
+  id: mdChannel
+  name: CM - Channel
+  table: mdChannel
+  description: 'CMBB metamodel: Channel (CAD-CMBB s2.2)'
+sections:
+- label: MD
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true

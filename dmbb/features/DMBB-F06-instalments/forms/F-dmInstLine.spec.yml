@@ -1,0 +1,35 @@
+form:
+  id: dmInstLine
+  name: DM - Instalment Line (child)
+  table: dmInstLine
+  description: 'DMBB-owned 1:many schedule line of a dmInstAgr (one row per instalment). Built by ReliefProductInterpreter (APPLY); evaluated by COMPLIANCE (paid vs expected within grace). instAgrId is the FormGrid foreignKey to the parent dmInstAgr id.'
+sections:
+- label: Line
+  columns: 2
+  fields:
+  - id: instAgrId
+    type: hidden
+    label: Agreement id (FK)
+  - id: seq
+    type: textfield
+    label: Sequence
+    storeNumeric: true
+    managed: true
+  - id: dueDate
+    type: textfield
+    label: Due date (ISO yyyy-MM-dd)
+    managed: true
+  - id: expectedAmount
+    type: textfield
+    label: Expected amount
+    storeNumeric: true
+    managed: true
+  - id: paidAmount
+    type: textfield
+    label: Paid amount
+    storeNumeric: true
+  - id: status
+    type: textfield
+    label: Status
+    value: pending
+    managed: true

@@ -1,0 +1,6 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  # UX-QA3: the cmIdentRun batch trigger moved to the consolidated "Operations — batch runs" admin
+  # category (DMBB-UX-QA UV-delta). This single-trigger category is retired.
+  categories: []

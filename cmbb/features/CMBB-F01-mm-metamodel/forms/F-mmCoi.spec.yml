@@ -1,0 +1,38 @@
+form:
+  id: mmCoi
+  name: CM - COI / Independence Rule
+  table: mmCoi
+  description: 'CMBB metamodel: COI / Independence Rule (CAD-CMBB s2.2)'
+sections:
+- label: Rule
+  columns: 2
+  fields:
+  - id: caseType
+    type: select
+    label: Case type
+    lookup:
+      formDefId: mmCaseType
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: ruleType
+    type: select
+    label: Rule type
+    static_options:
+    - value: EXCLUDE_DECISION_MAKER
+      label: Exclude original decision-maker
+    - value: EXCLUDE_UNIT
+      label: Exclude unit
+    - value: MATRIX
+      label: COI matrix
+    required: true
+  - id: overrideAuthority
+    type: textfield
+    label: Override authority role
+- label: Expression
+  columns: 1
+  fields:
+  - id: expression
+    type: textarea
+    label: Rule expression

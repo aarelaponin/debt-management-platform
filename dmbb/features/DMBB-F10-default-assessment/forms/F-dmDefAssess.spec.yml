@@ -1,0 +1,80 @@
+form:
+  id: dmDefAssess
+  name: DM - Default Assessment
+  table: dmDefAssess
+  listColumns: [tin, taxType, period, estimatedAmount, estimationMethod, status]
+  description: 'DMBB default (administrative) assessment for a non-filer (DM-FR-054..056). On create the DefaultAssessmentEngine ASSESS estimates the amount by the configured priority (prior-year ?? industry average ?? fixed, BR-DM-051) when not supplied, applies the reasonableness check (BR-DM-052), and records the informational debit. If no return is filed within the grace period the assessment escalates to a DM debt case (DM-FR-056).'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.DefaultAssessmentEngine
+  properties:
+    mode: ASSESS
+  runOn: create
+sections:
+- label: Assessment
+  columns: 2
+  fields:
+  - id: tin
+    type: textfield
+    label: TIN
+    required: true
+  - id: taxType
+    type: textfield
+    label: Tax type
+  - id: period
+    type: textfield
+    label: Tax period
+  - id: estimatedAmount
+    type: textfield
+    label: Estimated amount (blank = auto-estimate)
+    storeNumeric: true
+  - id: priorYearAmount
+    type: textfield
+    label: Prior-year amount (estimation basis 1)
+    storeNumeric: true
+  - id: estimationMethod
+    type: select
+    label: Estimation method (blank = auto by priority)
+    managed: false
+    lookup:
+      formDefId: mdEstMethod
+      idColumn: code
+      labelColumn: name
+  - id: legalRef
+    type: textfield
+    label: Legal reference
+  - id: status
+    type: textfield
+    label: Status (DRAFT on submit; set by engine)
+    value: DRAFT
+- label: Reasonableness / outcome (set by engine)
+  managed: true
+  columns: 2
+  fields:
+  - id: basis
+    type: textfield
+    label: Estimation basis (set by engine)
+  - id: reasonablenessFlag
+    type: textfield
+    label: Reasonableness flag (OK/REVIEW)
+  - id: justification
+    type: textarea
+    label: DMO justification (required if over threshold)
+    rows: 2
+    managed: false
+  - id: filedAmount
+    type: textfield
+    label: Filed return amount (on replacement)
+    storeNumeric: true
+  - id: variance
+    type: textfield
+    label: Variance (filed - estimated)
+    storeNumeric: true
+  - id: debtCaseRef
+    type: textfield
+    label: Escalated debt case ref (DM-FR-056)
+  - id: assessedDate
+    type: textfield
+    label: Assessed date (grace-clock basis)
+  - id: asOf
+    type: textfield
+    label: As-of

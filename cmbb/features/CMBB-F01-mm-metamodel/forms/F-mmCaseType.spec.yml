@@ -1,0 +1,74 @@
+form:
+  id: mmCaseType
+  name: CM - Case Type
+  table: mmCaseType
+  description: 'CMBB metamodel: Case Type (CAD-CMBB s2.2)'
+sections:
+- label: Identity
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: owningBb
+    type: select
+    label: Owning building block
+    static_options:
+    - value: CMBB
+      label: CMBB
+    - value: DMBB
+      label: DMBB
+    - value: TABB
+      label: TABB
+    - value: OTHER
+      label: Other
+    required: true
+  - id: idFormat
+    type: textfield
+    label: Case ID format (e.g. DM-??????)
+    required: true
+  - id: subjectFormId
+    type: textfield
+    label: Subject form id (per-type content form; GCMF §4 extension point, ADR-001)
+  - id: ttScope
+    type: select
+    label: TTT scope
+    static_options:
+    - value: PARTY
+      label: Party-scoped
+    - value: OBLIGATION
+      label: Obligation-scoped
+    required: true
+  - id: active
+    type: checkbox
+    label: Active
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+  - id: dedupPolicy
+    type: select
+    label: Duplicate policy
+    static_options:
+    - value: SKIP_IF_ACTIVE
+      label: Skip if active case exists
+    - value: CONSOLIDATE
+      label: Consolidate into existing
+    - value: ALLOW
+      label: Allow duplicates
+  - id: requireDecision
+    type: checkbox
+    label: Closure requires an approved decision (CMBB-F08)
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+- label: Description
+  columns: 1
+  fields:
+  - id: description
+    type: textarea
+    label: Description

@@ -1,0 +1,25 @@
+[
+    {
+        "title": "CMBB Outcome Writeback",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Default mode (cmOutcomeRun.mode overrides)",
+                "type": "selectbox",
+                "required": "True",
+                "value": "SHIP",
+                "options": [
+                    { "value": "SHIP", "label": "SHIP — newly closed cases" },
+                    { "value": "RETRY", "label": "RETRY — queued ledger rows" }
+                ]
+            },
+            { "name": "recordId", "label": "cmOutcomeRun record id (blank = auto)", "type": "textfield", "required": "False" },
+            { "name": "readerUrl", "label": "sta_v1 JDBC URL (enrichment)", "type": "textfield", "value": "jdbc:clickhouse://localhost:8123/sta_v1" },
+            { "name": "readerUser", "label": "sta_v1 user", "type": "textfield", "value": "sta_reader" },
+            { "name": "readerPass", "label": "sta_v1 password", "type": "password", "value": "sta_reader_dev" },
+            { "name": "writerUrl", "label": "fact_case_outcomes JDBC URL", "type": "textfield", "value": "jdbc:clickhouse://localhost:8123/mtca_ors" },
+            { "name": "writerUser", "label": "writeback user", "type": "textfield", "value": "writeback_api" },
+            { "name": "writerPass", "label": "writeback password", "type": "password", "value": "writeback_dev" }
+        ]
+    }
+]

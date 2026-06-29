@@ -1,0 +1,25 @@
+datalist:
+  id: list_kpi
+  name: Case KPIs (emitted events)
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: >-
+      SELECT e.id,
+             e.c_caseid AS case_id,
+             e.c_eventtime AS emitted_at,
+             e.c_payload AS dimensions
+      FROM app_fd_cmevent e
+      WHERE e.c_eventtype = 'KPI_EMITTED'
+      ORDER BY e.c_eventtime DESC
+  columns:
+  - id: case_id
+    label: Case ID
+  - id: emitted_at
+    label: Emitted at
+  - id: dimensions
+    label: KPI dimensions (JSON)
+  filters:
+  - id: case_id
+    label: Case ID
+notes: 'Read-only face of the EventEmitter EMIT output (GCMF §3.5 typed KPI events). Payload carries caseType/tin/taxType/cycleTimeDays/slaBreached/outcomeCode.'

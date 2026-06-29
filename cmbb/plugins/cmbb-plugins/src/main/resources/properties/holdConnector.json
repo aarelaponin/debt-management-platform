@@ -1,0 +1,29 @@
+[
+    {
+        "title": "CMBB Hold Connector",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "options": [
+                    {
+                        "value": "ASSERT",
+                        "label": "ASSERT — activate a cmHold"
+                    },
+                    {
+                        "value": "RELEASE",
+                        "label": "RELEASE — release a cmHold (cmHoldRelease)"
+                    }
+                ]
+            },
+            {
+                "name": "recordId",
+                "label": "Record id (blank = newest unprocessed)",
+                "type": "textfield",
+                "required": "False"
+            }
+        ]
+    }
+]

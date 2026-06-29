@@ -1,0 +1,68 @@
+<svg width="680" height="600" viewBox="0 0 680 600" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="680" height="600" fill="#FFFFFF"/>
+  <text x="40" y="30" font-size="15" font-weight="bold" fill="#2C2C2A">MTCA Debt Management — development environment (deployment view)</text>
+
+  <rect x="20" y="50" width="640" height="450" rx="6" fill="none" stroke="#B4B2A9" stroke-width="1.5"/>
+  <text x="36" y="72" font-size="12" fill="#5F5E5A">macOS dev machine — native processes + Docker</text>
+
+  <rect x="40" y="86" width="200" height="34" rx="4" fill="#F1EFE8" stroke="#5F5E5A"/>
+  <text x="140" y="107" font-size="12" text-anchor="middle" fill="#444441">browser · psql · IDE (clients)</text>
+
+  <rect x="40" y="156" width="280" height="164" rx="4" fill="#EEEDFE" stroke="#534AB7"/>
+  <text x="56" y="180" font-size="13" font-weight="bold" fill="#3C3489">Joget DX 9.0.7 Enterprise — jdx9</text>
+  <text x="56" y="200" font-size="12" fill="#534AB7">Tomcat 11 · OpenJDK 21 (pinned)</text>
+  <text x="56" y="218" font-size="12" fill="#534AB7">apps: cmbb · dmbb</text>
+  <text x="56" y="236" font-size="12" fill="#534AB7">plugins: GoldMartClient ·</text>
+  <text x="56" y="252" font-size="12" fill="#534AB7">MayanConnector · OutcomeWriteback</text>
+  <text x="56" y="274" font-size="12" fill="#534AB7">http :8089 · glowroot :4019</text>
+  <text x="56" y="292" font-size="12" fill="#534AB7">shutdown :8019 · https :8443</text>
+
+  <rect x="40" y="366" width="200" height="78" rx="4" fill="#F1EFE8" stroke="#5F5E5A"/>
+  <text x="56" y="390" font-size="13" font-weight="bold" fill="#444441">PostgreSQL 16 — pg1</text>
+  <text x="56" y="410" font-size="12" fill="#5F5E5A">jwdb_mtca · :5432</text>
+  <text x="56" y="428" font-size="12" fill="#5F5E5A">(also jwdb_gam, jwdb)</text>
+
+  <rect x="360" y="126" width="280" height="330" rx="6" fill="none" stroke="#0F6E56" stroke-width="1.5"/>
+  <text x="376" y="146" font-size="12" fill="#0F6E56">Docker compose — project mtca</text>
+
+  <rect x="380" y="158" width="240" height="86" rx="4" fill="#E1F5EE" stroke="#0F6E56"/>
+  <text x="396" y="182" font-size="13" font-weight="bold" fill="#085041">ClickHouse 24.8 — mock Gold</text>
+  <text x="396" y="202" font-size="12" fill="#0F6E56">mtca_ors · sta_v1 views (A2)</text>
+  <text x="396" y="220" font-size="12" fill="#0F6E56">http :8123 · native/JDBC :9000</text>
+
+  <rect x="380" y="266" width="240" height="48" rx="4" fill="#F1EFE8" stroke="#5F5E5A" stroke-dasharray="5 4"/>
+  <text x="396" y="286" font-size="12" font-weight="bold" fill="#444441">writeback API (planned — A2)</text>
+  <text x="396" y="304" font-size="12" fill="#5F5E5A">REST → fact_case_outcomes</text>
+
+  <rect x="380" y="336" width="240" height="104" rx="4" fill="#FAECE7" stroke="#993C1D"/>
+  <text x="396" y="360" font-size="13" font-weight="bold" fill="#712B13">Mayan EDMS s4.11</text>
+  <text x="396" y="380" font-size="12" fill="#993C1D">UI + REST API v4 · :8880</text>
+  <text x="396" y="398" font-size="12" fill="#993C1D">workers: OCR · previews · index</text>
+  <text x="396" y="416" font-size="12" fill="#993C1D">pg14 · redis · rabbitmq (internal)</text>
+
+  <defs><marker id="ar" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0, 9 3.5, 0 7" fill="#888780"/></marker></defs>
+
+  <line x1="120" y1="120" x2="120" y2="156" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+  <text x="130" y="142" font-size="11" fill="#5F5E5A">:8089</text>
+
+  <line x1="140" y1="320" x2="140" y2="366" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+  <text x="150" y="348" font-size="11" fill="#5F5E5A">JDBC :5432</text>
+
+  <line x1="320" y1="196" x2="380" y2="196" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+  <text x="350" y="188" font-size="11" fill="#5F5E5A" text-anchor="middle">1 JDBC</text>
+
+  <line x1="320" y1="290" x2="380" y2="290" stroke="#888780" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+  <text x="350" y="282" font-size="11" fill="#5F5E5A" text-anchor="middle">2 REST</text>
+
+  <line x1="500" y1="266" x2="500" y2="244" stroke="#888780" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+
+  <path d="M260 320 L260 388 L380 388" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#ar)"/>
+  <text x="268" y="356" font-size="11" fill="#5F5E5A">REST v4 (documents)</text>
+
+  <path d="M140 444 L140 476 L500 476 L500 456" fill="none" stroke="#888780" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+  <text x="320" y="470" font-size="11" fill="#5F5E5A" text-anchor="middle">3 app_fd_* ingestion (designed — built later)</text>
+
+  <text x="40" y="526" font-size="11" fill="#5F5E5A">purple = Joget build (TARA Domain 4) · teal = data platform mock (Domain 2) · coral = Mayan DMS · gray = native infra</text>
+  <text x="40" y="544" font-size="11" fill="#5F5E5A">dashed = planned/deferred · 1 JDBC reads of sta_v1 product views · 2 idempotent outcome writeback · 3 Joget-as-source ingestion</text>
+  <text x="40" y="574" font-size="10" fill="#888780">MTCA · ITCAS workstream 03 · 11 June 2026 · per SAD-DM-Solution v0.3 (D-SAD-03/05/06)</text>
+</svg>

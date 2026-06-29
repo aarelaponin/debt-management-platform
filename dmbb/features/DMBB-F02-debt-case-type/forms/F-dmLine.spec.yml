@@ -1,0 +1,52 @@
+form:
+  id: dmLine
+  name: DM - Debt Line (child)
+  table: dmLine
+  description: 'DMBB-owned 1:many debt line of a DM case (TIN x tax x year snapshot, D-SAD-04 — evidence, never recomputed). caseId is the FormGrid foreignKey to the parent cmCase id.'
+sections:
+- label: Line
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: Case id (FK)
+  - id: taxType
+    type: select
+    label: Tax type
+    static_options:
+    - {value: PIT, label: PIT - Personal Income Tax}
+    - {value: CIT, label: CIT - Corporate Income Tax}
+    - {value: VAT, label: VAT - Value Added Tax}
+    - {value: FSS, label: FSS - Final Settlement System}
+    - {value: SSC, label: SSC - Social Security Contributions}
+  - id: yofa
+    type: textfield
+    label: Year / period
+  - id: amount
+    type: textfield
+    label: Amount (total)
+    storeNumeric: true
+  - id: principal
+    type: textfield
+    label: Principal
+    storeNumeric: true
+  - id: interest
+    type: textfield
+    label: Interest
+    storeNumeric: true
+  - id: penalty
+    type: textfield
+    label: Penalty / costs
+    storeNumeric: true
+  - id: disputed
+    type: textfield
+    label: Disputed amount
+    storeNumeric: true
+  - id: enforceable
+    type: textfield
+    label: Enforceable amount
+    storeNumeric: true
+  - id: asOf
+    type: textfield
+    label: As-of
+    managed: true

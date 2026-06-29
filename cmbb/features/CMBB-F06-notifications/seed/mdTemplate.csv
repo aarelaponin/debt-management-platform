@@ -1,0 +1,3 @@
+id,code,name,language,version,effectiveFrom,active,subject,body
+TPL-TEST-en,TPL-TEST,Test notice,en,1,2026-01-01,true,"Notice #caseRef# for #taxpayerName#","Dear #taxpayerName# (TIN #tin#), amount due EUR #amountAtStake#. Date: #date#. - MTCA"
+TPL-TEST-mt,TPL-TEST,Avviz tat-test,mt,1,2026-01-01,true,"Avviz #caseRef# ghal #taxpayerName#","Ghaziz #taxpayerName# (TIN #tin#), ammont dovut EUR #amountAtStake#. Data: #date#. - MTCA"

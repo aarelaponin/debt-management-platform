@@ -1,0 +1,19 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Enforcement admin
+    permission_role: dm_policy_admin
+    menus:
+    - type: crud
+      formDefId: mdNoticeRule
+      datalistId: list_mdNoticeRule
+      label: Notice consolidation rules
+    - type: crud
+      formDefId: cmEnfConfigCheck
+      datalistId: list_cmEnfConfigCheck
+      label: Config consistency checks
+    - type: crud
+      formDefId: cmTemplatePreview
+      datalistId: list_cmTemplatePreview
+      label: Template previews

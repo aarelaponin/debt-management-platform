@@ -1,0 +1,19 @@
+code,name,minCategory,executionMode,authorityLevel,legalBasis,proportionalityMinAmount,docTemplate,costRecorded,disputeHoldSensitive,enabled,countryProfile
+DEMAND,Demand notice,C2,ADMINISTRATIVE,OFFICER,Income Tax Management Act,0,TPL-DEMAND,false,true,true,MLT
+REFUND_INTERCEPT,Refund interception / set-off,C2,ADMINISTRATIVE,OFFICER,ITMA set-off,0,,false,true,true,MLT
+PHONE,Telephone contact,C3,ADMINISTRATIVE,OFFICER,,0,,false,true,true,MLT
+PAYMENT_ARR,Payment arrangement,C3,ADMINISTRATIVE,OFFICER,Instalment provisions,0,TPL-INSTALMENT,false,true,true,MLT
+BANK_GARNISH,Bank account garnishing,C3,ADMINISTRATIVE,SUPERVISOR,Garnishee provisions,1000,TPL-GARNISH,true,true,true,MLT
+PUBLISH_NAME,Publish debtor name,C3,ADMINISTRATIVE,SUPERVISOR,Public debtors list provisions,1000,,false,true,true,MLT
+VISIT,Taxpayer visit,C4,FIELD,OFFICER,,0,,true,true,true,MLT
+LIEN,Lien on assets,C4,ADMINISTRATIVE,SUPERVISOR,Charge / lien provisions,1000,TPL-LIEN,true,true,true,MLT
+THIRD_PARTY,Third-party claim,C4,ADMINISTRATIVE,SUPERVISOR,Garnishee (third party),1000,TPL-3P,true,true,true,MLT
+PASSPORT,Departure prohibition (passport),C4,JUDICIAL,DIRECTOR,Departure prohibition order,5000,TPL-DPO,false,true,true,MLT
+PROPERTY_SEIZURE,Property seizure and sale,C4,FIELD,DIRECTOR,Seizure and sale provisions,5000,TPL-SEIZURE,true,true,true,MLT
+BANKRUPTCY,Bankruptcy demand,C4,JUDICIAL,DIRECTOR,Bankruptcy / insolvency proceedings,20000,TPL-BANKR,true,true,true,MLT
+AGENT_WARRANT,Agent (warrant) appointment,C4,FIELD,SUPERVISOR,Warrant of recovery,1000,TPL-WARRANT,true,true,true,MLT
+JUDICIAL_LETTER,Judicial letter / court action,C3,JUDICIAL,SUPERVISOR,Judicial recovery,500,TPL-JUDICIAL,true,true,true,MLT
+TRAVEL_BAN_FOREIGN,Travel ban (foreign pattern),C5,JUDICIAL,DIRECTOR,,0,,false,true,false,FOREIGN
+REGISTER_SEIZURE,Cash-register seizure (foreign pattern),C4,FIELD,SUPERVISOR,,0,,true,true,false,FOREIGN
+LICENCE_MEASURE,Licence measure (foreign pattern),C4,ADMINISTRATIVE,DIRECTOR,,0,,false,true,false,FOREIGN
+DEBTORS_DEBTOR_OFFSET,Debtor's-debtor offset (foreign pattern),C4,ADMINISTRATIVE,SUPERVISOR,,0,,false,true,false,FOREIGN

@@ -1,0 +1,3 @@
+id,code,name,tenant,taxType,segment,industry,categoryFloor,validFrom,validTo,status,version,description
+W-DEFAULT,W-DEFAULT,Default collection workflow,MLT,,,,C2,2026-01-01,,Active,1,Default ladder for all taxes (migrated from STD-MLT)
+W-VAT,W-VAT,VAT collection workflow,MLT,VAT,,,C2,2026-01-01,,Active,1,VAT ladder — skips the Reminder stage (ADR-003 pilot)

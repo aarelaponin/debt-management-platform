@@ -1,0 +1,34 @@
+form:
+  id: cmAlert
+  name: CM - Internal Alert
+  table: cmAlert
+  description: 'WF-FR-015: in-app officer alerts. Written by NotificationDispatcher;
+    read flag toggled by officer.'
+sections:
+- label: Alert
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: eventId
+    type: hidden
+    label: originating cmEvent id
+  - id: recipient
+    type: textfield
+    label: Recipient (user or group)
+  - id: alertType
+    type: textfield
+    label: Alert type
+  - id: priority
+    type: textfield
+    label: Priority
+  - id: message
+    type: textfield
+    label: Message
+  - id: isRead
+    type: checkbox
+    label: Read
+    static_options:
+    - value: 'true'
+      label: 'Yes'

@@ -1,0 +1,6 @@
+id,code,category,recoveryRate,countryProfile,active
+CP-C2,CP-C2,C2,0.20,MLT,true
+CP-C3,CP-C3,C3,0.30,MLT,true
+CP-C4,CP-C4,C4,0.35,MLT,true
+CP-C5,CP-C5,C5,0.40,MLT,true
+CP-DEFAULT,CP-DEFAULT,,0.30,MLT,true

@@ -1,0 +1,25 @@
+[
+    {
+        "title": "CMBB Notification Dispatcher",
+        "properties": [
+            {
+                "name": "mode",
+                "label": "Mode",
+                "type": "selectbox",
+                "required": "True",
+                "options": [
+                    {
+                        "value": "DISPATCH",
+                        "label": "DISPATCH \u2014 process pending notifications"
+                    }
+                ]
+            },
+            {
+                "name": "recordId",
+                "label": "cmDispatchRun record id (blank = auto)",
+                "type": "textfield",
+                "required": "False"
+            }
+        ]
+    }
+]

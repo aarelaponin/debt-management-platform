@@ -1,0 +1,30 @@
+form:
+  id: cmEscalateRun
+  name: DM - Escalation Run
+  table: cmEscalateRun
+  description: 'EscalationEngine SWEEP trigger + audit log (DM-FR-009..014). Cron or console POSTs a row; the engine walks the collection-strategy ladder for open DM cases. asOf (blank = now) gives deterministic time-travel.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.EscalationEngine
+  properties:
+    mode: SWEEP
+  runOn: create
+sections:
+- label: Run
+  columns: 2
+  fields:
+  - id: asOf
+    type: textfield
+    label: As-of (ISO yyyy-MM-ddTHH:mm:ss; blank = now)
+  - id: casesScanned
+    type: textfield
+    label: Open DM cases scanned (set by engine)
+  - id: stepsFired
+    type: textfield
+    label: Escalation steps fired (set by engine)
+  - id: skippedCount
+    type: textfield
+    label: Skipped - below category floor (set by engine)
+  - id: result
+    type: textarea
+    label: Detail (set by engine)
+    rows: 2

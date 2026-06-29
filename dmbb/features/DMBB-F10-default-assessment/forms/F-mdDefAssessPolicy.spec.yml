@@ -1,0 +1,30 @@
+form:
+  id: mdDefAssessPolicy
+  name: DM - Default Assessment Policy
+  table: mdDefAssessPolicy
+  description: 'DPM default-assessment policy (BR-DM-052, DM-FR-056): the reasonableness multiplier on the prior-year amount and the non-filing grace period before escalation to a debt case. Read by DefaultAssessmentEngine.'
+sections:
+- label: Policy
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: reasonablenessMultiplier
+    type: textfield
+    label: Reasonableness multiplier (e.g. 1.5 = 150%)
+    storeNumeric: true
+  - id: nonFilingGraceDays
+    type: textfield
+    label: Non-filing grace period (days) before escalation
+    storeNumeric: true
+  - id: legalRef
+    type: textfield
+    label: Legal reference
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

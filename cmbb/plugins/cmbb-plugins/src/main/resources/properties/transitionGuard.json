@@ -1,0 +1,32 @@
+[
+    {
+        "title": "CMBB Transition Guard",
+        "properties": [
+            {
+                "name": "phase",
+                "label": "Guard phase",
+                "type": "selectbox",
+                "required": "True",
+                "options": [
+                    { "value": "OPEN", "label": "OPEN — case creation / re-open" },
+                    { "value": "PRE_CLOSE", "label": "PRE_CLOSE — closure readiness" },
+                    { "value": "CLOSE", "label": "CLOSE — final closure" }
+                ]
+            },
+            {
+                "name": "caseId",
+                "label": "Case record id (blank = origin process id)",
+                "type": "textfield",
+                "required": "False"
+            },
+            {
+                "name": "requireDecision",
+                "label": "Require closure decision (enable at F08)",
+                "type": "checkbox",
+                "options": [
+                    { "value": "true", "label": "Yes" }
+                ]
+            }
+        ]
+    }
+]

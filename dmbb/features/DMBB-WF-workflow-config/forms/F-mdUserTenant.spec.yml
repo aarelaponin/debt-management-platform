@@ -1,0 +1,26 @@
+form:
+  id: mdUserTenant
+  name: MD - User Tenant mapping
+  table: mdUserTenant
+  description: 'ADR-004 multi-tenancy. Admin-maintained mapping of a login username to its tenant. NOT an end-user screen and NOT a tenant picker — TenantContext reads this silently to stamp the tenant onto cases/config. Unmapped users fall back to the platform default tenant.'
+sections:
+- label: User tenant mapping
+  columns: 2
+  fields:
+  - id: username
+    type: textfield
+    label: Username (login id)
+    required: true
+  - id: tenantCode
+    type: textfield
+    label: Tenant code
+    required: true
+  - id: active
+    type: checkbox
+    label: Active
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+  - id: note
+    type: textfield
+    label: Note

@@ -1,0 +1,35 @@
+form:
+  id: mdNoticeRule
+  name: DM - Notice Consolidation Rule
+  table: mdNoticeRule
+  description: 'DPM notice-consolidation configuration (DM-FR-041): per caseType (and optionally taxType) whether enforcement notices are issued SEPARATE per tax type (default), CONSOLIDATED_ALL into one notice, or CONSOLIDATED_SELECTED. Read by EnforcementConfigEngine PREVIEW (and the run-time notice generation).'
+sections:
+- label: Consolidation rule
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code
+    required: true
+  - id: caseType
+    type: textfield
+    label: Case type (e.g. DM)
+  - id: taxType
+    type: textfield
+    label: Tax type (blank = all)
+  - id: consolidationMode
+    type: select
+    label: Consolidation mode
+    static_options:
+    - value: SEPARATE
+      label: Separate notice per tax type (default)
+    - value: CONSOLIDATED_ALL
+      label: Single consolidated notice (all tax types)
+    - value: CONSOLIDATED_SELECTED
+      label: Consolidated across selected tax types
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

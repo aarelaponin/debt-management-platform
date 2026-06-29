@@ -1,0 +1,34 @@
+form:
+  id: mdEstMethod
+  name: DM - Estimation Method
+  table: mdEstMethod
+  description: 'DPM default-assessment estimation methods (BR-DM-051): the priority-ordered methods (prior-year, industry average, fixed formula) with their representative amounts. Read by DefaultAssessmentEngine ASSESS.'
+sections:
+- label: Method
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code (PRIOR_YEAR/INDUSTRY_AVG/FIXED)
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+  - id: priority
+    type: textfield
+    label: Priority (1 = first)
+    storeNumeric: true
+  - id: industryAvgAmount
+    type: textfield
+    label: Industry average amount (DEV representative)
+    storeNumeric: true
+  - id: fixedAmount
+    type: textfield
+    label: Fixed formula amount
+    storeNumeric: true
+  - id: countryProfile
+    type: textfield
+    label: Country profile
+  - id: active
+    type: textfield
+    label: Active (true/false)

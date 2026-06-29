@@ -1,0 +1,72 @@
+form:
+  id: cmDoc
+  name: CM - Case Document (register)
+  table: cmDoc
+  description: 'WF-FR-018 / BR-DM-060: document register; binary lives in Mayan (P15).
+    Immutable once REGISTERED.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.MayanConnector
+  properties:
+    mode: PUSH
+  runOn: create
+sections:
+- label: Document
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: caseRef
+    type: textfield
+    label: Case reference
+  - id: tin
+    type: textfield
+    label: TIN
+  - id: docClass
+    type: select
+    label: Document class
+    lookup:
+      formDefId: mdDocClass
+      idColumn: c_code
+      labelColumn: c_name
+      addEmptyOption: true
+    required: true
+  - id: description
+    type: textfield
+    label: Description
+  - id: version
+    type: textfield
+    label: Version
+    storeNumeric: true
+  - id: source
+    type: select
+    label: Source
+    static_options:
+    - value: UPLOAD
+      label: Uploaded
+    - value: GENERATED
+      label: Generated (ADG)
+  - id: status
+    type: select
+    label: Register status
+    static_options:
+    - value: PENDING
+      label: Pending
+    - value: REGISTERED
+      label: Registered in Mayan
+    - value: FAILED
+      label: Push failed (retry)
+  - id: mayanDocId
+    type: textfield
+    label: Mayan document id (set by connector)
+  - id: uploadedBy
+    type: textfield
+    label: Uploaded by
+- label: File
+  columns: 1
+  fields:
+  - id: file
+    type: fileupload
+    label: File (max 25MB; PDF/DOCX/XLSX/JPG/PNG)
+    maxSizeKb: 25600
+    fileType: .pdf;.docx;.xlsx;.jpg;.png

@@ -1,0 +1,36 @@
+form:
+  id: cmHoldRelease
+  name: CM - Case Hold Release
+  table: cmHoldRelease
+  description: 'GCMF §3.3-8: release an active hold. On create the HoldConnector
+    flips the referenced cmHold to RELEASED and emits HOLD_RELEASED — restoring any
+    suppressed scope (hold↔state consistency).'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.HoldConnector
+  properties:
+    mode: RELEASE
+  runOn: create
+sections:
+- label: Release
+  columns: 2
+  fields:
+  - id: holdId
+    type: textfield
+    label: Hold record id
+    required: true
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: caseRef
+    type: textfield
+    label: Case reference
+  - id: releaseReason
+    type: textfield
+    label: Release reason
+    required: true
+  - id: releasedBy
+    type: textfield
+    label: Released by
+  - id: result
+    type: textfield
+    label: Engine result (set by engine)

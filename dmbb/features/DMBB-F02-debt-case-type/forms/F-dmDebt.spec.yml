@@ -1,0 +1,36 @@
+form:
+  id: dmDebt
+  name: DM - Debt (subject form)
+  table: dmDebt
+  listColumns: [tin, debtCategory, stage, consolidatedAmount, writeOffStatus]
+  description: 'DMBB-owned 1:1 subject of a DM cmCase (ADR-001). SubForm stores this row under the parent cmCase id, so dmDebt.id = cmCase.id — no foreign key. Debt-specific attributes of the case.'
+# Officer-facing view trimmed to the one collection-relevant attribute (step 4 /
+# usability U-05): TIN + category duplicate the case header; the workflow / tenant /
+# trigger / as-of / step-seq / consolidated-amount / write-off fields are engine-managed
+# plumbing and are no longer surfaced on the case screen. The DB columns are untouched —
+# the engines still read/write them via FormDataDao; this only removes them from display.
+sections:
+- label: Collection status
+  columns: 2
+  fields:
+  - id: stage
+    type: textfield
+    label: Debt stage
+    managed: true
+  # Engine-managed attributes: NOT shown on the case screen, but kept in the form as
+  # hidden fields. Joget's FormDataDao.load maps a row's columns to FormRow properties
+  # via the form's field ids, so an engine that does dao.load(dmDebt).getProperty("x")
+  # only sees fields the form declares. Removing them (the step-4 slim) blanked these
+  # reads for escalation (workflowCode/lastStepSeq) and instalments (consolidatedAmount).
+  # Hidden = invisible on screen AND readable by the engines.
+  - {id: tin, type: hidden, label: TIN}
+  - {id: debtCategory, type: hidden, label: Debt category}
+  - {id: lastStepSeq, type: hidden, label: Last escalation step seq}
+  - {id: workflowCode, type: hidden, label: Governing workflow}
+  - {id: tenant, type: hidden, label: Tenant}
+  - {id: triggerOrigin, type: hidden, label: Trigger origin}
+  - {id: consolidatedAmount, type: hidden, label: Consolidated owed amount}
+  - {id: asOf, type: hidden, label: As-of}
+  - {id: firstAssessedDate, type: hidden, label: First assessed date}
+  - {id: writeOffStatus, type: hidden, label: Write-off status}
+  - {id: writeOffRef, type: hidden, label: Write-off record ref}

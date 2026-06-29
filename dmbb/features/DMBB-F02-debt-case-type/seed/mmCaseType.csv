@@ -1,0 +1,2 @@
+code,name,owningBb,idFormat,subjectFormId,ttScope,dedupPolicy,requireDecision,active,description
+DM,Debt case,DMBB,DM-??????,dmDebt,PARTY,SKIP,false,true,Debt management case (DMBB-F02) - cmCase specialisation with dmDebt subject

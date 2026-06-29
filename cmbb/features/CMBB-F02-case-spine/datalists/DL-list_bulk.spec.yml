@@ -1,0 +1,10 @@
+bulk_companion_lists:
+  forms:
+  - formDefId: cmCase
+    listId: list_cmCase
+  - formDefId: cmTask
+    listId: list_cmTask
+  - formDefId: cmNote
+    listId: list_cmNote
+  - formDefId: cmEvent
+    listId: list_cmEvent

@@ -1,0 +1,27 @@
+datalist:
+  id: list_recoveryByAction
+  name: Recovery by enforcement action (MI)
+  binder:
+    type: jdbc
+    primaryKey: instrument
+    sql: >-
+      SELECT a.c_instrument AS instrument,
+             COUNT(*) AS actions,
+             SUM(CASE WHEN a.c_status IN ('EXECUTED','CONFIRMED') THEN 1 ELSE 0 END) AS executed,
+             ROUND(100.0 * SUM(CASE WHEN a.c_status IN ('EXECUTED','CONFIRMED') THEN 1 ELSE 0 END)
+                   / NULLIF(COUNT(*),0), 1) AS execution_rate_pct,
+             SUM(COALESCE(NULLIF(a.c_recoveredamount,'')::numeric,0)) AS recovered
+      FROM app_fd_dmaction a
+      WHERE ('#requestParam.finstr#' = '' OR a.c_instrument = '#requestParam.finstr#')
+      GROUP BY a.c_instrument ORDER BY recovered DESC
+  columns:
+  - {id: instrument, label: Instrument, drill: {to: list_enfActions, hrefColumn: instrument, hrefParam: finstr}}
+  - {id: actions, label: Actions}
+  - {id: executed, label: Executed}
+  - {id: execution_rate_pct, label: 'Exec rate %'}
+  - {id: recovered, label: Recovered}
+  filters:
+  - {id: instrument, label: Instrument, type: select, param: finstr, options: [BANK_GARNISH, LIEN, THIRD_PARTY, PROPERTY_SEIZURE, BANKRUPTCY, JUDICIAL_LETTER, AGENT_WARRANT, PUBLISH_NAME, REFUND_INTERCEPT]}
+  rowActions:
+  - {label: View actions, to: list_enfActions, hrefColumn: instrument, hrefParam: finstr}
+notes: 'DM-FR-048 (recovery rate by action type) / RPT-FR-005. recovered = dmAction.recoveredAmount (F07 garnish writeback).'

@@ -1,0 +1,77 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  # RPT-FR-006 multi-stream dashboard, ADR-002 (native): enterprise SqlChartMenu, server-side SQL ->
+  # Apache ECharts. Charts bind to RAW SQL (datasource=default) — the datalist-binder mode renders
+  # "No data is available". SQL = the tested MI datalist queries with the #requestParam# filter guards
+  # stripped (a chart takes no request params). keyName = category/x column, value = numeric/y column.
+  categories:
+  - label: Dashboards
+    menus:
+    - type: formmenu
+      formId: dashOverviewForm
+      label: Management dashboard
+    - type: sqlchart
+      customId: chartDebtByCategory
+      label: Debt stock by category
+      title: Debt stock by category (€)
+      chartType: bar
+      keyName: category
+      value: total_debt
+      sql: |
+        SELECT COALESCE(NULLIF(d.c_debtcategory,''), c.c_category, '-') AS category,
+               SUM(COALESCE(NULLIF(d.c_consolidatedamount,'')::numeric,0)) AS total_debt
+        FROM app_fd_cmcase c JOIN app_fd_dmdebt d ON d.id = c.id
+        WHERE c.c_casetype = 'DM'
+          AND COALESCE(d.c_writeoffstatus,'') <> 'written-off'
+          AND COALESCE(c.c_currentstate,'') NOT IN
+              (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal='true')
+        GROUP BY 1 ORDER BY 1
+    - type: sqlchart
+      customId: chartDebtAging
+      label: Debt aging
+      title: Debt aging (€ by band)
+      chartType: bar
+      keyName: age_band
+      value: total_debt
+      sql: |
+        SELECT band AS age_band, SUM(amt) AS total_debt FROM (
+          SELECT COALESCE(NULLIF(d.c_consolidatedamount,'')::numeric,0) AS amt,
+                 CASE
+                   WHEN EXTRACT(day FROM now() - c.datecreated) <= 30  THEN '1: 0-30'
+                   WHEN EXTRACT(day FROM now() - c.datecreated) <= 60  THEN '2: 31-60'
+                   WHEN EXTRACT(day FROM now() - c.datecreated) <= 90  THEN '3: 61-90'
+                   WHEN EXTRACT(day FROM now() - c.datecreated) <= 180 THEN '4: 91-180'
+                   WHEN EXTRACT(day FROM now() - c.datecreated) <= 365 THEN '5: 181-365'
+                   ELSE '6: >365'
+                 END AS band
+          FROM app_fd_cmcase c JOIN app_fd_dmdebt d ON d.id = c.id
+          WHERE c.c_casetype = 'DM'
+            AND COALESCE(d.c_writeoffstatus,'') <> 'written-off'
+            AND COALESCE(c.c_currentstate,'') NOT IN
+                (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal='true')
+        ) q GROUP BY band ORDER BY band
+    - type: sqlchart
+      customId: chartRecoveryByAction
+      label: Recovery by action
+      title: Recovery by enforcement action (€)
+      chartType: bar
+      keyName: instrument
+      value: recovered
+      sql: |
+        SELECT a.c_instrument AS instrument,
+               SUM(COALESCE(NULLIF(a.c_recoveredamount,'')::numeric,0)) AS recovered
+        FROM app_fd_dmaction a
+        GROUP BY a.c_instrument ORDER BY recovered DESC
+    - type: sqlchart
+      customId: chartInstalmentCompliance
+      label: Instalment compliance
+      title: Instalment compliance (agreements)
+      chartType: donut
+      keyName: status
+      value: agreements
+      sql: |
+        SELECT COALESCE(NULLIF(g.c_status,''),'-') AS status,
+               COUNT(*) AS agreements
+        FROM app_fd_dminstagr g
+        GROUP BY g.c_status ORDER BY agreements DESC

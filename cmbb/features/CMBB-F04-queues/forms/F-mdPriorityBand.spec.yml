@@ -1,0 +1,22 @@
+form:
+  id: mdPriorityBand
+  name: MD - Priority Band
+  table: mdPriorityBand
+  description: 'Risk-score -> priority thresholds (WF-FR-006, configurable). Highest matching minScore wins.'
+sections:
+- label: Band
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Code (H/M/L)
+    required: true
+  - id: name
+    type: textfield
+    label: Name
+    required: true
+  - id: minScore
+    type: textfield
+    label: Minimum risk score
+    storeNumeric: true
+    required: true

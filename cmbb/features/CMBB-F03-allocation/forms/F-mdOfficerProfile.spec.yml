@@ -1,0 +1,40 @@
+form:
+  id: mdOfficerProfile
+  name: MD - Officer Profile
+  table: mdOfficerProfile
+  description: Officer allocation attributes (CMBB-F03, WF-FR-007 / BR-WF-005). id
+    = directory username.
+sections:
+- label: Officer
+  columns: 2
+  fields:
+  - id: code
+    type: textfield
+    label: Username (directory id)
+    required: true
+  - id: name
+    type: textfield
+    label: Display name
+    required: true
+  - id: unit
+    type: textfield
+    label: Organisational unit
+  - id: taxTypes
+    type: textfield
+    label: Specialisation - tax types (comma-separated)
+  - id: geography
+    type: textfield
+    label: Geographic assignment (comma-separated)
+  - id: maxCapacity
+    type: textfield
+    label: Max open cases (BR-WF-005)
+    storeNumeric: true
+  - id: active
+    type: checkbox
+    label: Active for assignment
+    static_options:
+    - value: 'true'
+      label: 'Yes'
+  - id: alertPrefs
+    type: textfield
+    label: Suppressed alert types (comma list - WF-FR-015)

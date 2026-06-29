@@ -1,0 +1,36 @@
+form:
+  id: cmCollectionMiRun
+  name: DM - Collection MI Run
+  table: cmCollectionMiRun
+  description: 'CollectionMiEngine trigger + audit log. mode: ROLLUP (fill plan-vs-actual for a plan, DM-FR-047), SUGGEST (seed plan targets from current stock × recovery rate, BR-DM-043), RECONCILE (②/③ writeback-completeness check, CAD §132). planId targets ROLLUP/SUGGEST; asOf (blank = now) bounds RECONCILE.'
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.CollectionMiEngine
+  properties:
+    mode: RUN
+  runOn: create
+sections:
+- label: Run
+  columns: 2
+  fields:
+  - id: runMode
+    type: textfield
+    label: Run mode (ROLLUP/SUGGEST/RECONCILE)
+    required: true
+  - id: planId
+    type: textfield
+    label: Plan id (ROLLUP/SUGGEST)
+  - id: asOf
+    type: textfield
+    label: As-of (ISO; blank = now)
+  - id: matchedCount
+    type: textfield
+    label: Matched / processed (set by engine)
+    storeNumeric: true
+  - id: varianceCount
+    type: textfield
+    label: Variances / orphans (set by engine)
+    storeNumeric: true
+  - id: result
+    type: textarea
+    label: Summary (set by engine)
+    rows: 2

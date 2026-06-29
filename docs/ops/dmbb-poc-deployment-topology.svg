@@ -1,0 +1,140 @@
+<svg viewBox="0 0 1480 980" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">DMBB Proof-of-Concept deployment topology on MITA infrastructure</title>
+<desc id="d">A single MITA-hosted environment running Joget DX9 Enterprise with the cmbb and dmbb apps, PostgreSQL, ClickHouse seeded with the STA product, and the Mayan EDMS stack; external integrations are stubbed for the PoC.</desc>
+<defs>
+  <marker id="aS" markerWidth="11" markerHeight="11" refX="8" refY="5.5" orient="auto"><path d="M0,1 L9,5.5 L0,10 Z" fill="#2E6F95"/></marker>
+  <marker id="aM" markerWidth="11" markerHeight="11" refX="8" refY="5.5" orient="auto"><path d="M0,1 L9,5.5 L0,10 Z" fill="#5B6B7B"/></marker>
+</defs>
+<rect x="0" y="0" width="1480" height="980" fill="#FFFFFF"/>
+
+<text x="40" y="46" font-size="26" font-weight="700" fill="#0F2A43">DMBB Proof-of-Concept — Deployment Topology (MITA-hosted)</text>
+<text x="40" y="73" font-size="14.5" fill="#5B6B7B">Single dev / PoC environment  &#183;  seed test data only  &#183;  external integrations stubbed  &#183;  no live taxpayer data</text>
+
+<!-- ===== USERS ZONE (left) ===== -->
+<rect x="40" y="120" width="250" height="470" rx="10" fill="#F4F8FC" stroke="#D7E2EC"/>
+<text x="60" y="150" font-size="13" font-weight="700" letter-spacing="1.5" fill="#2E6F95">MTCA — DEBT MANAGEMENT UNIT</text>
+<g>
+  <rect x="64" y="172" width="202" height="74" rx="8" fill="#FFFFFF" stroke="#D7E2EC"/>
+  <text x="80" y="200" font-size="14.5" font-weight="700" fill="#0F2A43">Debt officers</text>
+  <text x="80" y="222" font-size="12" fill="#5B6B7B">day-to-day case work</text>
+</g>
+<g>
+  <rect x="64" y="258" width="202" height="74" rx="8" fill="#FFFFFF" stroke="#D7E2EC"/>
+  <text x="80" y="286" font-size="14.5" font-weight="700" fill="#0F2A43">Team leader / supervisor</text>
+  <text x="80" y="308" font-size="12" fill="#5B6B7B">approvals, oversight</text>
+</g>
+<g>
+  <rect x="64" y="344" width="202" height="74" rx="8" fill="#FFFFFF" stroke="#D7E2EC"/>
+  <text x="80" y="372" font-size="14.5" font-weight="700" fill="#0F2A43">Policy administrator</text>
+  <text x="80" y="394" font-size="12" fill="#5B6B7B">configuration console</text>
+</g>
+<text x="80" y="462" font-size="12.5" fill="#1C2733">Access via web browser</text>
+<text x="80" y="482" font-size="12.5" fill="#1C2733">(Chrome / Edge / Firefox)</text>
+<text x="80" y="514" font-size="12" fill="#5B6B7B">over the MITA network /</text>
+<text x="80" y="532" font-size="12" fill="#5B6B7B">government VPN — HTTPS</text>
+
+<!-- arrow users -> env -->
+<line x1="290" y1="350" x2="360" y2="350" stroke="#2E6F95" stroke-width="2.6" marker-end="url(#aS)"/>
+<text x="296" y="338" font-size="11.5" font-weight="700" fill="#2E6F95">HTTPS</text>
+
+<!-- ===== MITA ENVIRONMENT (center) ===== -->
+<rect x="360" y="120" width="745" height="700" rx="12" fill="#FBFCFE" stroke="#0F2A43" stroke-width="1.6"/>
+<rect x="360" y="120" width="745" height="34" rx="12" fill="#0F2A43"/>
+<text x="380" y="143" font-size="14.5" font-weight="700" fill="#FFFFFF">MITA-hosted PoC environment  (single host / VM)</text>
+
+<!-- reverse proxy -->
+<rect x="388" y="172" width="688" height="50" rx="8" fill="#E2ECF5" stroke="#2E6F95"/>
+<text x="408" y="203" font-size="13.5" font-weight="700" fill="#0F2A43">Reverse proxy / TLS termination</text>
+<text x="900" y="203" font-size="12" fill="#34536B" text-anchor="end">Apache / Nginx &#183; HTTPS 443</text>
+<line x1="730" y1="222" x2="730" y2="248" stroke="#2E6F95" stroke-width="2.2" marker-end="url(#aS)"/>
+
+<!-- Application tier -->
+<rect x="388" y="252" width="688" height="118" rx="9" fill="#FFFFFF" stroke="#2E6F95" stroke-width="1.6"/>
+<rect x="388" y="252" width="6" height="118" rx="3" fill="#2E6F95"/>
+<text x="408" y="278" font-size="15" font-weight="700" fill="#0F2A43">Application tier — Joget DX 9.0.7 Enterprise</text>
+<text x="1056" y="278" font-size="11.5" fill="#5B6B7B" text-anchor="end">Tomcat 11 &#183; OpenJDK 21</text>
+<rect x="408" y="292" width="300" height="62" rx="7" fill="#F4F8FC" stroke="#D7E2EC"/>
+<text x="424" y="316" font-size="13.5" font-weight="700" fill="#0F2A43">Apps:  cmbb  +  dmbb</text>
+<text x="424" y="338" font-size="11.5" fill="#5B6B7B">case fabric + debt module</text>
+<rect x="724" y="292" width="334" height="62" rx="7" fill="#F4F8FC" stroke="#D7E2EC"/>
+<text x="740" y="316" font-size="13.5" font-weight="700" fill="#0F2A43">OSGi bundle: cmbb-plugins</text>
+<text x="740" y="338" font-size="11.5" fill="#5B6B7B">18 engines + 6 Jasper reports</text>
+
+<!-- Data tier -->
+<rect x="388" y="396" width="332" height="150" rx="9" fill="#FFFFFF" stroke="#D7E2EC"/>
+<rect x="388" y="396" width="6" height="150" rx="3" fill="#2E6F95"/>
+<text x="408" y="422" font-size="14.5" font-weight="700" fill="#0F2A43">Database tier</text>
+<rect x="408" y="436" width="292" height="46" rx="7" fill="#F4F8FC" stroke="#D7E2EC"/>
+<text x="422" y="455" font-size="13" font-weight="700" fill="#0F2A43">PostgreSQL 16</text>
+<text x="422" y="473" font-size="11.5" fill="#5B6B7B">Joget application DB (jwdb_mtca)</text>
+<rect x="408" y="488" width="292" height="48" rx="7" fill="#FBF1DF" stroke="#C8881E"/>
+<text x="422" y="507" font-size="13" font-weight="700" fill="#0F2A43">ClickHouse 24.8 — STA product</text>
+<text x="422" y="525" font-size="11.5" fill="#8A5E12">sta_v1 views &#183; SEED test data &#183; read-only</text>
+
+<!-- Document tier -->
+<rect x="744" y="396" width="332" height="150" rx="9" fill="#FFFFFF" stroke="#D7E2EC"/>
+<rect x="744" y="396" width="6" height="150" rx="3" fill="#2E6F95"/>
+<text x="764" y="422" font-size="14.5" font-weight="700" fill="#0F2A43">Document tier (container stack)</text>
+<rect x="764" y="436" width="292" height="46" rx="7" fill="#F4F8FC" stroke="#D7E2EC"/>
+<text x="778" y="455" font-size="13" font-weight="700" fill="#0F2A43">Mayan EDMS s4.11</text>
+<text x="778" y="473" font-size="11.5" fill="#5B6B7B">document binaries, OCR, retention</text>
+<rect x="764" y="488" width="292" height="48" rx="7" fill="#F4F8FC" stroke="#D7E2EC"/>
+<text x="778" y="507" font-size="12" font-weight="700" fill="#0F2A43">PostgreSQL 14 &#183; Redis 7 &#183; RabbitMQ 3.13</text>
+<text x="778" y="525" font-size="11.5" fill="#5B6B7B">Mayan support services</text>
+
+<!-- internal connectors -->
+<line x1="500" y1="370" x2="500" y2="394" stroke="#2E6F95" stroke-width="2" marker-end="url(#aS)"/>
+<text x="510" y="387" font-size="10.5" fill="#2E6F95">JDBC</text>
+<line x1="640" y1="370" x2="640" y2="486" stroke="#C8881E" stroke-width="2" marker-end="url(#aS)"/>
+<text x="648" y="408" font-size="10.5" fill="#C8881E">JDBC read-only</text>
+<line x1="860" y1="370" x2="860" y2="394" stroke="#2E6F95" stroke-width="2" marker-end="url(#aS)"/>
+<text x="870" y="387" font-size="10.5" fill="#2E6F95">REST v4</text>
+
+<!-- container runtime note -->
+<rect x="388" y="566" width="688" height="44" rx="8" fill="#EEF3F8" stroke="#D7E2EC"/>
+<text x="408" y="593" font-size="12.5" fill="#1C2733"><tspan font-weight="700">Container runtime</tspan> (Docker / Podman) hosts the ClickHouse and Mayan stacks  &#183;  persistent volumes for all data stores</text>
+
+<!-- observability + backup -->
+<rect x="388" y="624" width="335" height="64" rx="8" fill="#FFFFFF" stroke="#D7E2EC"/>
+<text x="408" y="650" font-size="13" font-weight="700" fill="#0F2A43">Monitoring</text>
+<text x="408" y="671" font-size="11.5" fill="#5B6B7B">Glowroot APM (bundled) or MITA standard</text>
+<rect x="741" y="624" width="335" height="64" rx="8" fill="#FFFFFF" stroke="#D7E2EC"/>
+<text x="761" y="650" font-size="13" font-weight="700" fill="#0F2A43">Backup</text>
+<text x="761" y="671" font-size="11.5" fill="#5B6B7B">pg_dump (Joget + Mayan) &#183; CH rebuilt from seed</text>
+
+<text x="384" y="724" font-size="12" fill="#5B6B7B">Internal ports:  Joget 8089 (proxied)  &#183;  PostgreSQL 5432  &#183;  ClickHouse 8123/9000  &#183;  Mayan 8880  &#183;  Glowroot 4019</text>
+<text x="384" y="745" font-size="12" fill="#5B6B7B">Identity:  local Joget accounts for the PoC  (Keycloak / AD SSO is a later-phase option)</text>
+<text x="384" y="766" font-size="11.5" font-style="italic" fill="#8A5E12">All data stores hold synthetic test data only — no production taxpayer data in the PoC.</text>
+
+<!-- ===== OUT OF SCOPE (right) ===== -->
+<rect x="1135" y="120" width="305" height="700" rx="10" fill="#F7F8FA" stroke="#D7E2EC" stroke-dasharray="5 4"/>
+<text x="1155" y="150" font-size="13" font-weight="700" letter-spacing="1" fill="#5B6B7B">STUBBED / OUT OF SCOPE FOR PoC</text>
+<g font-size="12.5" fill="#5B6B7B">
+  <rect x="1155" y="172" width="266" height="70" rx="8" fill="#FFFFFF" stroke="#E3E8EE" stroke-dasharray="4 3"/>
+  <text x="1171" y="198" font-size="13.5" font-weight="700" fill="#33414F">Live STA / Data Platform</text>
+  <text x="1171" y="220" >real ASA feed — replaced by seed</text>
+  <rect x="1155" y="254" width="266" height="64" rx="8" fill="#FFFFFF" stroke="#E3E8EE" stroke-dasharray="4 3"/>
+  <text x="1171" y="280" font-size="13.5" font-weight="700" fill="#33414F">Email / SMS gateway</text>
+  <text x="1171" y="302" >notice dispatch — stubbed</text>
+  <rect x="1155" y="330" width="266" height="64" rx="8" fill="#FFFFFF" stroke="#E3E8EE" stroke-dasharray="4 3"/>
+  <text x="1171" y="356" font-size="13.5" font-weight="700" fill="#33414F">Bank / court / registry</text>
+  <text x="1171" y="378" >enforcement connectors — stubbed</text>
+  <rect x="1155" y="406" width="266" height="64" rx="8" fill="#FFFFFF" stroke="#E3E8EE" stroke-dasharray="4 3"/>
+  <text x="1171" y="432" font-size="13.5" font-weight="700" fill="#33414F">SAS VIYA risk scoring</text>
+  <text x="1171" y="454" >risk_score stays empty</text>
+  <rect x="1155" y="482" width="266" height="64" rx="8" fill="#FFFFFF" stroke="#E3E8EE" stroke-dasharray="4 3"/>
+  <text x="1171" y="508" font-size="13.5" font-weight="700" fill="#33414F">Keycloak / AD SSO</text>
+  <text x="1171" y="530" >local accounts for PoC</text>
+</g>
+<text x="1155" y="588" font-size="11.5" font-style="italic" fill="#8A98A6">These interfaces are designed</text>
+<text x="1155" y="606" font-size="11.5" font-style="italic" fill="#8A98A6">but not connected in the PoC;</text>
+<text x="1155" y="624" font-size="11.5" font-style="italic" fill="#8A98A6">they are enabled in later phases</text>
+<text x="1155" y="642" font-size="11.5" font-style="italic" fill="#8A98A6">without changing DMBB.</text>
+
+<!-- footer -->
+<text x="40" y="860" font-size="12" fill="#5B6B7B">Legend:  </text>
+<rect x="92" y="850" width="14" height="14" rx="3" fill="#E2ECF5" stroke="#2E6F95"/><text x="112" y="861" font-size="12" fill="#1C2733">DMBB components</text>
+<rect x="250" y="850" width="14" height="14" rx="3" fill="#FBF1DF" stroke="#C8881E"/><text x="270" y="861" font-size="12" fill="#1C2733">Seeded data product</text>
+<rect x="430" y="850" width="14" height="14" rx="3" fill="#FFFFFF" stroke="#E3E8EE" stroke-dasharray="3 2"/><text x="450" y="861" font-size="12" fill="#1C2733">Stubbed / out of scope</text>
+<text x="40" y="900" font-size="12" font-weight="700" fill="#0F2A43">Malta Tax &amp; Customs Administration  ·  Debt Management Building Block (DMBB)  ·  PoC installation</text>
+</svg>

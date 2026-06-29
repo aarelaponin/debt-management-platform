@@ -1,0 +1,38 @@
+datalist:
+  id: list_instalments
+  name: Instalment agreements
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: >-
+      SELECT g.id,
+             COALESCE(NULLIF(c.c_caseref,''), g.c_debtcaseid) AS case_ref,
+             g.c_tin AS tin,
+             COALESCE(NULLIF(c.c_taxpayername,''), g.c_tin) AS taxpayer,
+             g.c_status AS status,
+             NULLIF(g.c_totaldebt,'')::numeric AS total_debt,
+             NULLIF(g.c_monthlyamount,'')::numeric AS monthly,
+             NULLIF(g.c_durationmonths,'')::numeric AS months,
+             COALESCE(NULLIF(g.c_approvalref,''),'-') AS approval_level,
+             g.c_debtcaseid AS case_id
+      FROM app_fd_dminstagr g LEFT JOIN app_fd_cmcase c ON c.id = g.c_debtcaseid
+      WHERE ('#requestParam.fstat#' = '' OR g.c_status = '#requestParam.fstat#')
+        AND ('#requestParam.ftin#' = '' OR g.c_tin = '#requestParam.ftin#')
+      ORDER BY g.dateCreated DESC
+  columns:
+  - {id: case_ref, label: Case}
+  - {id: tin, label: TIN}
+  - {id: taxpayer, label: Taxpayer}
+  - {id: status, label: Status}
+  - {id: total_debt, label: Total debt}
+  - {id: monthly, label: Monthly}
+  - {id: months, label: Months}
+  - {id: approval_level, label: Approval}
+  filters:
+  - {id: status, label: Status, type: select, param: fstat, options: [ACTIVE, UNDER_REVIEW, REJECTED, CANCELLED, APPLIED]}
+  - {id: tin, label: TIN, type: text, param: ftin}
+  rowActions:
+  - {label: Open case, to: dmCaseConsole_crud, hrefColumn: case_id, hrefParam: id}
+  sort: {column: total_debt, desc: true}
+notes: 'UX-QA2: instalment-agreement detail list (drill target for the Instalment-compliance summary via
+  ?fstat=<status>). dmInstAgr joined to cmCase for TIN/taxpayer/case ref. Filters + drill via #requestParam#.'

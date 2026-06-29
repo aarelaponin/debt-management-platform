@@ -1,0 +1,13 @@
+code,name,language,version,effectiveFrom,active,subject,body
+TPL-LIEN,Lien registration notice,en,1,,true,Lien on assets - case #caseRef#,"Dear #taxpayerName#, a lien for #amountAtStake# (#taxType#) has been registered against your assets on case #caseRef#. The charge is released on settlement."
+TPL-3P,Third-party claim order,en,1,,true,Third-party claim - case #caseRef#,"To the third party: you are directed to pay to MTCA amounts owed to #taxpayerName# (TIN #tin#) up to #amountAtStake# in settlement of case #caseRef#."
+TPL-DPO,Departure prohibition order,en,1,,true,Departure prohibition - case #caseRef#,"Dear #taxpayerName#, a departure prohibition order has been requested for the outstanding debt of #amountAtStake# on case #caseRef#. It is lifted on settlement or court order."
+TPL-BANKR,Bankruptcy demand,en,1,,true,Bankruptcy demand - case #caseRef#,"Dear #taxpayerName#, MTCA will petition for bankruptcy/insolvency proceedings for the unsatisfied debt of #amountAtStake# on case #caseRef# unless settled."
+TPL-WARRANT,Warrant of recovery,en,1,,true,Warrant of recovery - case #caseRef#,"Warrant of recovery: the appointed agent is authorised to recover #amountAtStake# from #taxpayerName# (TIN #tin#) on case #caseRef# per the terms of appointment."
+TPL-JUDICIAL,Judicial recovery letter,en,1,,true,Judicial recovery - case #caseRef#,"Dear #taxpayerName#, court action for the recovery of #amountAtStake# (#taxType#) on case #caseRef# will be commenced unless the debt is settled."
+TPL-INSTALMENT,Payment arrangement notice,en,1,,true,Payment arrangement - case #caseRef#,"Dear #taxpayerName#, the payment arrangement for #amountAtStake# on case #caseRef# is confirmed. Keep to the schedule to avoid enforcement."
+TPL-REMINDER,Payment reminder,en,1,,true,Payment reminder - case #caseRef#,"Dear #taxpayerName#, our records show an overdue balance of #amountAtStake# (#taxType#) on case #caseRef#. Please pay within the period stated."
+TPL-DEMAND,Demand notice,en,1,,true,Demand for payment - case #caseRef#,"Dear #taxpayerName#, this is a formal demand for #amountAtStake# (#taxType#) on case #caseRef#. Non-payment may lead to enforcement."
+TPL-FINAL,Final demand,en,1,,true,Final demand - case #caseRef#,"Dear #taxpayerName#, FINAL demand for #amountAtStake# (#taxType#) on case #caseRef#. Enforcement will follow without further notice."
+TPL-GARNISH,Garnishing notice,en,1,,true,Bank garnishing - case #caseRef#,"Notice of bank garnishing for #amountAtStake# (#taxType#) on case #caseRef# against #taxpayerName#."
+TPL-SEIZURE,Seizure notice,en,1,,true,Property seizure - case #caseRef#,"Notice of property seizure for #amountAtStake# on case #caseRef# against #taxpayerName#."

@@ -1,0 +1,31 @@
+userview_delta:
+  userviewId: cmbbConsole
+  name: CMBB Console
+  categories:
+  - label: Audit & KPIs
+    permission_role: cmbb_user
+    menus:
+    - type: crud
+      formDefId: cmChainCheck
+      datalistId: list_cmChainCheck
+      label: Audit chain verification
+    - type: datalist
+      datalistId: list_kpi
+      label: Case KPIs
+    - type: datalist
+      datalistId: list_sla_compliance
+      label: SLA compliance %
+    - type: crud
+      formDefId: cmOutcomeRun
+      datalistId: list_cmOutcomeRun
+      label: Outcome writeback runs
+    - type: datalist
+      datalistId: list_cmOutcome
+      label: Outcome ledger
+    - type: crud
+      formDefId: cmGoldProbe
+      datalistId: list_cmGoldProbe
+      label: Gold mart probe
+    - type: datalist
+      datalistId: list_cmGoldSnapshot
+      label: Gold snapshots (cache)

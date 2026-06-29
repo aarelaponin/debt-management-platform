@@ -1,0 +1,30 @@
+form:
+  id: cmNote
+  name: CM - Case Note
+  table: cmNote
+  description: CMBB case spine (CAD-CMBB s2.2)
+sections:
+- label: Note
+  columns: 2
+  fields:
+  - id: caseId
+    type: hidden
+    label: caseId
+  - id: confidentiality
+    type: select
+    label: Confidentiality
+    static_options:
+    - value: PUBLIC
+      label: Public
+    - value: INTERNAL
+      label: Internal
+    - value: RESTRICTED
+      label: Restricted
+    required: true
+- label: Text
+  columns: 1
+  fields:
+  - id: note
+    type: textarea
+    label: Note
+    rows: 5

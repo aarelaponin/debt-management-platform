@@ -1,0 +1,21 @@
+userview_delta:
+  userviewId: cmbbConsole
+  name: CMBB Console
+  categories:
+  - label: Notifications
+    permission_role: cmbb_user
+    menus:
+    - type: datalist
+      datalistId: list_cmAlert_my
+      label: My alerts
+    - type: datalist
+      datalistId: list_cmNotif_log
+      label: Outbound log
+    - type: crud
+      formDefId: mdTemplate
+      datalistId: list_mdTemplate
+      label: Templates (config)
+    - type: crud
+      formDefId: cmDispatchRun
+      datalistId: list_cmDispatchRun
+      label: Dispatch runs (trigger/log)

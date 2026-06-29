@@ -1,0 +1,46 @@
+# Cross-app reuse demo for joget-form-prefill.
+# A form in a BRAND-NEW app (prefilldemo) — unrelated to dmbb — wired to the SAME
+# already-deployed FormPrefillLoadBinder bundle by CONFIGURATION ONLY. It prefills from
+# the instance-global cmCase table (owned by the cmbb app), proving the binder is not tied
+# to dmbb or to any one app. The config also differs from dmbb's (no related load here):
+# the case row's own amountAtStake is mapped straight to the outstanding field.
+form:
+  id: pfDemo
+  name: Prefill Reuse Demo
+  table: pfDemo
+  loadBinder: prefill
+  prefill:
+    keySources:
+      - {source: requestParam, name: tin}
+    formId: cmCase
+    matchField: tin
+    filters:
+      - {field: caseType, op: eq, value: DM}
+      - {field: currentState, op: ne, value: CLOSED}
+    orderBy: amountAtStake
+    orderNumeric: true
+    mappings:
+      - {from: key, to: tin}
+      - {from: id, to: caseRef}
+      - {from: amountAtStake, to: totalDebt}
+  listColumns: [tin, caseRef, totalDebt]
+sections:
+- label: Reuse demo
+  columns: 2
+  fields:
+  - id: tin
+    type: textfield
+    label: TIN
+    required: true
+  - id: caseRef
+    type: textfield
+    label: Resolved case id (prefilled)
+    managed: true
+  - id: totalDebt
+    type: textfield
+    label: Outstanding from case (prefilled)
+    storeNumeric: true
+    managed: true
+  - id: note
+    type: textfield
+    label: Officer note (free)
