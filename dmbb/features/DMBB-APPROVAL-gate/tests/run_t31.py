@@ -94,8 +94,11 @@ def sweep(sid, asof_date):
 def main():
     assert CK and DK, "missing api keys"
     # self-seed (idempotent): the unified authority matrix + the cmApproval lifecycle (as run_t30)
+    # explicit slaDays/maxEscalations so the escalation arithmetic is deterministic regardless of
+    # any config another test left on this shared band (the form API merge-updates rows).
     cmbb("mmAuthority", {"id": "AUTH-IA-S", "actionType": "INSTALMENT_PLAN", "amountMin": "5000.01",
-                         "amountMax": "20000", "level": "SUPERVISOR", "bodyType": "SINGLE"})
+                         "amountMax": "20000", "level": "SUPERVISOR", "bodyType": "SINGLE",
+                         "slaDays": "2", "maxEscalations": "2"})
     for fr, to in [("Pending", "Approved"), ("Pending", "Rejected"), ("Pending", "Returned")]:
         cmbb("mmEntityTransition", {"id": f"tr-ap-{to.lower()}", "entity": "cmApproval",
                                     "scope": "DEFAULT", "fromStatus": fr, "toStatus": to})

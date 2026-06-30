@@ -341,6 +341,48 @@ public class ApprovalServiceTest {
         assertEquals(0, ev("APPROVAL_DELEGATED"));
     }
 
+    // ---------------- config: SLA / max-escalations / effective-dating ----------------
+
+    @Test
+    public void slaDays_fromConfig_setsDeadline() {
+        ApprovalService s = svc();
+        put("mmAuthority", row("actionType", "TEST_SLA", "amountMin", "0", "amountMax", "",
+                "level", "SUPERVISOR", "bodyType", "SINGLE", "slaDays", "5"), "auth-sla");
+        s.request("dmInstAgr", "agr-sla", "TEST_SLA", 6000, "clerk", "case-sla", "clerk",
+                LocalDateTime.of(2026, 6, 1, 9, 0));
+        String dl = prop("cmApproval", apId(), "deadline");
+        assertTrue(dl, dl.startsWith("2026-06-06")); // 1 June + 5 SLA days
+    }
+
+    @Test
+    public void maxEscalations_fromConfig_honoured() {
+        ApprovalService s = svc();
+        put("mmAuthority", row("actionType", "TEST_ESC", "amountMin", "0", "amountMax", "",
+                "level", "SUPERVISOR", "bodyType", "SINGLE", "maxEscalations", "1"), "auth-esc");
+        LocalDateTime t = LocalDateTime.of(2026, 6, 1, 9, 0);
+        s.request("dmInstAgr", "agr-esc", "TEST_ESC", 6000, "clerk", "case-esc", "clerk", t);
+        String id = apId();
+        s.sweep(t.plusDays(3), "cron"); // esc 0 < 1 -> escalate once
+        assertEquals("Pending", prop("cmApproval", id, "status"));
+        assertEquals("1", prop("cmApproval", id, "escalations"));
+        String r = s.sweep(t.plusDays(6), "cron"); // esc 1 >= max 1 -> timeout
+        assertTrue(r, r.contains("timedOut=1"));
+        assertEquals("Rejected", prop("cmApproval", id, "status"));
+    }
+
+    @Test
+    public void effectiveDating_picksTheCurrentBand() {
+        ApprovalService s = svc();
+        put("mmAuthority", row("actionType", "TEST_DATE", "amountMin", "0", "amountMax", "",
+                "level", "OFFICER", "bodyType", "SINGLE", "effectiveTo", "2000-01-01"), "auth-old");
+        put("mmAuthority", row("actionType", "TEST_DATE", "amountMin", "0", "amountMax", "",
+                "level", "DIRECTOR", "bodyType", "SINGLE", "effectiveFrom", "2020-01-01"), "auth-new");
+        s.request("dmInstAgr", "agr-dt", "TEST_DATE", 6000, "clerk", "case-dt", "clerk",
+                LocalDateTime.now());
+        // the expired band (effectiveTo 2000) is skipped; the current one (effectiveFrom 2020) wins
+        assertEquals("DIRECTOR", prop("cmApproval", apId(), "requiredLevel"));
+    }
+
     // ---------------- conflict of interest (#3) ----------------
 
     @Test

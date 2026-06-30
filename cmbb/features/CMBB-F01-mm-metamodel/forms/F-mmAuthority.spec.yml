@@ -37,6 +37,14 @@ sections:
     type: textfield
     label: Quorum (collegial)
     storeNumeric: true
+  - id: slaDays
+    type: textfield
+    label: Decision SLA (days)
+    storeNumeric: true
+  - id: maxEscalations
+    type: textfield
+    label: Max escalations before timeout
+    storeNumeric: true
   - id: effectiveFrom
     type: date
     label: Effective from

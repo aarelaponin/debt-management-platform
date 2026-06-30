@@ -61,11 +61,15 @@ public class ApprovalService {
         final String kind;          // SINGLE | CHAIN | QUORUM
         final List<String> levels;  // CHAIN: ordered steps; SINGLE/QUORUM: [level]
         final int quorum;           // QUORUM: N; else 1
+        final int slaDays;          // decision SLA for this band (config; default applied if blank)
+        final int maxEscalations;   // escalations before timeout (config; default if blank)
 
-        Route(String kind, List<String> levels, int quorum) {
+        Route(String kind, List<String> levels, int quorum, int slaDays, int maxEscalations) {
             this.kind = kind;
             this.levels = levels;
             this.quorum = Math.max(quorum, 1);
+            this.slaDays = slaDays;
+            this.maxEscalations = maxEscalations;
         }
 
         String firstLevel() {
@@ -130,7 +134,7 @@ public class ApprovalService {
         ap.setProperty("quorum", String.valueOf(route.quorum));
         ap.setProperty("approvalsCount", "0");
         ap.setProperty("voters", "");
-        ap.setProperty("deadline", now.plusDays(SLA_DAYS).toString());
+        ap.setProperty("deadline", now.plusDays(route.slaDays).toString());
         ap.setProperty("escalations", "0");
         ap.setProperty("delegatedTo", "");
         ap.setProperty("delegatedBy", "");
@@ -156,14 +160,19 @@ public class ApprovalService {
         String level = p(band, "level");
         String bodyType = p(band, "bodyType");
         int q = (int) parseLong(p(band, "quorum"));
+        // SLA + max-escalations are config (mmAuthority); the code constants are the fallback only
+        String sd = p(band, "slaDays");
+        int sla = sd.isEmpty() ? (int) SLA_DAYS : (int) parseLong(sd);
+        String me = p(band, "maxEscalations");
+        int maxEsc = me.isEmpty() ? MAX_ESCALATIONS : (int) parseLong(me);
         if ("CHAIN".equalsIgnoreCase(bodyType)) {
             List<String> steps = splitCsv(level);
-            return steps.isEmpty() ? null : new Route("CHAIN", steps, steps.size());
+            return steps.isEmpty() ? null : new Route("CHAIN", steps, steps.size(), sla, maxEsc);
         }
         if ("COLLEGIAL".equalsIgnoreCase(bodyType)) {
-            return new Route("QUORUM", Collections.singletonList(level), Math.max(q, 1));
+            return new Route("QUORUM", Collections.singletonList(level), Math.max(q, 1), sla, maxEsc);
         }
-        return new Route("SINGLE", Collections.singletonList(level), 1);
+        return new Route("SINGLE", Collections.singletonList(level), 1, sla, maxEsc);
     }
 
     /** The mmAuthority band for (actionType, amount in [amountMin, amountMax]), or null. */
@@ -174,15 +183,34 @@ public class ApprovalService {
         if (rows == null) {
             return null;
         }
+        // effective-dating: only bands valid today; among overlapping matches the most recently
+        // effective (then highest version) wins. ISO yyyy-MM-dd sorts lexicographically.
+        String today = LocalDateTime.now().toString().substring(0, 10);
+        FormRow best = null;
+        String bestFrom = "";
+        long bestVer = -1;
         for (FormRow r : rows) {
             double min = num(p(r, "amountMin"));
             String maxStr = p(r, "amountMax");
             double max = maxStr.isEmpty() ? Double.MAX_VALUE : num(maxStr);
-            if (materiality >= min && materiality <= max) {
-                return r;
+            if (materiality < min || materiality > max) {
+                continue;
+            }
+            String from = p(r, "effectiveFrom");
+            String to = p(r, "effectiveTo");
+            if ((!from.isEmpty() && from.compareTo(today) > 0)
+                    || (!to.isEmpty() && to.compareTo(today) < 0)) {
+                continue; // not effective today
+            }
+            long ver = parseLong(p(r, "version"));
+            if (best == null || from.compareTo(bestFrom) > 0
+                    || (from.equals(bestFrom) && ver > bestVer)) {
+                best = r;
+                bestFrom = from;
+                bestVer = ver;
             }
         }
-        return null;
+        return best;
     }
 
     // ---------------- DECIDE ----------------
@@ -321,13 +349,17 @@ public class ApprovalService {
                 String recordId = p(ap, "recordId");
                 String actionType = p(ap, "actionType");
                 double materiality = num(p(ap, "materiality"));
+                // re-resolve the band so escalation count + extension honour the configured policy
+                Route route = resolveRoute(actionType, materiality);
+                int maxEsc = route == null ? MAX_ESCALATIONS : route.maxEscalations;
+                int slaDays = route == null ? (int) SLA_DAYS : route.slaDays;
                 int esc = (int) parseLong(p(ap, "escalations"));
-                if (esc < MAX_ESCALATIONS) {
+                if (esc < maxEsc) {
                     String from = p(ap, "requiredLevel");
                     String to = DecisionService.nextRank(from);
                     ap.setProperty("requiredLevel", to);
                     ap.setProperty("escalations", String.valueOf(esc + 1));
-                    ap.setProperty("deadline", asOf.plusDays(SLA_DAYS).toString());
+                    ap.setProperty("deadline", asOf.plusDays(slaDays).toString());
                     ap.setProperty("requiredAuthority", to + " (escalated x" + (esc + 1) + ")");
                     save(ap);
                     event(caseId, "APPROVAL_ESCALATED", actor,
