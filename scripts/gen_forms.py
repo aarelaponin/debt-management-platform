@@ -69,7 +69,7 @@ def element(f):
             "rows": str(f.get("rows", 4)), "cols": "80", "readonly": ro(f), "readonlyLabel": "",
             "requiredSanitize": "", "workflowVariable": "", "validator": validator(f)}}
     if t == "select":
-        props = {"id": fid, "label": label, "value": "", "multiple": "", "size": "",
+        props = {"id": fid, "label": label, "value": str(f.get("value", "")), "multiple": "", "size": "",
                  "controlField": "", "controlValue": "", "readonly": ro(f), "readonlyLabel": "",
                  "workflowVariable": "", "validator": validator(f)}
         if "lookup" in f:

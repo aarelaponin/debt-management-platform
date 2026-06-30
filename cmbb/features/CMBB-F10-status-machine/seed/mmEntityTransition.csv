@@ -39,3 +39,6 @@ tr-debt-vat-1,dmDebt,VAT,Identified,Demand notice,,,1
 tr-debt-vat-2,dmDebt,VAT,Demand notice,Final demand,,,1
 tr-debt-vat-3,dmDebt,VAT,Final demand,Bank garnishing,,,1
 tr-debt-vat-4,dmDebt,VAT,Bank garnishing,Field enforcement,,,1
+tr-ap-1,cmApproval,DEFAULT,Pending,Approved,,,1
+tr-ap-2,cmApproval,DEFAULT,Pending,Rejected,,,1
+tr-ap-3,cmApproval,DEFAULT,Pending,Returned,,,1

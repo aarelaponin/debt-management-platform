@@ -1,0 +1,31 @@
+# Decision & Approval Service (#6) — the approval REQUEST carrier. Rows are created and
+# transitioned by ApprovalService (the engine), never via this form directly; the form exists
+# so app_fd_cmApproval + the FormDataDao column mapping + the inbox list exist. All fields are
+# engine-written (managed). The companion list is the approver inbox; the "Decide" row action
+# opens cmApprovalDecision prefilled with this request's id.
+form:
+  id: cmApproval
+  name: Approval request
+  table: cmApproval
+  listColumns: [actionType, materiality, requiredAuthority, status, requestedBy, decidedBy]
+  listRowActions:
+    - {label: Decide, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/cmApprovalDecision_crud?_mode=add', hrefColumn: id, hrefParam: approvalId}
+sections:
+- label: Request
+  columns: 2
+  fields:
+  - {id: entity, type: textfield, label: Entity, managed: true}
+  - {id: recordId, type: textfield, label: Record, managed: true}
+  - {id: actionType, type: textfield, label: Action, managed: true}
+  - {id: materiality, type: textfield, label: Materiality, storeNumeric: true, managed: true}
+  - {id: caseId, type: textfield, label: Case, managed: true}
+  - {id: requestedBy, type: textfield, label: Requested by, managed: true}
+  - {id: requiredAuthority, type: textfield, label: Required authority, managed: true}
+  - {id: status, type: textfield, label: Status, managed: true}
+- label: Decision
+  columns: 2
+  fields:
+  - {id: decision, type: textfield, label: Decision, managed: true}
+  - {id: reason, type: textfield, label: Reason, managed: true}
+  - {id: decidedBy, type: textfield, label: Decided by, managed: true}
+  - {id: decidedAt, type: textfield, label: Decided at, managed: true}

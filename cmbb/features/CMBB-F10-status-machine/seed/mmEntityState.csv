@@ -36,3 +36,7 @@ es-debt-vat-demand,dmDebt,VAT,Demand notice,Demand notice,,,1,true
 es-debt-vat-final,dmDebt,VAT,Final demand,Final demand,,,1,true
 es-debt-vat-garnish,dmDebt,VAT,Bank garnishing,Bank garnishing,,,1,true
 es-debt-vat-enforcement,dmDebt,VAT,Field enforcement,Field enforcement,,true,1,true
+es-ap-pending,cmApproval,DEFAULT,Pending,Pending,true,,1,true
+es-ap-approved,cmApproval,DEFAULT,Approved,Approved,,true,1,true
+es-ap-rejected,cmApproval,DEFAULT,Rejected,Rejected,,true,1,true
+es-ap-returned,cmApproval,DEFAULT,Returned,Returned,,,1,true

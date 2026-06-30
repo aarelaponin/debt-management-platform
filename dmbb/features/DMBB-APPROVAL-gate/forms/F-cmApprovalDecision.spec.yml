@@ -1,0 +1,39 @@
+# Decision & Approval Service (#6) — the approver's decision (trigger form). On create the
+# ApprovalGateEngine runs ApprovalService.decide: separation-of-duties (approver ≠ requester),
+# the guarded + audited Pending→Approved/Rejected/Returned transition, the mandatory-reason
+# first-class record, and (on approve) the gate's DecisionEffect exactly once. Reached from the
+# Approvals inbox "Decide" action, prefilled with the approval id.
+form:
+  id: cmApprovalDecision
+  name: Approval decision
+  table: cmApprovalDecision
+  listColumns: [approvalId, outcome, result]
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.ApprovalGateEngine
+  properties: {}
+  runOn: create
+sections:
+- label: Decision
+  columns: 1
+  fields:
+  - id: approvalId
+    type: textfield
+    label: Approval id
+    value: '#requestParam.approvalId#'
+    required: true
+  - id: outcome
+    type: select
+    label: Decision
+    value: approve
+    static_options:
+    - {value: approve, label: Approve}
+    - {value: reject, label: Reject}
+    - {value: return, label: Return for information}
+  - id: reason
+    type: textarea
+    label: Reason (required)
+    required: true
+  - id: result
+    type: textfield
+    label: Result (set by engine)
+    managed: true

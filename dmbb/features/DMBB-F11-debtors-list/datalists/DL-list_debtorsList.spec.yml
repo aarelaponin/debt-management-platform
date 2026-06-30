@@ -49,14 +49,15 @@ datalist:
   - {id: stage, label: Enforcement stage (contains), type: text, param: fstage}
   - {id: tax_type, label: Tax type, type: text, param: ftax}
   rowActions:
+  # Short, single-word labels keep the action buttons on one line (the Dx theme renders
+  # row actions as buttons; long labels wrap to 2-3 lines and clutter every row).
   # _mode=edit opens the specific record; without it the CRUD shows its default list.
-  - {label: Open case, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmCaseConsole_crud?_mode=edit', hrefColumn: id, hrefParam: id}
-  # Step 6 officer action: launch the instalment form prefilled from this debtor's case
-  # (caseId/tin/total reach the form's field defaults via #requestParam.*#).
-  # Joget datalist actions pass ONE row value only — multiple comma params are NOT
-  # substituted. Pass the TIN; the engine resolves the debtor's case + total from it.
-  - {label: Set up instalment plan, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmInstAgr_crud?_mode=add', hrefColumn: 'tin', hrefParam: 'tin'}
-  - {label: Record payment, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmPayment_crud?_mode=add', hrefColumn: 'tin', hrefParam: 'tin'}
+  - {label: Open, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmCaseConsole_crud?_mode=edit', hrefColumn: id, hrefParam: id}
+  # Officer actions: open the instalment / payment form prefilled from this debtor's case.
+  # Datalist actions carry ONE row value — pass the TIN; FormPrefillLoadBinder resolves the
+  # debtor's open DM case + outstanding from it.
+  - {label: Instalment, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmInstAgr_crud?_mode=add', hrefColumn: 'tin', hrefParam: 'tin'}
+  - {label: Payment, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmPayment_crud?_mode=add', hrefColumn: 'tin', hrefParam: 'tin'}
   sort: {column: total_debt, desc: true}
 notes: 'DM-FR-057 debtors list. UX-QA: sortable columns; category dropdown + stage/tax filters via
   #requestParam.fcat/fstage/ftax# (the verified JDBC filter mechanism — same param a summary cell-drill

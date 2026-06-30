@@ -11,6 +11,7 @@ import org.joget.commons.util.LogUtil;
 import org.joget.plugin.base.DefaultApplicationPlugin;
 import org.joget.workflow.util.WorkflowUtil;
 
+import com.fiscaladmin.mtca.cmbb.service.ApprovalEffects;
 import com.fiscaladmin.mtca.cmbb.service.CaseEventWriter;
 import com.fiscaladmin.mtca.cmbb.service.DeadlineService;
 import com.fiscaladmin.mtca.cmbb.service.JogetProcessStarter;
@@ -85,14 +86,34 @@ public class ReliefProductInterpreter extends DefaultApplicationPlugin {
             return null;
         }
 
-        // APPLY (default)
+        // dmInstAgr create — the record's `action` field picks the path:
+        //   submit -> apply() (eligibility + approval/routing + enforcement hold) [today's finalise]
+        //   else   -> draft() (compute monthly/interest + schedule, status DRAFT, no hold/approval)
+        // Finalising a reviewed DRAFT is the Decision & Approval Service's job (#6, next piece).
         String agrId = resolveId(dao, properties, F_AGR);
         if (agrId == null) {
-            LogUtil.warn(CLASS_NAME, "APPLY: no dmInstAgr resolvable — skipped");
+            LogUtil.warn(CLASS_NAME, "instalment: no dmInstAgr resolvable — skipped");
             return null;
         }
-        String result = svc.apply(agrId, actor, LocalDateTime.now());
-        LogUtil.info(CLASS_NAME, "APPLY " + agrId + ": " + result);
+        FormRow agr = dao.load(F_AGR, F_AGR, agrId);
+        String action = agr == null ? "" : DeadlineService.prop(agr, "action");
+        String result;
+        if ("submit".equalsIgnoreCase(action)) {
+            // ensure resolved (case + outstanding + schedule) as a DRAFT, then route the submit
+            // through the Decision & Approval Service (#6): under the band it auto-passes (the
+            // gate's effect = ReliefService.apply), over the band it raises a Pending approval and
+            // enforcement stays un-held until an authority approves.
+            svc.draft(agrId, actor, LocalDateTime.now());
+            FormRow a2 = dao.load(F_AGR, F_AGR, agrId);
+            double materiality = a2 == null ? 0 : num(DeadlineService.prop(a2, "totalDebt"));
+            String caseId = a2 == null ? "" : DeadlineService.prop(a2, "debtCaseId");
+            result = ApprovalEffects.service(dao).request("dmInstAgr", agrId,
+                    ApprovalEffects.ACTION_INSTALMENT, materiality, actor, caseId, actor,
+                    LocalDateTime.now());
+        } else {
+            result = svc.draft(agrId, actor, LocalDateTime.now());
+        }
+        LogUtil.info(CLASS_NAME, "instalment " + agrId + " action=" + action + ": " + result);
         return null;
     }
 
@@ -114,6 +135,14 @@ public class ReliefProductInterpreter extends DefaultApplicationPlugin {
         Object[] params = F_AGR.equals(form) ? new Object[]{"APPLIED"} : new Object[]{""};
         FormRowSet rows = dao.find(form, form, cond, params, "dateCreated", Boolean.TRUE, 0, 1);
         return (rows == null || rows.isEmpty()) ? null : rows.get(0).getId();
+    }
+
+    private static double num(String s) {
+        try {
+            return (s == null || s.trim().isEmpty()) ? 0 : Double.parseDouble(s.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     private void saveRow(FormDataDao dao, String form, FormRow row) {

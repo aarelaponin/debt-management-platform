@@ -52,10 +52,20 @@ sections:
     label: Requested duration (months)
     storeNumeric: true
     required: true
+  # On save: "Generate draft" computes the monthly + interest + schedule into a DRAFT
+  # (no enforcement hold, no approval) for review; "Submit application" runs the current
+  # finalise (eligibility + approval routing + hold). Submitting a *reviewed* draft via the
+  # standard Decision & Approval Service (Core Service #6) is the next, separate piece.
+  - id: action
+    type: select
+    label: On save
+    value: draft
+    static_options:
+    - {value: draft, label: 'Generate draft (schedule only — no hold, no approval)'}
+    - {value: submit, label: 'Submit application (run eligibility + approval)'}
   - id: status
     type: textfield
     label: Status
-    value: APPLIED
     managed: true
 - label: Decision (set by engine)
   columns: 2

@@ -115,17 +115,18 @@ def dashboard_menu(m, base_dir):
 
 # Business-friendly console: collapse the ~18 per-feature categories into 4 buckets so business users
 # see WHAT THEY DO, not configuration. Mapping is by the spec category label; unknown -> Operations.
-BUCKET_ORDER = ["Dashboards", "Operations", "Automation",
+BUCKET_ORDER = ["Dashboards", "Operations", "Automation", "Approvals",
                 "Collection settings", "Legal & reference"]
 BUCKET_ICON = {"Dashboards": "fa-line-chart", "Operations": "fa-tasks",
-               "Automation": "fa-bolt", "Collection settings": "fa-sliders",
+               "Automation": "fa-bolt", "Approvals": "fa-gavel",
+               "Collection settings": "fa-sliders",
                "Legal & reference": "fa-balance-scale"}
 # Per-role gating + landing (task #60): each bucket is visible only to its directory group.
 # `admin` is a member of all three groups (so superuser/admin checks still see everything);
 # a role user lands on the first bucket they may see. Memberships compose the per-role view:
 # manager -> dm_manager(+dm_officer); officer -> dm_officer; policy admin -> dm_policy_admin(+dm_officer).
 BUCKET_ROLE = {"Dashboards": "dm_manager", "Operations": "dm_officer",
-               "Automation": "dm_policy_admin",
+               "Automation": "dm_policy_admin", "Approvals": "dm_supervisor",
                "Collection settings": "dm_collection_admin",  # operational tier (ADR-004 §7)
                "Legal & reference": "dm_legal_admin"}         # legislative tier (ADR-004 §7)
 # ADR-004 §7 legislative tier: config determined by law/regulation, change-controlled. Everything
@@ -147,6 +148,7 @@ BUCKET = {
     "Write-off": "Operations", "Default assessments": "Operations", "Debtors list": "Operations",
     "Collection MI": "Operations", "Reports": "Operations", "Detail views": "Operations",
     "Operations — batch runs": "Automation",
+    "Approvals": "Approvals",  # Decision & Approval Service (#6) inbox + authority matrix
     "Workflow configuration": "Collection settings",  # ADR-004 §6 workspace entry
     # The admin categories map to a transient "Admin" bucket; each menu is then routed per the
     # ADR-004 §7 operational/legislative split (LEGISLATIVE_FORMS) into the two real buckets.

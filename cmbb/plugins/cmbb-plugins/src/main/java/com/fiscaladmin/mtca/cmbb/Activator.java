@@ -59,6 +59,8 @@ public class Activator implements BundleActivator {
                 DebtorsListEngine.class.getName(), new DebtorsListEngine(), null));
         registrationList.add(context.registerService(
                 CollectionMiEngine.class.getName(), new CollectionMiEngine(), null));
+        registrationList.add(context.registerService(
+                ApprovalGateEngine.class.getName(), new ApprovalGateEngine(), null));
     }
 
     public void stop(BundleContext context) {

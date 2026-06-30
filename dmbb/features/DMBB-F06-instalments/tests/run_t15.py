@@ -69,8 +69,10 @@ def make_debt_case(cid, tin, cat, amount, disputed):
 
 
 def apply_plan(agr, tin, cid, total, months):
+    # action=submit -> the relief engine finalises immediately (the APPLY path); the
+    # default (Generate draft) is exercised by T-15.7.
     dmbb("dmInstAgr", {"id": agr, "tin": tin, "debtCaseId": cid, "totalDebt": total,
-                       "durationMonths": months, "status": "APPLIED"})
+                       "durationMonths": months, "action": "submit", "status": "APPLIED"})
     time.sleep(5)
 
 
@@ -161,6 +163,27 @@ def main():
                 "AND c_eventtype='STATUS_CHANGED'")
     check("T-15.6 dmInstAgr status guarded + audited (approve + reject → 2 STATUS_CHANGED)",
           int(agrSc) >= 2, f"caseA_statusChanged={agrSc}")
+
+    # ---------- T-15.7 generate-draft (action=draft): schedule + DRAFT, NO hold, NO approval ----------
+    caseG, tinG, agrG = f"iaG-{RUN}", f"T15G{RUN}", f"agrG-{RUN}"
+    make_debt_case(caseG, tinG, "C4", "1200", "0")
+    dmbb("dmInstAgr", {"id": agrG, "tin": tinG, "debtCaseId": caseG, "totalDebt": "1200",
+                       "durationMonths": "6", "action": "draft", "status": "APPLIED"})
+    time.sleep(5)
+    statusG = sql(f"SELECT c_status FROM app_fd_dminstagr WHERE id='{agrG}'")
+    linesG = sql(f"SELECT count(*) FROM app_fd_dminstline WHERE c_instagrid='{agrG}'")
+    monthlyG = sql(f"SELECT c_monthlyamount FROM app_fd_dminstagr WHERE id='{agrG}'")
+    holdG = sql("SELECT count(*) FROM app_fd_cmhold WHERE c_caseid='%s' "
+                "AND c_scope='ENFORCEMENT_SUPPRESS' AND c_status='ACTIVE'" % caseG)
+    apprG = sql(f"SELECT count(*) FROM app_fd_cmevent WHERE c_caseid='{caseG}' "
+                "AND c_eventtype='INSTALMENT_APPROVED'")
+    draftEv = sql(f"SELECT count(*) FROM app_fd_cmevent WHERE c_caseid='{caseG}' "
+                  "AND c_eventtype='INSTALMENT_DRAFTED'")
+    check("T-15.7 generate-draft: schedule + DRAFT, no hold, no approval",
+          statusG == "DRAFT" and linesG == "6" and float(monthlyG or 0) > 0
+          and int(holdG) == 0 and int(apprG) == 0 and int(draftEv) >= 1,
+          f"status={statusG} lines={linesG} monthly={monthlyG} hold={holdG} "
+          f"approved={apprG} drafted={draftEv}")
 
     print()
     failed = [n for n, ok in RESULTS if not ok]

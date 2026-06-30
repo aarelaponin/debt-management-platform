@@ -1,0 +1,2 @@
+id,actionType,threshold,authorityRole,topology
+pol-ia-1,INSTALMENT_PLAN,5000,dm_supervisor,single

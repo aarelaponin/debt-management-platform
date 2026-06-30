@@ -1,0 +1,22 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  - label: Approvals
+    permission_role: dm_officer
+    menus:
+    # The approver inbox — Pending (and decided) approval requests; the list's "Decide" row
+    # action opens the decision form prefilled with the request id.
+    - type: datalist
+      datalistId: list_cmApproval
+      label: Approval inbox
+    # The decision trigger (reached from the inbox action; also navigable).
+    - type: crud
+      formDefId: cmApprovalDecision
+      datalistId: list_cmApprovalDecision
+      label: Decide
+    # The authority matrix (Zone B standing config).
+    - type: crud
+      formDefId: mdApprovalPolicy
+      datalistId: list_mdApprovalPolicy
+      label: Approval policy (authority matrix)

@@ -174,7 +174,8 @@ def main():
             idx += 1
         binder = {"className": "org.joget.plugin.enterprise.AdvancedFormRowDataListBinder",
                   "properties": {"formDefId": form_id, "extraCondition": ""}}
-        dl = envelope(f"list_{form_id}", f"List: {spec['form']['name']}", binder, columns, filters, [])
+        ras = [row_action(i, r) for i, r in enumerate(spec["form"].get("listRowActions", []))]
+        dl = envelope(f"list_{form_id}", f"List: {spec['form']['name']}", binder, columns, filters, ras)
         json.dump(dl, open(os.path.join(out_dir, f"list_{form_id}.json"), "w"), indent=2)
         count += 1
         print(f"  + list_{form_id}.json ({len(columns)} cols)")

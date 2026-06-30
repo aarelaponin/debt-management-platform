@@ -71,12 +71,15 @@ public class ReliefService {
         if (agr == null) {
             return "no agreement " + agrId;
         }
-        if (!"".equals(p(agr, "status")) && !"APPLIED".equalsIgnoreCase(p(agr, "status"))) {
-            return "already processed (" + p(agr, "status") + ")"; // idempotent
+        String st0 = p(agr, "status");
+        if (!st0.isEmpty() && !"APPLIED".equalsIgnoreCase(st0) && !"DRAFT".equalsIgnoreCase(st0)) {
+            return "already processed (" + st0 + ")"; // idempotent
         }
-        // dmInstAgr.status is read-only → the data API drops the creator's "APPLIED"; establish the
-        // canonical initial so the guarded moves below (approve/reject) have a valid from-state.
-        if (p(agr, "status").isEmpty()) {
+        // dmInstAgr.status is read-only → the data API drops the creator's "APPLIED", and a
+        // generated DRAFT is finalised here when its approval gate opens (Decision & Approval
+        // Service #6). Establish the canonical initial so the guarded moves below (approve/reject)
+        // have a valid APPLIED from-state.
+        if (st0.isEmpty() || "DRAFT".equalsIgnoreCase(st0)) {
             agr.setProperty("status", "APPLIED");
         }
         String tin = p(agr, "tin");
@@ -130,29 +133,95 @@ public class ReliefService {
         agr.setProperty("totalInterest", String.valueOf(totalInterest));
         agr.setProperty("consecutiveMissed", "0");
 
-        // --- approval (BR-DM-021 auto-approve within params, else route) ---
-        double autoThreshold = relief == null ? 5000 : num(p(relief, "autoThreshold"));
-        int autoMax = relief == null ? 12 : (int) DeadlineService.parseLong(p(relief, "autoMaxMonths"), 12);
-        boolean firstApp = countAgrForTin(tin, agrId) == 0;
-        if (totalDebt < autoThreshold && duration <= autoMax && firstApp) {
-            agr.setProperty("approvalRef", "AUTO");
-            agr.setProperty("complianceStatus", "COMPLIANT");
-            status.apply(F_AGR, agr, "status", debtCaseId, "ACTIVE", SCOPE_DM, actor,
-                    "auto-approved (BR-DM-021)");
-            save(F_AGR, agr);
-            assertHold(debtCaseId, agrId, actor);
-            event(debtCaseId, "INSTALMENT_APPROVED", actor,
-                    "auto-approved (BR-DM-021)", "\"agr\":\"" + CaseEventWriter.esc(agrId)
-                            + "\",\"monthly\":\"" + perLine + "\"");
-            return "ACTIVE (auto-approved, hold asserted)";
+        // --- activate: authority is now the Decision & Approval Service's job (#6). apply()
+        //     only finalises a plan the gate has already authorised — eligibility was checked
+        //     above and the schedule is built, so go ACTIVE and assert the ENFORCEMENT_SUPPRESS
+        //     hold (DM-FR-028). "Whether approval was needed" is the matrix's call, not this one's.
+        if (p(agr, "approvalRef").isEmpty()) {
+            agr.setProperty("approvalRef", "GATE");
         }
-        agr.setProperty("complianceStatus", "");
-        status.apply(F_AGR, agr, "status", debtCaseId, "UNDER_REVIEW", SCOPE_DM, actor,
-                "routed to authority (BR-DM-022)");
+        agr.setProperty("complianceStatus", "COMPLIANT");
+        status.apply(F_AGR, agr, "status", debtCaseId, "ACTIVE", SCOPE_DM, actor,
+                "activated (approval gate)");
         save(F_AGR, agr);
-        event(debtCaseId, "INSTALMENT_UNDER_REVIEW", actor,
-                "routed to authority (BR-DM-022)", "\"agr\":\"" + CaseEventWriter.esc(agrId) + "\"");
-        return "UNDER_REVIEW (outside auto-approval params)";
+        assertHold(debtCaseId, agrId, actor);
+        event(debtCaseId, "INSTALMENT_APPROVED", actor, "activated (approval gate)",
+                "\"agr\":\"" + CaseEventWriter.esc(agrId) + "\",\"monthly\":\"" + perLine + "\"");
+        return "ACTIVE (activated, hold asserted)";
+    }
+
+    // ---------------- DRAFT (generate-only; no approval, no hold) ----------------
+
+    /**
+     * Generate a reviewable DRAFT: resolve the case + outstanding from the TIN, compute the
+     * monthly instalment + projected reduced-rate interest, build the schedule, and leave the
+     * agreement in DRAFT — NO enforcement-suppress hold, NO approval/routing. The officer
+     * reviews the plan (and any eligibility warning, which is informational here — the hard
+     * gate runs at submit). Idempotent by line id, so re-drafting upserts the same lines.
+     * Finalising a reviewed draft is the Decision &amp; Approval Service's job (Core Service #6).
+     */
+    public String draft(String agrId, String actor, LocalDateTime now) {
+        updateSchemas();
+        FormRow agr = dao.load(F_AGR, F_AGR, agrId);
+        if (agr == null) {
+            return "no agreement " + agrId;
+        }
+        String st = p(agr, "status");
+        if (!st.isEmpty() && !"DRAFT".equalsIgnoreCase(st)) {
+            return "already " + st; // only a blank/DRAFT record is draftable
+        }
+        String tin = p(agr, "tin");
+        String debtCaseId = p(agr, "debtCaseId");
+        double totalDebt = num(p(agr, "totalDebt"));
+        int duration = (int) DeadlineService.parseLong(p(agr, "durationMonths"), 12);
+        FormRow relief = firstRow(F_RELIEF);
+        FormRow projrate = firstRow(F_PROJRATE);
+
+        if (debtCaseId.isEmpty() && !tin.isEmpty()) {
+            FormRow primary = resolvePrimaryCase(tin);
+            if (primary != null) {
+                debtCaseId = primary.getId();
+                agr.setProperty("debtCaseId", debtCaseId);
+            }
+        }
+        if (totalDebt == 0 && !debtCaseId.isEmpty()) {
+            FormRow dd0 = dao.load(F_DEBT, F_DEBT, debtCaseId);
+            if (dd0 != null) {
+                totalDebt = num(p(dd0, "consolidatedAmount"));
+                agr.setProperty("totalDebt", String.valueOf(totalDebt));
+            }
+        }
+
+        double reducedRate = projrate == null ? 0 : num(p(projrate, "reducedRate"));
+        double totalInterest = round2(totalDebt * (reducedRate / 100.0) * (duration / 2.0));
+        double perLine = round2((totalDebt + totalInterest) / Math.max(1, duration));
+
+        buildSchedule(agrId, duration, perLine, now);
+        agr.setProperty("monthlyAmount", String.valueOf(perLine));
+        agr.setProperty("totalInterest", String.valueOf(totalInterest));
+        agr.setProperty("consecutiveMissed", "0");
+
+        // informational eligibility note — the binding gate runs at submit (apply)
+        String cat = debtCategory(debtCaseId);
+        String allowed = relief == null ? "C3,C4,C5" : p(relief, "categories");
+        double minInst = relief == null ? 0 : num(p(relief, "minInstalment"));
+        String note;
+        if (cat.isEmpty() || !allowed.toUpperCase().contains(cat.toUpperCase())) {
+            note = "DRAFT — category " + cat + " not in product set " + allowed + " (would reject on submit)";
+        } else if (perLine < minInst) {
+            note = "DRAFT — instalment " + perLine + " below minimum " + minInst + " (would reject on submit)";
+        } else if (hasActivePlan(tin, agrId)) {
+            note = "DRAFT — taxpayer already has an active plan (would reject on submit)";
+        } else {
+            note = "DRAFT — eligible; review then submit for approval";
+        }
+        agr.setProperty("complianceStatus", note);
+        agr.setProperty("status", "DRAFT");
+        save(F_AGR, agr);
+        event(debtCaseId, "INSTALMENT_DRAFTED", actor, note,
+                "\"agr\":\"" + CaseEventWriter.esc(agrId) + "\",\"monthly\":\"" + perLine
+                        + "\",\"lines\":\"" + duration + "\"");
+        return "DRAFT (schedule generated, " + duration + " lines)";
     }
 
     private void buildSchedule(String agrId, int duration, double perLine, LocalDateTime now) {

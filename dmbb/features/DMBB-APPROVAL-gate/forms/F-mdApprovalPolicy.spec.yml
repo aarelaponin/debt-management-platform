@@ -1,0 +1,17 @@
+# Decision & Approval Service (#6) — the authority matrix (Zone B standing config). One row per
+# action band: an approval is required when the action's materiality exceeds `threshold`, routed
+# to `authorityRole` (a Resource-Registry role, by name). Below the lowest band → no approval.
+# `topology` (single/chain/quorum) is recorded for the future routing topologies.
+form:
+  id: mdApprovalPolicy
+  name: Approval policy (authority matrix)
+  table: mdApprovalPolicy
+  listColumns: [actionType, threshold, authorityRole, topology]
+sections:
+- label: Authority band
+  columns: 2
+  fields:
+  - {id: actionType, type: textfield, label: Action type, required: true}
+  - {id: threshold, type: textfield, label: Approval required above (materiality), storeNumeric: true}
+  - {id: authorityRole, type: textfield, label: Authority role}
+  - {id: topology, type: textfield, label: Topology (single/chain/quorum)}

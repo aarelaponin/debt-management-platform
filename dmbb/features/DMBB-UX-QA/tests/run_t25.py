@@ -116,10 +116,11 @@ def main():
         for m in c.get("menus", []):
             if menu_form_id(m) in BATCH:
                 leaks.setdefault(lbl, []).append(menu_form_id(m))
-    # 5-bucket console (ADR-004 §7): Dashboards / Operations / Automation / Collection settings / Legal & reference
+    # Business console (ADR-004 §7): Dashboards / Operations / Automation / Collection settings /
+    # Legal & reference, plus the Decision & Approval Service (#6) inbox bucket "Approvals".
     buckets = {re.sub(r"<[^>]+>", "", c["properties"]["label"]).strip() for c in cats}
-    check("T-25.4 batch triggers live only in Automation; console is the 5 business buckets",
-          not leaks and buckets <= {"Dashboards", "Operations", "Automation",
+    check("T-25.4 batch triggers live only in Automation; console is the business buckets",
+          not leaks and buckets <= {"Dashboards", "Operations", "Automation", "Approvals",
                                     "Collection settings", "Legal & reference"},
           f"leaks={leaks} buckets={sorted(buckets)}")
 
