@@ -24,6 +24,8 @@ import org.joget.apps.form.model.FormRowSet;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fiscaladmin.mtca.cmbb.service.ApprovalEffects;
+import com.fiscaladmin.mtca.cmbb.service.ApprovalService;
 import com.fiscaladmin.mtca.cmbb.service.CaseEventWriter;
 import com.fiscaladmin.mtca.cmbb.service.WriteOffService;
 
@@ -87,6 +89,28 @@ public class WriteOffServiceTest {
         return new WriteOffService(dao, new CaseEventWriter(dao));
     }
 
+    /** The gate's prerequisites: the cmApproval lifecycle + the WRITE_OFF authority bands. */
+    private void seedGate() {
+        String[][] edges = {{"Pending", "Approved"}, {"Pending", "Rejected"}, {"Pending", "Returned"}};
+        for (String[] e : edges) {
+            put("mmEntityTransition", row("entity", "cmApproval", "scope", "DEFAULT",
+                    "fromStatus", e[0], "toStatus", e[1]), "tr-ap-" + e[1]);
+        }
+        put("mmAuthority", row("actionType", "WRITE_OFF", "amountMin", "0", "amountMax", "5000",
+                "level", "SUPERVISOR", "bodyType", "SINGLE"), "AUTH-WO-S");
+        put("mmAuthority", row("actionType", "WRITE_OFF", "amountMin", "5000.01", "amountMax", "",
+                "level", "DIRECTOR", "bodyType", "COLLEGIAL", "quorum", "2"), "AUTH-WO-D");
+    }
+
+    private FormRow approvalFor(String recordId) {
+        for (FormRow r : rows("cmApproval")) {
+            if (recordId.equals(r.getProperty("recordId"))) {
+                return r;
+            }
+        }
+        return null;
+    }
+
     // ---------------- SUBMIT / APPROVE ----------------
 
     @Test
@@ -113,32 +137,31 @@ public class WriteOffServiceTest {
     }
 
     @Test
-    public void submitApprovedRoutesByDelegation() {
+    public void submitDiscretionaryRoutesThroughGate() {
+        // P2: a discretionary write-off no longer routes to the bespoke delegation/cmWriteOffApprove;
+        // submit raises a Decision & Approval Service request that the gate routes off mmAuthority.
+        seedGate();
         debtCase("c3", "T3", "C4", "500");
         put("dmWriteOff", row("debtCaseId", "c3", "tin", "T3", "amount", "500", "woType", "APPROVED",
                 "ground", "WO-MGMT", "enforcementHistorySummary", "5 actions", "evidenceRef", "EV-1",
                 "rationale", "insolvent", "status", "SUBMITTED"), "wo3");
         String r = svc().submit("wo3", "dmo", LocalDateTime.now());
-        assertTrue(r, r.contains("DMO"));
+        assertTrue(r, r.contains("gate"));
         assertEquals("UNDER_REVIEW", prop("dmWriteOff", "wo3", "status"));
-        assertEquals("DMO", prop("dmWriteOff", "wo3", "approvalLevel"));
-
-        debtCase("c3b", "T3B", "C5", "25000");
-        put("dmWriteOff", row("debtCaseId", "c3b", "tin", "T3B", "amount", "25000", "woType", "APPROVED",
-                "ground", "WO-MGMT", "enforcementHistorySummary", "x", "evidenceRef", "EV-2",
-                "rationale", "y", "status", "SUBMITTED"), "wo3b");
-        svc().submit("wo3b", "sdo", LocalDateTime.now());
-        assertEquals("DIRECTOR", prop("dmWriteOff", "wo3b", "approvalLevel"));
+        FormRow ap = approvalFor("wo3");
+        assertTrue("a Pending gate request was raised", ap != null);
+        assertEquals("Pending", ap.getProperty("status"));
+        assertEquals("WRITE_OFF", ap.getProperty("actionType"));
+        assertEquals("SUPERVISOR", ap.getProperty("requiredLevel")); // 500 -> AUTH-WO-S band
     }
 
     @Test
-    public void approvePostsWriteOff() {
+    public void applyApprovedPostsWriteOff() {
+        // P2: the WRITE_OFF DecisionEffect — the gate approved, so post the write-off.
         debtCase("c4", "T4", "C4", "500");
         put("dmWriteOff", row("debtCaseId", "c4", "tin", "T4", "amount", "500",
-                "woType", "APPROVED", "approvalLevel", "DMO", "status", "UNDER_REVIEW"), "wo4");
-        put("cmWriteOffApprove", row("writeOffId", "wo4", "decision", "APPROVE",
-                "approver", "boss"), "ap4");
-        String r = svc().approve("ap4", "boss", LocalDateTime.now());
+                "woType", "APPROVED", "status", "UNDER_REVIEW"), "wo4");
+        String r = svc().applyApproved("wo4", "boss", LocalDateTime.now());
         assertTrue(r, r.startsWith("POSTED"));
         assertEquals("POSTED", prop("dmWriteOff", "wo4", "status"));
         assertEquals("written-off", prop("dmDebt", "c4", "writeOffStatus"));
@@ -146,15 +169,21 @@ public class WriteOffServiceTest {
     }
 
     @Test
-    public void approveRejectReturnsCase() {
+    public void applyApprovedGuardsNonUnderReview() {
+        // the effect is state-guarded + idempotent: only an UNDER_REVIEW write-off posts.
         debtCase("c5", "T5", "C4", "500");
         put("dmWriteOff", row("debtCaseId", "c5", "tin", "T5", "amount", "500",
-                "woType", "APPROVED", "status", "UNDER_REVIEW"), "wo5");
-        put("cmWriteOffApprove", row("writeOffId", "wo5", "decision", "REJECT",
-                "approver", "boss"), "ap5");
-        svc().approve("ap5", "boss", LocalDateTime.now());
-        assertEquals("REJECTED", prop("dmWriteOff", "wo5", "status"));
-        assertEquals("OPEN", prop("cmCase", "c5", "currentState")); // not closed
+                "woType", "APPROVED", "status", "SUBMITTED"), "wo5");
+        String r = svc().applyApproved("wo5", "boss", LocalDateTime.now());
+        assertTrue(r, r.contains("not under review"));
+        assertEquals("SUBMITTED", prop("dmWriteOff", "wo5", "status")); // unchanged
+    }
+
+    @Test
+    public void registryWiresWriteOffEffect() {
+        Map<String, ApprovalService.DecisionEffect> reg = ApprovalEffects.registry(dao);
+        assertTrue("WRITE_OFF effect registered", reg.containsKey("WRITE_OFF"));
+        assertTrue("INSTALMENT_PLAN effect still registered", reg.containsKey("INSTALMENT_PLAN"));
     }
 
     // ---------------- SWEEP ----------------

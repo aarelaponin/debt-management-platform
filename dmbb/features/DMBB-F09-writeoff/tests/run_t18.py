@@ -3,8 +3,7 @@
 
 T-18.1 auto C1 write-off (no human intervention): AUTO_C1 sweep -> C1 case written off + closed (DM-FR-042/BR-DM-036)
 T-18.2 evidence guard: an APPROVED request with no evidence -> REJECTED (BR-DM-039)
-T-18.3 delegation + approval: APPROVED 500 with evidence -> UNDER_REVIEW(DMO); cmWriteOffApprove APPROVE -> POSTED+closed (DM-FR-043)
-T-18.4 delegation level by amount: APPROVED 25000 -> approvalLevel DIRECTOR (BR-DM-037)
+  (T-18.3/T-18.4 retired: discretionary route+approve+post migrated onto the DAS gate — see run_t33)
 T-18.5 statutory bulk: a debt aged past the statutory period -> STATUTORY_BULK writes it off (DM-FR-044/BR-DM-038)
 T-18.6 C2 passive: C2_PASSIVE marks a C2 debt passive-collection, case stays open (DM-FR-045)
 T-18.7 status preservation: a written-off case + its history persist with status written-off (DM-FR-046)
@@ -106,33 +105,9 @@ def main():
     check("T-18.2 APPROVED write-off without evidence REJECTED (BR-DM-039)",
           st2 == "REJECTED" and evc(c2, "WRITEOFF_REJECTED") >= 1, f"status={st2}")
 
-    # ---------- T-18.3 delegation + approval ----------
-    c3 = f"wo3-{RUN}"
-    debt_case(c3, f"T18C{RUN}", "C4", "500")
-    dmbb("dmWriteOff", {"id": f"r3-{RUN}", "debtCaseId": c3, "tin": f"T18C{RUN}", "amount": "500",
-                        "woType": "APPROVED", "ground": "WO-MGMT", "enforcementHistorySummary": "5 steps",
-                        "evidenceRef": "EV-9", "rationale": "insolvent", "status": "SUBMITTED"})
-    time.sleep(4)
-    lvl3 = sql(f"SELECT c_approvallevel FROM app_fd_dmwriteoff WHERE id='r3-{RUN}'")
-    rev3 = sql(f"SELECT c_status FROM app_fd_dmwriteoff WHERE id='r3-{RUN}'")
-    dmbb("cmWriteOffApprove", {"id": f"ap3-{RUN}", "writeOffId": f"r3-{RUN}", "decision": "APPROVE",
-                               "approver": "dmo-jane"})
-    time.sleep(4)
-    st3 = sql(f"SELECT c_status FROM app_fd_dmwriteoff WHERE id='r3-{RUN}'")
-    cs3 = sql(f"SELECT c_currentstate FROM app_fd_cmcase WHERE id='{c3}'")
-    check("T-18.3 APPROVED routes to DMO then approval posts + closes (DM-FR-043)",
-          rev3 == "UNDER_REVIEW" and lvl3 == "DMO" and st3 == "POSTED" and cs3 == "CLOSED",
-          f"routed={rev3}/{lvl3} afterApprove={st3} case={cs3}")
-
-    # ---------- T-18.4 delegation level by amount ----------
-    c4 = f"wo4-{RUN}"
-    debt_case(c4, f"T18D{RUN}", "C5", "25000")
-    dmbb("dmWriteOff", {"id": f"r4-{RUN}", "debtCaseId": c4, "tin": f"T18D{RUN}", "amount": "25000",
-                        "woType": "APPROVED", "ground": "WO-MGMT", "enforcementHistorySummary": "x",
-                        "evidenceRef": "EV-4", "rationale": "y", "status": "SUBMITTED"})
-    time.sleep(4)
-    lvl4 = sql(f"SELECT c_approvallevel FROM app_fd_dmwriteoff WHERE id='r4-{RUN}'")
-    check("T-18.4 large write-off routes to DIRECTOR (BR-DM-037)", lvl4 == "DIRECTOR", f"level={lvl4}")
+    # NOTE (DAS finalisation P2): the discretionary write-off decision (route + approve + post)
+    # was retired from the bespoke cmWriteOffApprove path and migrated onto the Decision &
+    # Approval Service. That end-to-end flow is now proven in run_t33 (write-off via the gate).
 
     # ---------- T-18.5 statutory bulk ----------
     c5 = f"wo5-{RUN}"
@@ -158,11 +133,11 @@ def main():
           still == "written-off" and hist >= 1, f"status={still} events={hist}")
 
     # ---------- T-18.8 dmWriteOff status guarded + audited (ADR-003 migration) ----------
-    # approved case c3 moves SUBMITTED->UNDER_REVIEW->POSTED (2 STATUS_CHANGED); rejected c2 = 1.
-    sc3 = evc(c3, "STATUS_CHANGED")
+    # auto-C1 case c1 moves to POSTED (>=1 STATUS_CHANGED); rejected case c2 -> REJECTED (>=1).
+    sc1 = evc(c1, "STATUS_CHANGED")
     sc2 = evc(c2, "STATUS_CHANGED")
-    check("T-18.8 dmWriteOff status guarded + audited (approve chain 2x + reject 1x STATUS_CHANGED)",
-          sc3 >= 2 and sc2 >= 1, f"approved_case_sc={sc3} rejected_case_sc={sc2}")
+    check("T-18.8 dmWriteOff status guarded + audited (auto-post + reject each >=1 STATUS_CHANGED)",
+          sc1 >= 1 and sc2 >= 1, f"auto_case_sc={sc1} rejected_case_sc={sc2}")
 
     print()
     failed = [n for n, ok in RESULTS if not ok]

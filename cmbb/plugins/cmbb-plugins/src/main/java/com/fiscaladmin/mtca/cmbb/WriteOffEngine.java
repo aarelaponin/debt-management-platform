@@ -16,9 +16,10 @@ import com.fiscaladmin.mtca.cmbb.service.DeadlineService;
 import com.fiscaladmin.mtca.cmbb.service.WriteOffService;
 
 /**
- * WriteOffEngine — DMBB-F09 write-off (DM-FR-042..046). Form post-processor, three modes:
- *  SUBMIT  — dmWriteOff create: evidence guard + delegation; C1_AUTO posts, else UNDER_REVIEW.
- *  APPROVE — cmWriteOffApprove create: an officer's decision posts or rejects.
+ * WriteOffEngine — DMBB-F09 write-off (DM-FR-042..046). Form post-processor, two modes:
+ *  SUBMIT  — dmWriteOff create: evidence guard; C1_AUTO posts directly, else the discretionary
+ *            decision is routed through the Decision &amp; Approval Service (#6) — write-off is the
+ *            gate's second live consumer (DAS finalisation P2); approval fires WRITE_OFF effect.
  *  SWEEP   — cmWriteOffRun: AUTO_C1 / STATUTORY_BULK / C2_PASSIVE.
  */
 public class WriteOffEngine extends DefaultApplicationPlugin {
@@ -67,13 +68,9 @@ public class WriteOffEngine extends DefaultApplicationPlugin {
         WriteOffService svc = new WriteOffService(dao, new CaseEventWriter(dao));
         LocalDateTime now = LocalDateTime.now();
 
-        if ("APPROVE".equalsIgnoreCase(mode)) {
-            String id = resolveId(dao, properties, "cmWriteOffApprove",
-                    "e.customProperties.result = ?1 OR e.customProperties.result IS NULL",
-                    new Object[]{""});
-            log("APPROVE", id, id == null ? "skip" : svc.approve(id, actor, now));
-            return null;
-        }
+        // APPROVE mode retired (DAS finalisation P2): the discretionary write-off decision now
+        // flows through the Decision & Approval Service (cmApprovalDecision → WRITE_OFF effect =
+        // WriteOffService.applyApproved). The bespoke cmWriteOffApprove path is gone.
         if ("SWEEP".equalsIgnoreCase(mode)) {
             String runId = resolveId(dao, properties, "cmWriteOffRun",
                     "e.customProperties.result = ?1 OR e.customProperties.result IS NULL",

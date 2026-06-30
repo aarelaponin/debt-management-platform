@@ -22,7 +22,6 @@ import org.joget.apps.form.model.FormRowSet;
 public class WriteOffService {
 
     public static final String F_WO = "dmWriteOff";
-    public static final String F_APPROVE = "cmWriteOffApprove";
     public static final String F_GROUND = "mdWoGround";
     public static final String F_DELEGATION = "mdWoDelegation";
     public static final String F_POLICY = "mdWoPolicy";
@@ -99,56 +98,42 @@ public class WriteOffService {
             return "REJECTED: insufficient evidence (BR-DM-039)";
         }
 
-        // --- delegation routing (BR-DM-037) ---
-        String level = delegationLevel(amount);
-        wo.setProperty("approvalLevel", level);
+        // --- route the discretionary decision through the Decision & Approval Service (#6) ---
+        // The gate resolves the authority from the unified mmAuthority WRITE_OFF bands (SUPERVISOR
+        // single ≤ band; collegial DIRECTOR quorum above) and, when the decision completes, fires
+        // the WRITE_OFF effect = WriteOffService.applyApproved. Write-off is the gate's second live
+        // consumer (DAS finalisation P2); this retires the bespoke cmWriteOffApprove path.
         status.apply(F_WO, wo, "status", caseId, "UNDER_REVIEW", SCOPE_DM, actor,
-                "routed to " + level + " (BR-DM-037)");
+                "routed to the approval gate");
         save(F_WO, wo);
-        event(caseId, "WRITEOFF_SUBMITTED", actor, "routed to " + level + " (BR-DM-037)",
+        String req = ApprovalEffects.service(dao).request(F_WO, woId,
+                ApprovalEffects.ACTION_WRITEOFF, amount, actor, caseId, actor, now);
+        event(caseId, "WRITEOFF_SUBMITTED", actor, "routed to approval gate: " + req,
                 "\"wo\":\"" + CaseEventWriter.esc(woId) + "\",\"amount\":\"" + amount + "\"");
-        return "UNDER_REVIEW (" + level + ")";
+        return "UNDER_REVIEW (gate: " + req + ")";
     }
 
-    // ---------------- APPROVE ----------------
+    // ---------------- APPROVED EFFECT (DAS gate) ----------------
 
-    public String approve(String approveId, String actor, LocalDateTime now) {
-        FormRow a = dao.load(F_APPROVE, F_APPROVE, approveId);
-        if (a == null) {
-            return "no approval " + approveId;
-        }
-        if (!p(a, "result").isEmpty()) {
-            return "already processed";
-        }
-        FormRow wo = dao.load(F_WO, F_WO, p(a, "writeOffId"));
+    /**
+     * DecisionEffect for the WRITE_OFF action: the Decision &amp; Approval Service has approved the
+     * write-off (single supervisor, or the full collegial quorum) → post it. Idempotent and
+     * state-guarded — only an UNDER_REVIEW write-off is posted; a re-fire on an already-POSTED row
+     * is a no-op. Registered in {@link ApprovalEffects}; replaces the retired cmWriteOffApprove flow.
+     */
+    public String applyApproved(String woId, String actor, LocalDateTime now) {
+        FormRow wo = dao.load(F_WO, F_WO, woId);
         if (wo == null) {
-            a.setProperty("result", "no write-off " + p(a, "writeOffId"));
-            save(F_APPROVE, a);
-            return "no write-off";
+            return "no write-off " + woId;
         }
-        if (!"UNDER_REVIEW".equalsIgnoreCase(p(wo, "status"))) {
-            a.setProperty("result", "write-off not under review (" + p(wo, "status") + ")");
-            save(F_APPROVE, a);
-            return "not under review";
+        String st = p(wo, "status");
+        if ("POSTED".equalsIgnoreCase(st)) {
+            return "already posted";
         }
-        String caseId = p(wo, "debtCaseId");
-        String approver = p(a, "approver");
-        if ("APPROVE".equalsIgnoreCase(p(a, "decision"))) {
-            wo.setProperty("approver", approver);
-            String r = post(wo, caseId, actor, now, "approved by " + approver);
-            a.setProperty("result", r);
-            save(F_APPROVE, a);
-            return r;
+        if (!"UNDER_REVIEW".equalsIgnoreCase(st)) {
+            return "not under review (" + st + ")";
         }
-        wo.setProperty("approver", approver);
-        status.apply(F_WO, wo, "status", caseId, "REJECTED", SCOPE_DM, actor,
-                "rejected by " + approver);
-        save(F_WO, wo);
-        event(caseId, "WRITEOFF_REJECTED", actor, "rejected by " + approver,
-                "\"wo\":\"" + CaseEventWriter.esc(wo.getId()) + "\"");
-        a.setProperty("result", "REJECTED");
-        save(F_APPROVE, a);
-        return "REJECTED by " + approver;
+        return post(wo, p(wo, "debtCaseId"), actor, now, "approved via the approval gate");
     }
 
     // ---------------- SWEEP ----------------
@@ -257,19 +242,6 @@ public class WriteOffService {
     }
 
     // ---------------- helpers ----------------
-
-    private String delegationLevel(double amount) {
-        FormRow d = firstRow(F_DELEGATION);
-        double dmoMax = d == null ? 1000 : num(p(d, "dmoMax"));
-        double sdoMax = d == null ? 20000 : num(p(d, "sdoMax"));
-        if (amount < dmoMax) {
-            return "DMO";
-        }
-        if (amount < sdoMax) {
-            return "SDO";
-        }
-        return "DIRECTOR";
-    }
 
     private FormRow groundByCode(String code) {
         if (code == null || code.isEmpty()) {

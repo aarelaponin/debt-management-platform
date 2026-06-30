@@ -9,11 +9,9 @@ userview_delta:
       formDefId: dmWriteOff
       datalistId: list_dmWriteOff
       label: Write-off records (Write-Off Report)
-    - type: crud
-      formDefId: cmWriteOffApprove
-      datalistId: list_cmWriteOffApprove
-      label: Write-off approvals
-    # UX-QA3: cmWriteOffRun batch trigger moved to "Operations — batch runs"
+    # DAS finalisation P2: bespoke "Write-off approvals" (cmWriteOffApprove) retired — the
+    # discretionary write-off decision now flows through the Approvals inbox (Decision &
+    # Approval Service). UX-QA3: cmWriteOffRun batch trigger lives under "Operations — batch runs".
   - label: Write-off config
     permission_role: dm_policy_admin
     menus:

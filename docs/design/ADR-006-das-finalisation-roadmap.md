@@ -1,6 +1,8 @@
 # ADR-006 — Finalising the Decision & Approval Service into a comprehensive, platform-shared component
 
-**Status:** Accepted (roadmap — phase build in progress)
+**Status:** Accepted (roadmap — phase build in progress).
+**Progress:** P0 ✅ (spike + integration contract, `4eb4287`) · P1 ✅ (config-ify SLA/escalation/effective-dating, `f70ec2d`) · P2 ✅ (write-off is the 2nd live consumer — `WRITE_OFF` effect = `WriteOffService.applyApproved`, `submit()` raises the gate request, bespoke `cmWriteOffApprove` engine path retired; run_t33 4/4 + trimmed run_t18 6/6 + full regression t02–t33+t37 **33/33 green**). P3–P6 pending.
+**Deferred (cosmetic, P6 cleanup):** the live `cmWriteOffApprove` userview menu node is retired in the UV-delta spec but not yet removed from the deployed `dmbbConsole` (it is now a harmless no-op — its post-processor branch is gone). Remove it on the next faithful dmbb userview regen with the verified UV-delta ORDER (the stale ORDER in `RESUME-dashboard-polish.md` predates DMBB-APPROVAL-gate + DMBB-WF and must not be used as-is).
 **Date:** 2026-06-30
 **Builds on:** ADR-005 (DAS depth — routing, escalation/timeout/delegation, COI). The engine, the
 unified `mmAuthority` matrix, `mmCoi`, and the lifecycle are live and green (regression 2..32).

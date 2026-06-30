@@ -13,12 +13,15 @@ import org.joget.apps.form.dao.FormDataDao;
  * the band or is approved.
  *
  * <p>First effect: {@code INSTALMENT_PLAN → ReliefService.apply} (finalise the instalment:
- * eligibility + approval bookkeeping + the ENFORCEMENT_SUPPRESS hold). Later actions (write-off,
- * waiver, hold-release) add a line here, not a new approval flow.
+ * eligibility + approval bookkeeping + the ENFORCEMENT_SUPPRESS hold). Second effect:
+ * {@code WRITE_OFF → WriteOffService.applyApproved} (post the approved write-off) — the reuse
+ * proof that a structurally different action (collegial quorum, a different effect) drives the
+ * same gate. Later actions (waiver, hold-release) add a line here, not a new approval flow.
  */
 public final class ApprovalEffects {
 
     public static final String ACTION_INSTALMENT = "INSTALMENT_PLAN";
+    public static final String ACTION_WRITEOFF = "WRITE_OFF";
 
     private ApprovalEffects() {
     }
@@ -28,6 +31,9 @@ public final class ApprovalEffects {
         effects.put(ACTION_INSTALMENT, (entity, recordId, actor, now) ->
                 new ReliefService(dao, new CaseEventWriter(dao), new JogetProcessStarter())
                         .apply(recordId, actor, now));
+        effects.put(ACTION_WRITEOFF, (entity, recordId, actor, now) ->
+                new WriteOffService(dao, new CaseEventWriter(dao))
+                        .applyApproved(recordId, actor, now));
         return effects;
     }
 
