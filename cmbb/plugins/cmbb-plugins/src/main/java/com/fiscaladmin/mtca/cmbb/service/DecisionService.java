@@ -41,6 +41,16 @@ public class DecisionService {
         return i < 0 ? 0 : i + 1;
     }
 
+    /** The authority level one step above {@code level}; the top level if already at/above it
+     *  (used by approval escalation). An unknown level escalates to the lowest known. */
+    static String nextRank(String level) {
+        int i = RANKS.indexOf(level == null ? "" : level.trim().toUpperCase());
+        if (i < 0) {
+            return RANKS.get(0);
+        }
+        return i + 1 < RANKS.size() ? RANKS.get(i + 1) : RANKS.get(RANKS.size() - 1);
+    }
+
     /** mmAuthority row for (actionType, amount in band), or null. */
     FormRow requiredRow(String actionType, double amount) {
         FormRowSet rows = dao.find(F_AUTH, F_AUTH,

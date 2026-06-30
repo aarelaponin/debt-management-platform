@@ -47,6 +47,8 @@ public class ApprovalService {
     public static final String F_AUTH = "mmAuthority";
     private static final List<String> SCOPE = Collections.singletonList("DEFAULT");
     private static final int FETCH_ALL = 100000;
+    private static final long SLA_DAYS = 2;        // default approval SLA (calendar days)
+    private static final int MAX_ESCALATIONS = 2;  // escalate this many times, then time out
     private static final String CLASS_NAME = ApprovalService.class.getName();
 
     /** The module's lifecycle step the gate runs when an action is approved (or auto-passes). */
@@ -126,6 +128,10 @@ public class ApprovalService {
         ap.setProperty("quorum", String.valueOf(route.quorum));
         ap.setProperty("approvalsCount", "0");
         ap.setProperty("voters", "");
+        ap.setProperty("deadline", now.plusDays(SLA_DAYS).toString());
+        ap.setProperty("escalations", "0");
+        ap.setProperty("delegatedTo", "");
+        ap.setProperty("delegatedBy", "");
         ap.setProperty("requiredAuthority", route.describe());
         ap.setProperty("status", "Pending"); // plain genesis (guarded moves run at decide)
         ap.setProperty("reason", "");
@@ -279,7 +285,98 @@ public class ApprovalService {
                         + ",\"outcome\":\"" + CaseEventWriter.esc(target) + "\"");
     }
 
+    // ---------------- SWEEP (escalation / timeout) + DELEGATE ----------------
+
+    /**
+     * SWEEP: escalate or time out overdue Pending requests. A request past its deadline escalates
+     * one rank up (the gate then needs a higher authority) up to {@link #MAX_ESCALATIONS}, after
+     * which it is auto-<b>rejected</b> as a timeout (never auto-approved — AP-D5). {@code asOf}
+     * supports time-travel for testing. Returns a one-line summary.
+     */
+    public String sweep(LocalDateTime asOf, String actor) {
+        updateSchemas();
+        FormRowSet rows = dao.find(F_APPROVAL, F_APPROVAL,
+                "WHERE e.customProperties.status = ?1", new Object[]{"Pending"},
+                null, Boolean.FALSE, 0, FETCH_ALL);
+        int escalated = 0;
+        int timedOut = 0;
+        if (rows != null) {
+            for (FormRow ap : rows) {
+                String dl = p(ap, "deadline");
+                if (dl.isEmpty() || !before(dl, asOf)) {
+                    continue; // not overdue
+                }
+                String caseId = p(ap, "caseId");
+                String entity = p(ap, "entity");
+                String recordId = p(ap, "recordId");
+                String actionType = p(ap, "actionType");
+                double materiality = num(p(ap, "materiality"));
+                int esc = (int) parseLong(p(ap, "escalations"));
+                if (esc < MAX_ESCALATIONS) {
+                    String from = p(ap, "requiredLevel");
+                    String to = DecisionService.nextRank(from);
+                    ap.setProperty("requiredLevel", to);
+                    ap.setProperty("escalations", String.valueOf(esc + 1));
+                    ap.setProperty("deadline", asOf.plusDays(SLA_DAYS).toString());
+                    ap.setProperty("requiredAuthority", to + " (escalated x" + (esc + 1) + ")");
+                    save(ap);
+                    event(caseId, "APPROVAL_ESCALATED", actor,
+                            "overdue: escalated " + from + " -> " + to + " (#" + (esc + 1) + ")",
+                            extra(entity, recordId, actionType, materiality, to));
+                    escalated++;
+                } else {
+                    String reason = "SLA timeout after " + esc + " escalations";
+                    event(caseId, "APPROVAL_TIMEOUT", actor, reason,
+                            extra(entity, recordId, actionType, materiality, p(ap, "requiredLevel")));
+                    finalize(ap, caseId, entity, recordId, actionType, materiality,
+                            p(ap, "requiredAuthority"), "Rejected", actor, reason, asOf);
+                    timedOut++;
+                }
+            }
+        }
+        return "swept asOf " + asOf + ": escalated=" + escalated + ", timedOut=" + timedOut;
+    }
+
+    /**
+     * DELEGATE: reassign a Pending request to another approver (a "please handle this" hand-off).
+     * The delegate still decides under the normal rank gate + SoD — delegation routes the work, it
+     * does not confer authority. Records the delegation on the request + a first-class event.
+     */
+    public String delegate(String approvalId, String fromApprover, String delegateTo, String reason,
+                           LocalDateTime now) {
+        updateSchemas();
+        FormRow ap = dao.load(F_APPROVAL, F_APPROVAL, approvalId);
+        if (ap == null) {
+            return "no approval " + approvalId;
+        }
+        if (!"Pending".equalsIgnoreCase(p(ap, "status"))) {
+            return "already decided (" + p(ap, "status") + ")";
+        }
+        if (delegateTo == null || delegateTo.trim().isEmpty()) {
+            return "delegate target required";
+        }
+        if (reason == null || reason.trim().isEmpty()) {
+            return "reason required";
+        }
+        ap.setProperty("delegatedTo", delegateTo);
+        ap.setProperty("delegatedBy", fromApprover);
+        save(ap);
+        event(p(ap, "caseId"), "APPROVAL_DELEGATED", fromApprover,
+                "delegated to " + delegateTo + ": " + reason,
+                extra(p(ap, "entity"), p(ap, "recordId"), p(ap, "actionType"),
+                        num(p(ap, "materiality")), p(ap, "requiredLevel")));
+        return "DELEGATED to " + delegateTo;
+    }
+
     // ---------------- helpers ----------------
+
+    private static boolean before(String iso, LocalDateTime asOf) {
+        try {
+            return LocalDateTime.parse(iso).isBefore(asOf);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     private String runEffect(String entity, String recordId, String actionType, String actor,
                              LocalDateTime now) {

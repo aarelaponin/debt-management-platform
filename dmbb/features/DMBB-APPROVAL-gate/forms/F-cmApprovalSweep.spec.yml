@@ -1,0 +1,19 @@
+# Decision & Approval Service (#6) — the SLA sweep trigger. On create, ApprovalSweepEngine runs the
+# escalation/timeout pass over Pending requests as of `asOf` (blank = now; a bare date time-travels
+# the clock). Overdue requests escalate one rank up; once escalations are exhausted they time out
+# (auto-reject — never auto-approve, AP-D5).
+form:
+  id: cmApprovalSweep
+  name: Approval SLA sweep
+  table: cmApprovalSweep
+  listColumns: [asOf, result]
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.ApprovalSweepEngine
+  properties: {}
+  runOn: create
+sections:
+- label: Sweep
+  columns: 1
+  fields:
+  - {id: asOf, type: textfield, label: 'As of (blank = now; YYYY-MM-DD to time-travel)'}
+  - {id: result, type: textfield, label: Result (set by engine), managed: true}

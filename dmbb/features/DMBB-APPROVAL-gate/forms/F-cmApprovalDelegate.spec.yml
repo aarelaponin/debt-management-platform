@@ -1,0 +1,21 @@
+# Decision & Approval Service (#6) — delegate a pending request to another approver. On create,
+# ApprovalDelegateEngine records the hand-off (delegatedTo/By + APPROVAL_DELEGATED); the delegate
+# still decides under the normal rank gate + separation-of-duties — delegation routes the work, it
+# does not confer authority. Reached from the inbox; prefilled with the approval id.
+form:
+  id: cmApprovalDelegate
+  name: Delegate approval
+  table: cmApprovalDelegate
+  listColumns: [approvalId, delegateTo, result]
+postProcessor:
+  className: com.fiscaladmin.mtca.cmbb.ApprovalDelegateEngine
+  properties: {}
+  runOn: create
+sections:
+- label: Delegate
+  columns: 1
+  fields:
+  - {id: approvalId, type: textfield, label: Approval id, value: '#requestParam.approvalId#', required: true}
+  - {id: delegateTo, type: textfield, label: Delegate to (username), required: true}
+  - {id: reason, type: textarea, label: Reason (required), required: true}
+  - {id: result, type: textfield, label: Result (set by engine), managed: true}

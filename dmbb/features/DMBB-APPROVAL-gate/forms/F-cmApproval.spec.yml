@@ -36,6 +36,15 @@ sections:
   - {id: quorum, type: textfield, label: Quorum, storeNumeric: true, managed: true}
   - {id: approvalsCount, type: textfield, label: Approvals so far, storeNumeric: true, managed: true}
   - {id: voters, type: textfield, label: Voters, managed: true}
+- label: SLA & delegation
+  columns: 2
+  # Deadline drives the sweep: an overdue request escalates one rank up (escalations++) and on
+  # exhaustion times out (auto-reject). delegatedTo/By record a hand-off to another approver.
+  fields:
+  - {id: deadline, type: textfield, label: Decision due by, managed: true}
+  - {id: escalations, type: textfield, label: Escalations, storeNumeric: true, managed: true}
+  - {id: delegatedTo, type: textfield, label: Delegated to, managed: true}
+  - {id: delegatedBy, type: textfield, label: Delegated by, managed: true}
 - label: Decision
   columns: 2
   fields:

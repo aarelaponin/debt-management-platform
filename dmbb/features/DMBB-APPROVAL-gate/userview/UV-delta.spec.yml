@@ -15,6 +15,16 @@ userview_delta:
       formDefId: cmApprovalDecision
       datalistId: list_cmApprovalDecision
       label: Decide
+    # Hand a pending request to another approver (rank gate preserved).
+    - type: crud
+      formDefId: cmApprovalDelegate
+      datalistId: list_cmApprovalDelegate
+      label: Delegate
+    # The SLA sweep: escalate overdue requests one rank up, then time out (auto-reject).
+    - type: crud
+      formDefId: cmApprovalSweep
+      datalistId: list_cmApprovalSweep
+      label: SLA sweep
     # The authority matrix (mmAuthority) is unified with the F08 decision matrix and administered
     # in the cmbb (spine) console — ADR-005. The dmbb Approvals bucket is the operational surface
     # only: the approver inbox + the decision trigger.

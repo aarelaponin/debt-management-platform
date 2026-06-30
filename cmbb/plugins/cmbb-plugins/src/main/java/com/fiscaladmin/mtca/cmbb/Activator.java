@@ -61,6 +61,10 @@ public class Activator implements BundleActivator {
                 CollectionMiEngine.class.getName(), new CollectionMiEngine(), null));
         registrationList.add(context.registerService(
                 ApprovalGateEngine.class.getName(), new ApprovalGateEngine(), null));
+        registrationList.add(context.registerService(
+                ApprovalSweepEngine.class.getName(), new ApprovalSweepEngine(), null));
+        registrationList.add(context.registerService(
+                ApprovalDelegateEngine.class.getName(), new ApprovalDelegateEngine(), null));
     }
 
     public void stop(BundleContext context) {

@@ -277,6 +277,70 @@ public class ApprovalServiceTest {
         assertEquals(1, rows("cmApproval").size());
     }
 
+    // ---------------- escalation / timeout / delegation ----------------
+
+    @Test
+    public void sweep_escalatesOverdue_bumpsRankOneStep() {
+        ApprovalService s = svc();
+        req(s, "agr-e", 6000, "case-e"); // SINGLE SUPERVISOR, deadline now+2d
+        String id = apId();
+        String r = s.sweep(LocalDateTime.now().plusDays(3), "cron");
+        assertTrue(r, r.contains("escalated=1"));
+        assertEquals("Pending", prop("cmApproval", id, "status"));
+        assertEquals("MANAGER", prop("cmApproval", id, "requiredLevel"));
+        assertEquals("1", prop("cmApproval", id, "escalations"));
+        assertEquals(0, effectRuns);
+        assertEquals(1, ev("APPROVAL_ESCALATED"));
+    }
+
+    @Test
+    public void sweep_timesOutAfterMaxEscalations_rejects_noEffect() {
+        ApprovalService s = svc();
+        req(s, "agr-t", 6000, "case-t");
+        String id = apId();
+        s.sweep(LocalDateTime.now().plusDays(3), "cron"); // esc1 SUPERVISOR->MANAGER
+        s.sweep(LocalDateTime.now().plusDays(6), "cron"); // esc2 MANAGER->DIRECTOR
+        String r = s.sweep(LocalDateTime.now().plusDays(9), "cron"); // esc==MAX -> timeout
+        assertTrue(r, r.contains("timedOut=1"));
+        assertEquals("Rejected", prop("cmApproval", id, "status"));
+        assertEquals("DIRECTOR", prop("cmApproval", id, "requiredLevel"));
+        assertEquals(0, effectRuns);
+        assertEquals(1, ev("APPROVAL_TIMEOUT"));
+    }
+
+    @Test
+    public void sweep_leavesInTimeRequestsUntouched() {
+        ApprovalService s = svc();
+        req(s, "agr-i", 6000, "case-i"); // deadline now+2d
+        String r = s.sweep(LocalDateTime.now().plusDays(1), "cron"); // before the deadline
+        assertTrue(r, r.contains("escalated=0") && r.contains("timedOut=0"));
+        assertEquals("SUPERVISOR", prop("cmApproval", apId(), "requiredLevel"));
+        assertEquals(0, ev("APPROVAL_ESCALATED"));
+    }
+
+    @Test
+    public void delegate_recordsHandoff_staysPending() {
+        ApprovalService s = svc();
+        req(s, "agr-d", 6000, "case-d");
+        String id = apId();
+        String r = s.delegate(id, "boss", "deputy", "please cover for me", LocalDateTime.now());
+        assertTrue(r, r.startsWith("DELEGATED"));
+        assertEquals("deputy", prop("cmApproval", id, "delegatedTo"));
+        assertEquals("boss", prop("cmApproval", id, "delegatedBy"));
+        assertEquals("Pending", prop("cmApproval", id, "status"));
+        assertEquals(1, ev("APPROVAL_DELEGATED"));
+    }
+
+    @Test
+    public void delegate_requiresTargetAndReason() {
+        ApprovalService s = svc();
+        req(s, "agr-d2", 6000, "case-d2");
+        String id = apId();
+        assertEquals("delegate target required", s.delegate(id, "boss", " ", "r", LocalDateTime.now()));
+        assertEquals("reason required", s.delegate(id, "boss", "deputy", " ", LocalDateTime.now()));
+        assertEquals(0, ev("APPROVAL_DELEGATED"));
+    }
+
     // ---------------- fake store ----------------
 
     private FormRowSet query(String form, String cond, Object[] params, Integer limit) {
