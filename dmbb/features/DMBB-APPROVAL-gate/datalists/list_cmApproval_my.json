@@ -1,0 +1,197 @@
+{
+ "id": "list_cmApproval_my",
+ "name": "Approvals \u2014 mine to decide",
+ "binder": {
+  "className": "com.fiscaladmin.mtca.cmbb.ApprovalInboxBinder",
+  "properties": {}
+ },
+ "columns": [
+  {
+   "name": "caseId",
+   "id": "column_0",
+   "label": "Case",
+   "hidden": "false",
+   "renderHtml": "",
+   "format": {
+    "className": "",
+    "properties": {}
+   },
+   "sortable": "true",
+   "datalist_type": "column",
+   "exclude_export": "",
+   "width": "",
+   "headerAlignment": "",
+   "alignment": "",
+   "style": "",
+   "action": {
+    "className": "",
+    "properties": {}
+   }
+  },
+  {
+   "name": "actionType",
+   "id": "column_1",
+   "label": "Action",
+   "hidden": "false",
+   "renderHtml": "",
+   "format": {
+    "className": "",
+    "properties": {}
+   },
+   "sortable": "true",
+   "datalist_type": "column",
+   "exclude_export": "",
+   "width": "",
+   "headerAlignment": "",
+   "alignment": "",
+   "style": "",
+   "action": {
+    "className": "",
+    "properties": {}
+   }
+  },
+  {
+   "name": "requiredLevel",
+   "id": "column_2",
+   "label": "Required level",
+   "hidden": "false",
+   "renderHtml": "",
+   "format": {
+    "className": "",
+    "properties": {}
+   },
+   "sortable": "true",
+   "datalist_type": "column",
+   "exclude_export": "",
+   "width": "",
+   "headerAlignment": "",
+   "alignment": "",
+   "style": "",
+   "action": {
+    "className": "",
+    "properties": {}
+   }
+  },
+  {
+   "name": "materiality",
+   "id": "column_3",
+   "label": "Materiality",
+   "hidden": "false",
+   "renderHtml": "",
+   "format": {
+    "className": "",
+    "properties": {}
+   },
+   "sortable": "true",
+   "datalist_type": "column",
+   "exclude_export": "",
+   "width": "",
+   "headerAlignment": "",
+   "alignment": "",
+   "style": "",
+   "action": {
+    "className": "",
+    "properties": {}
+   }
+  },
+  {
+   "name": "requestedBy",
+   "id": "column_4",
+   "label": "Requested by",
+   "hidden": "false",
+   "renderHtml": "",
+   "format": {
+    "className": "",
+    "properties": {}
+   },
+   "sortable": "true",
+   "datalist_type": "column",
+   "exclude_export": "",
+   "width": "",
+   "headerAlignment": "",
+   "alignment": "",
+   "style": "",
+   "action": {
+    "className": "",
+    "properties": {}
+   }
+  },
+  {
+   "name": "deadline",
+   "id": "column_5",
+   "label": "Decide by",
+   "hidden": "false",
+   "renderHtml": "",
+   "format": {
+    "className": "",
+    "properties": {}
+   },
+   "sortable": "true",
+   "datalist_type": "column",
+   "exclude_export": "",
+   "width": "",
+   "headerAlignment": "",
+   "alignment": "",
+   "style": "",
+   "action": {
+    "className": "",
+    "properties": {}
+   }
+  },
+  {
+   "name": "recordId",
+   "id": "column_6",
+   "label": "Record",
+   "hidden": "false",
+   "renderHtml": "",
+   "format": {
+    "className": "",
+    "properties": {}
+   },
+   "sortable": "true",
+   "datalist_type": "column",
+   "exclude_export": "",
+   "width": "",
+   "headerAlignment": "",
+   "alignment": "",
+   "style": "",
+   "action": {
+    "className": "",
+    "properties": {}
+   }
+  },
+  {
+   "name": "id",
+   "id": "column_7",
+   "label": "Approval id",
+   "hidden": "false",
+   "renderHtml": "",
+   "format": {
+    "className": "",
+    "properties": {}
+   },
+   "sortable": "true",
+   "datalist_type": "column",
+   "exclude_export": "",
+   "width": "",
+   "headerAlignment": "",
+   "alignment": "",
+   "style": "",
+   "action": {
+    "className": "",
+    "properties": {}
+   }
+  }
+ ],
+ "filters": [],
+ "actions": [],
+ "rowActions": [],
+ "order": "ASC",
+ "orderBy": "deadline",
+ "useSession": "false",
+ "showPageSizeSelector": "true",
+ "pageSize": 0,
+ "pageSizeSelectorOptions": "10,20,30,40,50,100",
+ "buttonPosition": "bothLeft",
+ "checkboxPosition": "left"
+}

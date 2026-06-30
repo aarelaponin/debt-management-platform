@@ -5,11 +5,15 @@ userview_delta:
   - label: Approvals
     permission_role: dm_officer
     menus:
-    # The approver inbox — Pending (and decided) approval requests; the list's "Decide" row
-    # action opens the decision form prefilled with the request id.
+    # DAS P3b — the PER-USER inbox: only the requests THIS logged-in officer may decide, resolved
+    # from their directory role-groups via the ApprovalInboxBinder (API-only; no dir_* SQL).
+    - type: datalist
+      datalistId: list_cmApproval_my
+      label: My approvals — to decide
+    # The full approver inbox — all Pending (and decided) approval requests across the unit.
     - type: datalist
       datalistId: list_cmApproval
-      label: Approval inbox
+      label: Approval inbox (all)
     # The decision trigger (reached from the inbox action; also navigable).
     - type: crud
       formDefId: cmApprovalDecision

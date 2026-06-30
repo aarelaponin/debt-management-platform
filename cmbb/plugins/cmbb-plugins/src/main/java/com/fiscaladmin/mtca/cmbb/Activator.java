@@ -65,6 +65,8 @@ public class Activator implements BundleActivator {
                 ApprovalSweepEngine.class.getName(), new ApprovalSweepEngine(), null));
         registrationList.add(context.registerService(
                 ApprovalDelegateEngine.class.getName(), new ApprovalDelegateEngine(), null));
+        registrationList.add(context.registerService(
+                ApprovalInboxBinder.class.getName(), new ApprovalInboxBinder(), null));
     }
 
     public void stop(BundleContext context) {
