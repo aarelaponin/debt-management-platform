@@ -1,6 +1,6 @@
 # ADR-005 — Decision & Approval Service (#6) depth: one authority matrix, routed topologies
 
-**Status:** Accepted (build in progress — slice 1 = chain + quorum routing)
+**Status:** Accepted (slices 1–3 built + live-green: routing, escalation/timeout/delegation, COI)
 **Date:** 2026-06-30
 **Extends:** the minimal #6 gate (ApprovalService over `mdApprovalPolicy`, run_t30 5/5) and the
 CMBB-F08 decision service (`DecisionService` over `mmAuthority`, run_t08).
@@ -84,10 +84,11 @@ At the live UI the level is the approver's profile level; in tests it is supplie
   decision config — a cleaner operational/spine separation.
 - `mdApprovalPolicy` (form + seed + the "Approval policy" menu) is **removed**; its instalment band is
   re-expressed as `mmAuthority` rows. `run_t30` seeds `mmAuthority`.
-- **Slice plan.** Slice 1 (this build): chain + quorum routing + rank gate on the unified matrix.
-  Slice 2: escalation / delegation / timeout (reusing the F05 DeadlineEngine clock + a sweep).
-  Slice 3: Conflict-of-Interest (#3), reusing F08's `EXCLUDE_DECISION_MAKER`. Then migrate write-off
-  off its bespoke approval onto the gate.
+- **Slice plan (all delivered).** Slice 1: chain + quorum routing + rank gate on the unified matrix
+  (run_t30). Slice 2: SLA escalation / timeout / delegation via a sweep trigger (run_t31). Slice 3:
+  Conflict-of-Interest (#3) reusing the `mmCoi` register with an `EXCLUDE_APPROVER` rule (`approver|tin`
+  with `*` wildcards), blocking a conflicted approver beyond four-eyes SoD (run_t32). **Next (future):**
+  migrate write-off off its bespoke approval onto this gate.
 
 ## 5. Alternatives considered
 

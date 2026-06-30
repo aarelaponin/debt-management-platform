@@ -86,13 +86,15 @@ public class ApprovalService {
     private final FormDataDao dao;
     private final CaseEventWriter events;
     private final StatusManager status;
+    private final MmConfigService mm;
     private final Map<String, DecisionEffect> effects;
 
     public ApprovalService(FormDataDao dao, CaseEventWriter events, Map<String, DecisionEffect> effects) {
         this.dao = dao;
         this.events = events;
         this.effects = effects;
-        this.status = new StatusManager(dao, new MmConfigService(dao), events);
+        this.mm = new MmConfigService(dao);
+        this.status = new StatusManager(dao, mm, events);
     }
 
     // ---------------- REQUEST ----------------
@@ -211,6 +213,14 @@ public class ApprovalService {
                     "separation of duties: approver == requester (" + approver + ")",
                     extra(entity, recordId, actionType, materiality, authority));
             return "SoD: approver == requester";
+        }
+        // conflict of interest (#3, GCMF §3.3-3) — an approver barred from this subject by an
+        // mmCoi EXCLUDE_APPROVER rule may not decide it at all (blocking, request stays Pending)
+        if (coiBarred(approver, caseId)) {
+            event(caseId, "APPROVAL_COI_BLOCKED", approver,
+                    "conflict of interest: " + approver + " is barred from deciding this request",
+                    extra(entity, recordId, actionType, materiality, authority));
+            return "COI: approver barred";
         }
 
         // reject / return are terminal for the whole request (a reject anywhere stops the route)
@@ -376,6 +386,42 @@ public class ApprovalService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * COI (#3, GCMF §3.3-3): true when an {@code mmCoi} EXCLUDE_APPROVER rule for the request's
+     * case type bars this approver from this subject. The rule {@code expression} is a comma list of
+     * {@code approver|tin} tokens; {@code *} is a wildcard on either side ({@code *|TIN} bars everyone
+     * for one taxpayer; {@code user|*} bars one user across the case type). Reuses the F08 register.
+     */
+    private boolean coiBarred(String approver, String caseId) {
+        if (approver == null || approver.isEmpty() || caseId == null || caseId.isEmpty()) {
+            return false;
+        }
+        FormRow c = dao.load("cmCase", "cmCase", caseId);
+        if (c == null) {
+            return false;
+        }
+        FormRowSet rules = mm.coiRules(p(c, "caseType"));
+        if (rules == null) {
+            return false;
+        }
+        String tin = p(c, "tin");
+        for (FormRow r : rules) {
+            if (!"EXCLUDE_APPROVER".equalsIgnoreCase(p(r, "ruleType"))) {
+                continue;
+            }
+            for (String token : p(r, "expression").split("[,;]")) {
+                String[] ab = token.trim().split("\\|", 2);
+                String who = ab[0].trim();
+                String which = ab.length > 1 ? ab[1].trim() : "*";
+                if (("*".equals(who) || who.equalsIgnoreCase(approver))
+                        && ("*".equals(which) || which.equalsIgnoreCase(tin))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private String runEffect(String entity, String recordId, String actionType, String actor,

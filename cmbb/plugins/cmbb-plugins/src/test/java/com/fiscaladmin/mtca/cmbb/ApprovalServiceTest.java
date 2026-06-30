@@ -341,6 +341,53 @@ public class ApprovalServiceTest {
         assertEquals(0, ev("APPROVAL_DELEGATED"));
     }
 
+    // ---------------- conflict of interest (#3) ----------------
+
+    @Test
+    public void coi_barredApprover_blocked_staysPending() {
+        ApprovalService s = svc();
+        put("cmCase", row("caseType", "DM", "tin", "TIN-X"), "caseCOI");
+        put("mmCoi", row("caseType", "DM", "ruleType", "EXCLUDE_APPROVER",
+                "expression", "*|TIN-X"), "coi-1"); // nobody may approve TIN-X's requests
+        s.request("dmInstAgr", "agr-coi", "INSTALMENT_PLAN", 6000, "clerk", "caseCOI", "clerk",
+                LocalDateTime.now());
+        String id = apId();
+        String r = s.decide(id, "boss", "DIRECTOR", "approve", "trying to approve", LocalDateTime.now());
+        assertTrue(r, r.startsWith("COI"));
+        assertEquals("Pending", prop("cmApproval", id, "status"));
+        assertEquals(0, effectRuns);
+        assertEquals(1, ev("APPROVAL_COI_BLOCKED"));
+    }
+
+    @Test
+    public void coi_unbarredSubject_passes() {
+        ApprovalService s = svc();
+        put("cmCase", row("caseType", "DM", "tin", "TIN-Y"), "caseOK");
+        put("mmCoi", row("caseType", "DM", "ruleType", "EXCLUDE_APPROVER",
+                "expression", "*|TIN-X"), "coi-1"); // bars TIN-X only
+        s.request("dmInstAgr", "agr-ok", "INSTALMENT_PLAN", 6000, "clerk", "caseOK", "clerk",
+                LocalDateTime.now());
+        String id = apId();
+        String r = s.decide(id, "boss", "DIRECTOR", "approve", "ok", LocalDateTime.now());
+        assertTrue(r, r.startsWith("APPROVED")); // TIN-Y is not barred
+        assertEquals(1, effectRuns);
+    }
+
+    @Test
+    public void coi_barNamedApproverAcrossCaseType() {
+        ApprovalService s = svc();
+        put("cmCase", row("caseType", "DM", "tin", "TIN-Z"), "caseZ");
+        put("mmCoi", row("caseType", "DM", "ruleType", "EXCLUDE_APPROVER",
+                "expression", "boss|*"), "coi-2"); // 'boss' barred for every DM subject
+        s.request("dmInstAgr", "agr-z", "INSTALMENT_PLAN", 6000, "clerk", "caseZ", "clerk",
+                LocalDateTime.now());
+        String id = apId();
+        assertTrue(s.decide(id, "boss", "DIRECTOR", "approve", "x", LocalDateTime.now()).startsWith("COI"));
+        // a different approver is fine
+        assertTrue(s.decide(id, "chief", "DIRECTOR", "approve", "ok", LocalDateTime.now()).startsWith("APPROVED"));
+        assertEquals(1, effectRuns);
+    }
+
     // ---------------- fake store ----------------
 
     private FormRowSet query(String form, String cond, Object[] params, Integer limit) {
