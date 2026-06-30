@@ -13,6 +13,7 @@ import org.joget.workflow.util.WorkflowUtil;
 
 import com.fiscaladmin.mtca.cmbb.service.ApprovalEffects;
 import com.fiscaladmin.mtca.cmbb.service.ApprovalService;
+import com.fiscaladmin.mtca.cmbb.service.AuthorityResolver;
 import com.fiscaladmin.mtca.cmbb.service.DeadlineService;
 
 /**
@@ -77,7 +78,14 @@ public class ApprovalGateEngine extends DefaultApplicationPlugin {
         String approvalId = DeadlineService.prop(dec, "approvalId");
         String outcome = DeadlineService.prop(dec, "outcome");
         String reason = DeadlineService.prop(dec, "reason");
-        String approverLevel = DeadlineService.prop(dec, "approverLevel");
+        // P3: the approver's authority is resolved from their DIRECTORY identity — their role-groups
+        // via the Joget directory API + the mmRoleLevel map (AuthorityResolver) — not self-declared.
+        // The declared approverLevel survives only as an explicit automation/test override (it is
+        // empty in live UI use, so the directory resolution is authoritative there).
+        String declaredLevel = DeadlineService.prop(dec, "approverLevel");
+        String approverLevel = declaredLevel.isEmpty()
+                ? new AuthorityResolver(dao, AuthorityResolver.directoryGroups()).resolveLevel(approver)
+                : declaredLevel;
         ApprovalService svc = ApprovalEffects.service(dao);
         String result = svc.decide(approvalId, approver, approverLevel, outcome, reason,
                 LocalDateTime.now());
