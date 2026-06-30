@@ -140,8 +140,10 @@ def main():
     submit_plan(aD, tD, cD, "8000", "12")
     apIdD = pending_id(aD)
     sql(f"UPDATE app_fd_cmapproval SET c_requestedby='officer-z' WHERE id='{apIdD}'")  # four-eyes fixture
+    # P4: delegation BINDS — the request can then be decided only by the named delegate, so we
+    # delegate to the identity that actually decides here (the data-API identity, roleAnonymous).
     dmbb("cmApprovalDelegate", {"id": f"del-{RUN}", "approvalId": apIdD,
-                                "delegateTo": "deputy", "reason": "please cover for me"})
+                                "delegateTo": "roleAnonymous", "reason": "please cover for me"})
     time.sleep(6)
     delTo = field(apIdD, "delegatedto")
     delEv = sql(f"SELECT count(*) FROM app_fd_cmevent WHERE c_caseid='{cD}' "
@@ -152,8 +154,8 @@ def main():
     time.sleep(6)
     stD2 = field(apIdD, "status")
     agrD = sql(f"SELECT c_status FROM app_fd_dminstagr WHERE id='{aD}'")
-    check("T-31.3 delegate records the hand-off; the delegate then decides (rank ok) -> ACTIVE + hold",
-          delTo == "deputy" and int(delEv) >= 1 and stD1 == "Pending"
+    check("T-31.3 delegate records the hand-off; the (bound) delegate then decides (rank ok) -> ACTIVE + hold",
+          delTo == "roleAnonymous" and int(delEv) >= 1 and stD1 == "Pending"
           and stD2 == "Approved" and agrD == "ACTIVE" and hold_active(cD) >= 1,
           f"delegatedTo={delTo} delegatedEv={delEv} statusAfterDelegate={stD1} final={stD2} agr={agrD} hold={hold_active(cD)}")
 

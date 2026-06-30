@@ -430,6 +430,63 @@ public class ApprovalServiceTest {
         assertEquals(1, effectRuns);
     }
 
+    // ---------------- P4: delegation binding + lifecycle notifications ----------------
+
+    @Test
+    public void delegationBindsTheDelegate() {
+        ApprovalService s = svc();
+        req(s, "agr-bind", 6000, "case-bind");   // SUPERVISOR band; requester = clerk
+        String id = apId();
+        s.delegate(id, "boss", "deputy", "please handle", LocalDateTime.now());
+        // an otherwise-eligible non-delegate is blocked; the request stays Pending
+        String blocked = s.decide(id, "manager", "DIRECTOR", "approve", "I'll take it", LocalDateTime.now());
+        assertTrue(blocked, blocked.contains("not the delegate"));
+        assertEquals(1, ev("APPROVAL_DELEGATE_BLOCKED"));
+        assertEquals("Pending", prop("cmApproval", id, "status"));
+        // the named delegate decides -> proceeds
+        String ok = s.decide(id, "deputy", "DIRECTOR", "approve", "handling as delegated", LocalDateTime.now());
+        assertTrue(ok, ok.startsWith("APPROVED"));
+        assertEquals("Approved", prop("cmApproval", id, "status"));
+    }
+
+    @Test
+    public void requestNotifiesTheAssignedRole() {
+        ApprovalService s = svc();
+        req(s, "agr-asn", 6000, "case-asn");   // SUPERVISOR band -> assigned to dm_supervisor
+        assertTrue("assignment notification queued to the role", notifWith("dm_supervisor") >= 1);
+        assertTrue("assignment alertType", notifWith("APPROVAL_ASSIGNED") >= 1);
+    }
+
+    @Test
+    public void delegationNotifiesTheDelegate() {
+        ApprovalService s = svc();
+        req(s, "agr-dn", 6000, "case-dn");
+        s.delegate(apId(), "boss", "deputy", "cover me", LocalDateTime.now());
+        assertTrue("the named delegate is notified", notifWith("deputy") >= 1);
+        assertTrue(notifWith("APPROVAL_DELEGATED") >= 1);
+    }
+
+    @Test
+    public void escalationAndTimeoutNotify() {
+        ApprovalService s = svc();
+        req(s, "agr-esc", 6000, "case-esc");
+        s.sweep(LocalDateTime.now().plusDays(3), "cron");   // escalate 1 -> MANAGER
+        assertTrue("escalation notifies the escalated-to role", notifWith("APPROVAL_ESCALATED") >= 1);
+        s.sweep(LocalDateTime.now().plusDays(6), "cron");   // escalate 2 -> DIRECTOR
+        s.sweep(LocalDateTime.now().plusDays(9), "cron");   // exhausted -> timeout
+        assertTrue("timeout is notified", notifWith("APPROVAL_TIMEOUT") >= 1);
+        assertTrue("timeout notifies the originator", notifWith("clerk") >= 1);
+    }
+
+    private long notifWith(String substr) {
+        return rows("cmEvent").stream()
+                .filter(e -> "NOTIF_PENDING".equals(e.getProperty("eventType")))
+                .filter(e -> {
+                    String pl = e.getProperty("payload");
+                    return pl != null && pl.contains(substr);
+                }).count();
+    }
+
     // ---------------- fake store ----------------
 
     private FormRowSet query(String form, String cond, Object[] params, Integer limit) {

@@ -145,6 +145,9 @@ public class ApprovalService {
         event(caseId, "APPROVAL_REQUESTED", actor,
                 "approval requested: " + actionType + " -> " + route.describe(),
                 extra(entity, recordId, actionType, materiality, route.firstLevel()));
+        // P4: notify the role-group that must act (assignment)
+        notify(caseId, roleGroupFor(route.firstLevel()), "APPROVAL_ASSIGNED",
+                "approval needed: " + actionType + " -> " + route.firstLevel());
         return "PENDING (" + route.describe() + ", id=" + apId + ")";
     }
 
@@ -249,6 +252,15 @@ public class ApprovalService {
                     "conflict of interest: " + approver + " is barred from deciding this request",
                     extra(entity, recordId, actionType, materiality, authority));
             return "COI: approver barred";
+        }
+        // delegation binding (P4) — once a request is delegated, ONLY the named delegate may decide
+        // it (any outcome); anyone else is blocked and the request stays Pending with the delegate.
+        String delegatedTo = p(ap, "delegatedTo");
+        if (!delegatedTo.isEmpty() && !delegatedTo.equalsIgnoreCase(approver)) {
+            event(caseId, "APPROVAL_DELEGATE_BLOCKED", approver,
+                    "delegated to " + delegatedTo + "; only the delegate may decide",
+                    extra(entity, recordId, actionType, materiality, authority));
+            return "delegated to " + delegatedTo + "; not the delegate";
         }
 
         // reject / return are terminal for the whole request (a reject anywhere stops the route)
@@ -365,11 +377,17 @@ public class ApprovalService {
                     event(caseId, "APPROVAL_ESCALATED", actor,
                             "overdue: escalated " + from + " -> " + to + " (#" + (esc + 1) + ")",
                             extra(entity, recordId, actionType, materiality, to));
+                    // P4: notify the escalated-to role-group that the overdue request is now theirs
+                    notify(caseId, roleGroupFor(to), "APPROVAL_ESCALATED",
+                            "overdue approval escalated to " + to);
                     escalated++;
                 } else {
                     String reason = "SLA timeout after " + esc + " escalations";
                     event(caseId, "APPROVAL_TIMEOUT", actor, reason,
                             extra(entity, recordId, actionType, materiality, p(ap, "requiredLevel")));
+                    // P4: notify the originator that their request auto-rejected on timeout
+                    notify(caseId, p(ap, "requestedBy"), "APPROVAL_TIMEOUT",
+                            "approval timed out (auto-rejected after " + esc + " escalations)");
                     finalize(ap, caseId, entity, recordId, actionType, materiality,
                             p(ap, "requiredAuthority"), "Rejected", actor, reason, asOf);
                     timedOut++;
@@ -382,7 +400,8 @@ public class ApprovalService {
     /**
      * DELEGATE: reassign a Pending request to another approver (a "please handle this" hand-off).
      * The delegate still decides under the normal rank gate + SoD — delegation routes the work, it
-     * does not confer authority. Records the delegation on the request + a first-class event.
+     * does not confer authority. P4: delegation now also <b>binds</b> — once delegated, ONLY the
+     * delegate may decide the request (enforced in {@link #decide}); the delegate is notified.
      */
     public String delegate(String approvalId, String fromApprover, String delegateTo, String reason,
                            LocalDateTime now) {
@@ -407,6 +426,9 @@ public class ApprovalService {
                 "delegated to " + delegateTo + ": " + reason,
                 extra(p(ap, "entity"), p(ap, "recordId"), p(ap, "actionType"),
                         num(p(ap, "materiality")), p(ap, "requiredLevel")));
+        // P4: notify the named delegate that the request is now bound to them
+        notify(p(ap, "caseId"), delegateTo, "APPROVAL_DELEGATED",
+                "approval delegated to you: " + reason);
         return "DELEGATED to " + delegateTo;
     }
 
@@ -495,6 +517,35 @@ public class ApprovalService {
 
     private void event(String caseId, String type, String actor, String reason, String extra) {
         events.append(caseId, type, actor, "", "", reason, extra);
+    }
+
+    /**
+     * Queue a lifecycle notification (P4): emit a {@code NOTIF_PENDING} event carrying a recipient,
+     * which the F06 dispatcher turns into a cmAlert / cmNotif. Used on assignment, escalation,
+     * timeout and delegation so the gate is no longer silent about who must act next.
+     */
+    private void notify(String caseId, String recipient, String alertType, String summary) {
+        if (caseId == null || caseId.isEmpty() || recipient == null || recipient.trim().isEmpty()) {
+            return;
+        }
+        event(caseId, "NOTIF_PENDING", "system", summary,
+                "\"recipient\":\"" + CaseEventWriter.esc(recipient) + "\",\"alertType\":\""
+                        + CaseEventWriter.esc(alertType) + "\"");
+    }
+
+    /** The role-group that holds a rank level (reverse of the mmRoleLevel map); the level itself as fallback. */
+    private String roleGroupFor(String level) {
+        try {
+            Map<String, String> m = new AuthorityResolver(dao, null).roleLevelMap();
+            for (Map.Entry<String, String> e : m.entrySet()) {
+                if (level != null && level.equalsIgnoreCase(e.getValue())) {
+                    return e.getKey();
+                }
+            }
+        } catch (Exception ignore) {
+            // fall through to the rank token
+        }
+        return level;
     }
 
     private void save(FormRow row) {
