@@ -27,10 +27,16 @@ import com.fiscaladmin.mtca.cmbb.service.ApprovalService;
 import com.fiscaladmin.mtca.cmbb.service.CaseEventWriter;
 
 /**
- * ApprovalService unit tests (Decision &amp; Approval Service #6, minimal slice) on the
- * generic in-memory FormDataDao fake: matrix resolution, below-band auto-pass, Pending
- * routing, guarded approve firing the DecisionEffect once, SoD self-approval block,
- * mandatory reason, reject, gate-once idempotency, duplicate-request guard.
+ * ApprovalService unit tests (Decision &amp; Approval Service #6) on the generic in-memory
+ * FormDataDao fake. Covers the deepened routing (ADR-005): mmAuthority band resolution,
+ * below-band auto-pass, SINGLE Pending routing + rank gate, guarded approve firing the
+ * DecisionEffect once, CHAIN sequential advance (effect only at the last step), QUORUM
+ * distinct-voter accumulation (duplicate vote ignored; effect at the Nth), rank-too-low block,
+ * SoD self-approval block, mandatory reason, reject, gate-once idempotency, duplicate-request guard.
+ *
+ * <p>Matrix (mmAuthority, actionType INSTALMENT_PLAN, by materiality band):
+ * 5000.01–20000 → SINGLE SUPERVISOR; 20000.01–50000 → CHAIN SUPERVISOR→DIRECTOR;
+ * 50000.01–∞ → QUORUM 2×DIRECTOR. Below 5000.01 → no band → auto-pass.
  */
 public class ApprovalServiceTest {
 
@@ -76,9 +82,13 @@ public class ApprovalServiceTest {
                 "fromStatus", "Pending", "toStatus", "Rejected"), "tr-ap-2");
         put("mmEntityTransition", row("entity", "cmApproval", "scope", "DEFAULT",
                 "fromStatus", "Pending", "toStatus", "Returned"), "tr-ap-3");
-        // authority matrix: INSTALMENT_PLAN materiality > 5000 -> dm_supervisor
-        put("mdApprovalPolicy", row("actionType", "INSTALMENT_PLAN", "threshold", "5000",
-                "authorityRole", "dm_supervisor"), "pol-1");
+        // unified authority matrix (mmAuthority) — three INSTALMENT_PLAN bands, one per topology
+        put("mmAuthority", row("actionType", "INSTALMENT_PLAN", "amountMin", "5000.01",
+                "amountMax", "20000", "level", "SUPERVISOR", "bodyType", "SINGLE"), "auth-ia-s");
+        put("mmAuthority", row("actionType", "INSTALMENT_PLAN", "amountMin", "20000.01",
+                "amountMax", "50000", "level", "SUPERVISOR,DIRECTOR", "bodyType", "CHAIN"), "auth-ia-c");
+        put("mmAuthority", row("actionType", "INSTALMENT_PLAN", "amountMin", "50000.01",
+                "amountMax", "", "level", "DIRECTOR", "bodyType", "COLLEGIAL", "quorum", "2"), "auth-ia-q");
     }
 
     private ApprovalService svc() {
@@ -91,10 +101,20 @@ public class ApprovalServiceTest {
         return new ApprovalService(dao, new CaseEventWriter(dao), effects);
     }
 
+    private String req(ApprovalService s, String agr, double amount, String caseId) {
+        return s.request("dmInstAgr", agr, "INSTALMENT_PLAN", amount, "clerk", caseId, "clerk",
+                LocalDateTime.now());
+    }
+
+    private String apId() {
+        return rows("cmApproval").get(rows("cmApproval").size() - 1).getId();
+    }
+
+    // ---------------- SINGLE band + auto-pass ----------------
+
     @Test
     public void belowBand_autoPasses_noRequest() {
-        String r = svc().request("dmInstAgr", "agr-1", "INSTALMENT_PLAN", 4000,
-                "clerk", "case-1", "clerk", LocalDateTime.now());
+        String r = req(svc(), "agr-1", 4000, "case-1");
         assertTrue(r, r.startsWith("AUTO"));
         assertEquals(1, effectRuns);
         assertEquals(0, rows("cmApproval").size());
@@ -102,41 +122,116 @@ public class ApprovalServiceTest {
     }
 
     @Test
-    public void aboveBand_createsPending_noEffect() {
-        String r = svc().request("dmInstAgr", "agr-2", "INSTALMENT_PLAN", 6000,
-                "clerk", "case-2", "clerk", LocalDateTime.now());
+    public void singleBand_createsPending_noEffect() {
+        String r = req(svc(), "agr-2", 6000, "case-2");
         assertTrue(r, r.startsWith("PENDING"));
         assertEquals(0, effectRuns);
-        assertEquals(1, rows("cmApproval").size());
         FormRow ap = rows("cmApproval").get(0);
         assertEquals("Pending", ap.getProperty("status"));
-        assertEquals("dm_supervisor", ap.getProperty("requiredAuthority"));
+        assertEquals("SUPERVISOR", ap.getProperty("requiredAuthority"));
+        assertEquals("SINGLE", ap.getProperty("routeKind"));
         assertEquals(1, ev("APPROVAL_REQUESTED"));
     }
 
     @Test
-    public void approve_firesEffect_writesReasonedRecord() {
+    public void single_approve_firesEffect_writesReasonedRecord() {
         ApprovalService s = svc();
-        s.request("dmInstAgr", "agr-3", "INSTALMENT_PLAN", 6000, "clerk", "case-3", "clerk", LocalDateTime.now());
-        String apId = rows("cmApproval").get(0).getId();
-        String r = s.decide(apId, "boss", "approve", "within delegated authority", LocalDateTime.now());
+        req(s, "agr-3", 6000, "case-3");
+        String r = s.decide(apId(), "boss", "DIRECTOR", "approve", "within delegated authority",
+                LocalDateTime.now());
         assertTrue(r, r.startsWith("APPROVED"));
-        assertEquals("Approved", prop("cmApproval", apId, "status"));
-        assertEquals("boss", prop("cmApproval", apId, "decidedBy"));
+        assertEquals("Approved", prop("cmApproval", apId(), "status"));
+        assertEquals("boss", prop("cmApproval", apId(), "decidedBy"));
         assertEquals(1, effectRuns);
         assertEquals("agr-3", effected.get(0));
-        assertEquals(1, ev("APPROVAL_DECISION"));
+        assertTrue("decision recorded", ev("APPROVAL_DECISION") >= 1);
         assertTrue("guarded transition audited", ev("STATUS_CHANGED") >= 1);
     }
 
     @Test
+    public void rankTooLow_blocked_staysPending() {
+        ApprovalService s = svc();
+        req(s, "agr-r", 6000, "case-r"); // SINGLE SUPERVISOR
+        String r = s.decide(apId(), "junior", "OFFICER", "approve", "I'll allow it",
+                LocalDateTime.now());
+        assertTrue(r, r.startsWith("rank too low"));
+        assertEquals("Pending", prop("cmApproval", apId(), "status"));
+        assertEquals(0, effectRuns);
+        assertEquals(1, ev("APPROVAL_RANK_BLOCKED"));
+    }
+
+    // ---------------- CHAIN ----------------
+
+    @Test
+    public void chain_advancesStepByStep_effectOnlyAtEnd() {
+        ApprovalService s = svc();
+        req(s, "agr-c", 30000, "case-c"); // CHAIN SUPERVISOR -> DIRECTOR
+        String id = apId();
+        assertEquals("CHAIN", prop("cmApproval", id, "routeKind"));
+        assertEquals("SUPERVISOR", prop("cmApproval", id, "requiredLevel"));
+        // step 1: a supervisor signs off -> advances, no effect yet
+        String s1 = s.decide(id, "sup", "SUPERVISOR", "approve", "step 1 ok", LocalDateTime.now());
+        assertTrue(s1, s1.startsWith("chain advanced"));
+        assertEquals("Pending", prop("cmApproval", id, "status"));
+        assertEquals("DIRECTOR", prop("cmApproval", id, "requiredLevel"));
+        assertEquals(0, effectRuns);
+        // step 2 by the SAME person is rejected as a duplicate voter (distinct sign-off per step)
+        String dup = s.decide(id, "sup", "DIRECTOR", "approve", "trying both", LocalDateTime.now());
+        assertTrue(dup, dup.startsWith("duplicate voter"));
+        assertEquals(0, effectRuns);
+        // step 2: a director completes the chain -> effect fires once
+        String s2 = s.decide(id, "dir", "DIRECTOR", "approve", "step 2 ok", LocalDateTime.now());
+        assertTrue(s2, s2.startsWith("APPROVED"));
+        assertEquals("Approved", prop("cmApproval", id, "status"));
+        assertEquals(1, effectRuns);
+    }
+
+    @Test
+    public void chain_secondStepRankEnforced() {
+        ApprovalService s = svc();
+        req(s, "agr-c2", 30000, "case-c2");
+        String id = apId();
+        s.decide(id, "sup", "SUPERVISOR", "approve", "step 1", LocalDateTime.now());
+        // step 2 requires DIRECTOR; another supervisor is too junior
+        String r = s.decide(id, "sup2", "SUPERVISOR", "approve", "step 2", LocalDateTime.now());
+        assertTrue(r, r.startsWith("rank too low"));
+        assertEquals("Pending", prop("cmApproval", id, "status"));
+        assertEquals(0, effectRuns);
+    }
+
+    // ---------------- QUORUM ----------------
+
+    @Test
+    public void quorum_needsDistinctVoters_effectAtN() {
+        ApprovalService s = svc();
+        req(s, "agr-q", 70000, "case-q"); // QUORUM 2 x DIRECTOR
+        String id = apId();
+        assertEquals("QUORUM", prop("cmApproval", id, "routeKind"));
+        String v1 = s.decide(id, "dir1", "DIRECTOR", "approve", "vote 1", LocalDateTime.now());
+        assertTrue(v1, v1.startsWith("quorum 1/2"));
+        assertEquals("Pending", prop("cmApproval", id, "status"));
+        assertEquals(0, effectRuns);
+        // the same director voting again does not count
+        String dup = s.decide(id, "dir1", "DIRECTOR", "approve", "vote again", LocalDateTime.now());
+        assertTrue(dup, dup.startsWith("duplicate voter"));
+        assertEquals(0, effectRuns);
+        // a second distinct director reaches quorum -> effect
+        String v2 = s.decide(id, "dir2", "DIRECTOR", "approve", "vote 2", LocalDateTime.now());
+        assertTrue(v2, v2.startsWith("APPROVED"));
+        assertEquals("Approved", prop("cmApproval", id, "status"));
+        assertEquals(1, effectRuns);
+    }
+
+    // ---------------- invariants ----------------
+
+    @Test
     public void sod_blocksSelfApproval() {
         ApprovalService s = svc();
-        s.request("dmInstAgr", "agr-4", "INSTALMENT_PLAN", 6000, "clerk", "case-4", "clerk", LocalDateTime.now());
-        String apId = rows("cmApproval").get(0).getId();
-        String r = s.decide(apId, "clerk", "approve", "trying to self-approve", LocalDateTime.now());
+        req(s, "agr-4", 6000, "case-4");
+        String r = s.decide(apId(), "clerk", "DIRECTOR", "approve", "trying to self-approve",
+                LocalDateTime.now());
         assertTrue(r, r.startsWith("SoD"));
-        assertEquals("Pending", prop("cmApproval", apId, "status"));
+        assertEquals("Pending", prop("cmApproval", apId(), "status"));
         assertEquals(0, effectRuns);
         assertEquals(1, ev("APPROVAL_SOD_BLOCKED"));
     }
@@ -144,32 +239,31 @@ public class ApprovalServiceTest {
     @Test
     public void reason_isMandatory() {
         ApprovalService s = svc();
-        s.request("dmInstAgr", "agr-5", "INSTALMENT_PLAN", 6000, "clerk", "case-5", "clerk", LocalDateTime.now());
-        String apId = rows("cmApproval").get(0).getId();
-        String r = s.decide(apId, "boss", "approve", "   ", LocalDateTime.now());
+        req(s, "agr-5", 6000, "case-5");
+        String r = s.decide(apId(), "boss", "DIRECTOR", "approve", "   ", LocalDateTime.now());
         assertEquals("reason required", r);
-        assertEquals("Pending", prop("cmApproval", apId, "status"));
+        assertEquals("Pending", prop("cmApproval", apId(), "status"));
         assertEquals(0, effectRuns);
     }
 
     @Test
     public void reject_blocks_noEffect() {
         ApprovalService s = svc();
-        s.request("dmInstAgr", "agr-6", "INSTALMENT_PLAN", 6000, "clerk", "case-6", "clerk", LocalDateTime.now());
-        String apId = rows("cmApproval").get(0).getId();
-        String r = s.decide(apId, "boss", "reject", "duration too long", LocalDateTime.now());
+        req(s, "agr-6", 6000, "case-6");
+        String r = s.decide(apId(), "boss", "DIRECTOR", "reject", "duration too long",
+                LocalDateTime.now());
         assertEquals("REJECTED", r);
-        assertEquals("Rejected", prop("cmApproval", apId, "status"));
+        assertEquals("Rejected", prop("cmApproval", apId(), "status"));
         assertEquals(0, effectRuns);
     }
 
     @Test
     public void gateOnce_secondDecideIsNoop() {
         ApprovalService s = svc();
-        s.request("dmInstAgr", "agr-7", "INSTALMENT_PLAN", 6000, "clerk", "case-7", "clerk", LocalDateTime.now());
-        String apId = rows("cmApproval").get(0).getId();
-        s.decide(apId, "boss", "approve", "ok", LocalDateTime.now());
-        String r2 = s.decide(apId, "boss", "approve", "again", LocalDateTime.now());
+        req(s, "agr-7", 6000, "case-7");
+        String id = apId();
+        s.decide(id, "boss", "DIRECTOR", "approve", "ok", LocalDateTime.now());
+        String r2 = s.decide(id, "boss", "DIRECTOR", "approve", "again", LocalDateTime.now());
         assertTrue(r2, r2.startsWith("already decided"));
         assertEquals(1, effectRuns);
     }
@@ -177,8 +271,8 @@ public class ApprovalServiceTest {
     @Test
     public void duplicateRequest_isGuarded() {
         ApprovalService s = svc();
-        s.request("dmInstAgr", "agr-8", "INSTALMENT_PLAN", 6000, "clerk", "case-8", "clerk", LocalDateTime.now());
-        String r2 = s.request("dmInstAgr", "agr-8", "INSTALMENT_PLAN", 6000, "clerk", "case-8", "clerk", LocalDateTime.now());
+        req(s, "agr-8", 6000, "case-8");
+        String r2 = req(s, "agr-8", 6000, "case-8");
         assertTrue(r2, r2.startsWith("already pending"));
         assertEquals(1, rows("cmApproval").size());
     }

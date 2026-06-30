@@ -84,9 +84,16 @@ def hold_active(cid):
 
 def main():
     assert CK and DK, "missing api keys"
-    # self-seed (idempotent): the authority matrix, a relief product, and the cmApproval lifecycle
-    dmbb("mdApprovalPolicy", {"id": "pol-ia-1", "actionType": "INSTALMENT_PLAN", "threshold": "5000",
-                              "authorityRole": "dm_supervisor", "topology": "single"})
+    # self-seed (idempotent): the unified authority matrix (mmAuthority — ADR-005) and the cmApproval
+    # lifecycle. Three INSTALMENT_PLAN bands, one per topology, exercised by materiality below:
+    # 5000.01-20000 -> SINGLE SUPERVISOR; 20000.01-50000 -> CHAIN SUPERVISOR->DIRECTOR;
+    # 50000.01-inf -> QUORUM 2 x DIRECTOR.
+    cmbb("mmAuthority", {"id": "AUTH-IA-S", "actionType": "INSTALMENT_PLAN", "amountMin": "5000.01",
+                         "amountMax": "20000", "level": "SUPERVISOR", "bodyType": "SINGLE"})
+    cmbb("mmAuthority", {"id": "AUTH-IA-C", "actionType": "INSTALMENT_PLAN", "amountMin": "20000.01",
+                         "amountMax": "50000", "level": "SUPERVISOR,DIRECTOR", "bodyType": "CHAIN"})
+    cmbb("mmAuthority", {"id": "AUTH-IA-Q", "actionType": "INSTALMENT_PLAN", "amountMin": "50000.01",
+                         "amountMax": "", "level": "DIRECTOR", "bodyType": "COLLEGIAL", "quorum": "2"})
     # mdRelief: rely on the standard seeded product REL-MLT-STD (C3,C4,C5, minInstalment 50),
     # exactly as run_t15 does — do not seed a competing row (firstRow ambiguity).
     for fr, to in [("Pending", "Approved"), ("Pending", "Rejected"), ("Pending", "Returned")]:
@@ -115,14 +122,14 @@ def main():
     auth = sql(f"SELECT c_requiredauthority FROM app_fd_cmapproval WHERE id='{apId}'")
     reqEv = sql(f"SELECT count(*) FROM app_fd_cmevent WHERE c_caseid='{cH}' "
                 "AND c_eventtype='APPROVAL_REQUESTED'")
-    check("T-30.2 over band -> Pending (dm_supervisor), agreement not activated, NO hold",
-          bool(apId) and not apId.startswith("SQL") and auth == "dm_supervisor"
+    check("T-30.2 over band -> Pending (SUPERVISOR), agreement not activated, NO hold",
+          bool(apId) and not apId.startswith("SQL") and auth == "SUPERVISOR"
           and sH != "ACTIVE" and hold_active(cH) == 0 and int(reqEv) >= 1,
           f"approval={apId} authority={auth} agrStatus={sH} hold={hold_active(cH)} reqEv={reqEv}")
 
     # ---------- T-30.3 approve (approver != requester) -> ACTIVE + hold + reasoned record ----------
     sql(f"UPDATE app_fd_cmapproval SET c_requestedby='officer-x' WHERE id='{apId}'")  # four-eyes fixture
-    dmbb("cmApprovalDecision", {"id": f"dec-ok-{RUN}", "approvalId": apId,
+    dmbb("cmApprovalDecision", {"id": f"dec-ok-{RUN}", "approvalId": apId, "approverLevel": "SUPERVISOR",
                                 "outcome": "approve", "reason": "within delegated authority"})
     time.sleep(6)
     apStat = sql(f"SELECT c_status FROM app_fd_cmapproval WHERE id='{apId}'")
@@ -138,7 +145,7 @@ def main():
     make_case(cS, tS, "C4", "9000")
     submit_plan(aS, tS, cS, "9000", "12")
     apIdS = pending_id(aS)  # requestedBy == the api user (== the decider) by default
-    dmbb("cmApprovalDecision", {"id": f"dec-sod-{RUN}", "approvalId": apIdS,
+    dmbb("cmApprovalDecision", {"id": f"dec-sod-{RUN}", "approvalId": apIdS, "approverLevel": "DIRECTOR",
                                 "outcome": "approve", "reason": "trying to self-approve"})
     time.sleep(6)
     apStatS = sql(f"SELECT c_status FROM app_fd_cmapproval WHERE id='{apIdS}'")
@@ -155,7 +162,7 @@ def main():
     submit_plan(aR, tR, cR, "7000", "12")
     apIdR = pending_id(aR)
     sql(f"UPDATE app_fd_cmapproval SET c_requestedby='officer-y' WHERE id='{apIdR}'")
-    dmbb("cmApprovalDecision", {"id": f"dec-rej-{RUN}", "approvalId": apIdR,
+    dmbb("cmApprovalDecision", {"id": f"dec-rej-{RUN}", "approvalId": apIdR, "approverLevel": "SUPERVISOR",
                                 "outcome": "reject", "reason": "duration too long for this band"})
     time.sleep(6)
     apStatR = sql(f"SELECT c_status FROM app_fd_cmapproval WHERE id='{apIdR}'")
@@ -163,6 +170,73 @@ def main():
     check("T-30.5 reject -> request Rejected, agreement not activated, no hold",
           apStatR == "Rejected" and sR != "ACTIVE" and hold_active(cR) == 0,
           f"approval={apStatR} agrStatus={sR} hold={hold_active(cR)}")
+
+    # ---------- T-30.6 chain route: first step advances the cursor; no effect yet ----------
+    # (Completion needs a distinct 2nd approver, which one API identity / roleAnonymous cannot
+    # represent live; the full supervisor->director->effect completion is unit-tested. Here we
+    # prove the live wiring: CHAIN routing, the rank-gated first step, the cursor advancing to the
+    # next level, persisted route state, and NO premature effect.)
+    cC, tC, aC = f"apC-{RUN}", f"T30C{RUN}", f"agrC-{RUN}"
+    make_case(cC, tC, "C4", "30000")
+    submit_plan(aC, tC, cC, "30000", "12")
+    apIdC = pending_id(aC)
+    kindC = sql(f"SELECT c_routekind FROM app_fd_cmapproval WHERE id='{apIdC}'")
+    lvl0 = sql(f"SELECT c_requiredlevel FROM app_fd_cmapproval WHERE id='{apIdC}'")
+    sql(f"UPDATE app_fd_cmapproval SET c_requestedby='officer-z' WHERE id='{apIdC}'")  # four-eyes fixture
+    dmbb("cmApprovalDecision", {"id": f"dec-c1-{RUN}", "approvalId": apIdC, "approverLevel": "SUPERVISOR",
+                                "outcome": "approve", "reason": "step 1 ok"})
+    time.sleep(6)
+    midStat = sql(f"SELECT c_status FROM app_fd_cmapproval WHERE id='{apIdC}'")
+    lvl1 = sql(f"SELECT c_requiredlevel FROM app_fd_cmapproval WHERE id='{apIdC}'")
+    midAgr = sql(f"SELECT c_status FROM app_fd_dminstagr WHERE id='{aC}'")
+    check("T-30.6 chain: supervisor step advances the cursor to DIRECTOR; Pending, no effect yet",
+          kindC == "CHAIN" and lvl0 == "SUPERVISOR" and midStat == "Pending"
+          and lvl1 == "DIRECTOR" and midAgr != "ACTIVE" and hold_active(cC) == 0,
+          f"kind={kindC} level0={lvl0} midStatus={midStat} level1={lvl1} midAgr={midAgr} hold={hold_active(cC)}")
+
+    # ---------- T-30.7 quorum route: vote accumulates; a duplicate vote is ignored; no effect yet --------
+    # (Reaching quorum needs a 2nd distinct director — unit-tested. Live proves: QUORUM routing,
+    # the 1st vote accumulating to 1/2, the same identity's repeat vote being ignored, Pending.)
+    cQ, tQ, aQ = f"apQ-{RUN}", f"T30Q{RUN}", f"agrQ-{RUN}"
+    make_case(cQ, tQ, "C4", "70000")
+    submit_plan(aQ, tQ, cQ, "70000", "12")
+    apIdQ = pending_id(aQ)
+    kindQ = sql(f"SELECT c_routekind FROM app_fd_cmapproval WHERE id='{apIdQ}'")
+    quoQ = sql(f"SELECT c_quorum FROM app_fd_cmapproval WHERE id='{apIdQ}'")
+    sql(f"UPDATE app_fd_cmapproval SET c_requestedby='officer-z' WHERE id='{apIdQ}'")
+    dmbb("cmApprovalDecision", {"id": f"dec-q1-{RUN}", "approvalId": apIdQ, "approverLevel": "DIRECTOR",
+                                "outcome": "approve", "reason": "vote 1"})
+    time.sleep(6)
+    cnt1 = sql(f"SELECT c_approvalscount FROM app_fd_cmapproval WHERE id='{apIdQ}'")
+    stat1 = sql(f"SELECT c_status FROM app_fd_cmapproval WHERE id='{apIdQ}'")
+    # the same identity voting again must NOT count
+    dmbb("cmApprovalDecision", {"id": f"dec-qd-{RUN}", "approvalId": apIdQ, "approverLevel": "DIRECTOR",
+                                "outcome": "approve", "reason": "voting again"})
+    time.sleep(6)
+    cntDup = sql(f"SELECT c_approvalscount FROM app_fd_cmapproval WHERE id='{apIdQ}'")
+    statQ = sql(f"SELECT c_status FROM app_fd_cmapproval WHERE id='{apIdQ}'")
+    agrQ = sql(f"SELECT c_status FROM app_fd_dminstagr WHERE id='{aQ}'")
+    check("T-30.7 quorum: 1st vote -> 1/2, duplicate vote ignored, Pending, no premature effect",
+          kindQ == "QUORUM" and quoQ == "2" and cnt1 == "1" and stat1 == "Pending"
+          and cntDup == "1" and statQ == "Pending" and agrQ != "ACTIVE" and hold_active(cQ) == 0,
+          f"kind={kindQ} quorum={quoQ} count1={cnt1} afterDup={cntDup} status1={stat1} agr={agrQ}")
+
+    # ---------- T-30.8 rank gate: an officer cannot approve a supervisor band ----------
+    cK, tK, aK = f"apK-{RUN}", f"T30K{RUN}", f"agrK-{RUN}"
+    make_case(cK, tK, "C4", "8000")
+    submit_plan(aK, tK, cK, "8000", "12")
+    apIdK = pending_id(aK)
+    sql(f"UPDATE app_fd_cmapproval SET c_requestedby='officer-z' WHERE id='{apIdK}'")
+    dmbb("cmApprovalDecision", {"id": f"dec-k-{RUN}", "approvalId": apIdK, "approverLevel": "OFFICER",
+                                "outcome": "approve", "reason": "trying to wave it through"})
+    time.sleep(6)
+    statK = sql(f"SELECT c_status FROM app_fd_cmapproval WHERE id='{apIdK}'")
+    rankEv = sql(f"SELECT count(*) FROM app_fd_cmevent WHERE c_caseid='{cK}' "
+                 "AND c_eventtype='APPROVAL_RANK_BLOCKED'")
+    agrK = sql(f"SELECT c_status FROM app_fd_dminstagr WHERE id='{aK}'")
+    check("T-30.8 rank gate: officer below the supervisor band is blocked, request stays Pending",
+          statK == "Pending" and int(rankEv) >= 1 and agrK != "ACTIVE" and hold_active(cK) == 0,
+          f"approvalStatus={statK} rankBlockedEv={rankEv} agr={agrK} hold={hold_active(cK)}")
 
     print()
     failed = [n for n, ok in RESULTS if not ok]

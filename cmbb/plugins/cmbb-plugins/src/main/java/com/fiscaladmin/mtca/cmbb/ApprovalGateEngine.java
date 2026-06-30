@@ -77,8 +77,10 @@ public class ApprovalGateEngine extends DefaultApplicationPlugin {
         String approvalId = DeadlineService.prop(dec, "approvalId");
         String outcome = DeadlineService.prop(dec, "outcome");
         String reason = DeadlineService.prop(dec, "reason");
+        String approverLevel = DeadlineService.prop(dec, "approverLevel");
         ApprovalService svc = ApprovalEffects.service(dao);
-        String result = svc.decide(approvalId, approver, outcome, reason, LocalDateTime.now());
+        String result = svc.decide(approvalId, approver, approverLevel, outcome, reason,
+                LocalDateTime.now());
         LogUtil.info(CLASS_NAME, "DECIDE " + approvalId + " (" + outcome + "): " + result);
         dec.setProperty("result", result);
         FormRowSet set = new FormRowSet();

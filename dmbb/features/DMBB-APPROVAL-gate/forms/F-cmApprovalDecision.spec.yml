@@ -29,6 +29,17 @@ sections:
     - {value: approve, label: Approve}
     - {value: reject, label: Reject}
     - {value: return, label: Return for information}
+  - id: approverLevel
+    type: select
+    label: Your authority level
+    value: SUPERVISOR
+    static_options:
+    - {value: OFFICER, label: Officer}
+    - {value: SENIOR, label: Senior}
+    - {value: SUPERVISOR, label: Supervisor}
+    - {value: MANAGER, label: Manager}
+    - {value: DIRECTOR, label: Director}
+    - {value: COMMISSIONER, label: Commissioner}
   - id: reason
     type: textarea
     label: Reason (required)

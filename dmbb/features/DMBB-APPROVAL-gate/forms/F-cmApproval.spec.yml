@@ -22,6 +22,20 @@ sections:
   - {id: requestedBy, type: textfield, label: Requested by, managed: true}
   - {id: requiredAuthority, type: textfield, label: Required authority, managed: true}
   - {id: status, type: textfield, label: Status, managed: true}
+- label: Routing
+  columns: 2
+  # The resolved route + its progress (engine-managed). routeKind in SINGLE/CHAIN/QUORUM;
+  # requiredLevel is the current rank gate (advances as a chain progresses); chain is the ordered
+  # CSV of levels; currentStep is the chain cursor; quorum is N and approvalsCount the tally for a
+  # collegial body; voters is the CSV of distinct approver ids (four-eyes + quorum de-dup).
+  fields:
+  - {id: routeKind, type: textfield, label: Route, managed: true}
+  - {id: requiredLevel, type: textfield, label: Required level, managed: true}
+  - {id: chain, type: textfield, label: Chain (levels), managed: true}
+  - {id: currentStep, type: textfield, label: Current step, storeNumeric: true, managed: true}
+  - {id: quorum, type: textfield, label: Quorum, storeNumeric: true, managed: true}
+  - {id: approvalsCount, type: textfield, label: Approvals so far, storeNumeric: true, managed: true}
+  - {id: voters, type: textfield, label: Voters, managed: true}
 - label: Decision
   columns: 2
   fields:

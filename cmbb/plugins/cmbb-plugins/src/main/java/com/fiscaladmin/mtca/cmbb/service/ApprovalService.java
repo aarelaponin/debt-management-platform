@@ -1,6 +1,7 @@
 package com.fiscaladmin.mtca.cmbb.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,26 +13,38 @@ import org.joget.apps.form.model.FormRowSet;
 import org.joget.commons.util.LogUtil;
 
 /**
- * ApprovalService — CMBB Decision &amp; Approval Service (GCMF Core Service #6), minimal slice.
+ * ApprovalService — CMBB Decision &amp; Approval Service (GCMF Core Service #6).
  *
  * <p>Mechanism only (the meaning is config): a module lifecycle <b>requests</b> approval for an
- * action; the service resolves the required authority from the {@code mdApprovalPolicy} matrix
- * (threshold band → role), and either lets the gate open immediately (below the lowest band — no
- * approval required) or raises a {@code Pending} {@code cmApproval}. An authority then
- * <b>decides</b> (approve / reject / return) with a <b>mandatory reason</b>; separation-of-duties
- * (approver ≠ requester) is a blocking filter; the request lifecycle is guarded + audited by
- * {@link StatusManager}; a first-class reasoned {@code APPROVAL_DECISION} record is appended to the
- * case hash-chain; and on {@code Approved} the {@link DecisionEffect} for the action runs once
- * (the gate). No e-signature, no document rendering (AP-D2); a human always decides (AP-D5).
+ * action; the service resolves a <b>route</b> from the unified authority matrix {@code mmAuthority}
+ * (the same matrix CMBB-F08 reads — ADR-005), and either lets the gate open immediately (no band
+ * matches the materiality — no approval required) or raises a {@code Pending} {@code cmApproval}.
+ * Authorities then <b>decide</b> (approve / reject / return) with a <b>mandatory reason</b>.
  *
- * <p>Deferred (this slice): chain/quorum/batch topologies, escalation/delegation/timeout, and the
- * Independence &amp; COI service (#3) — SoD here is the four-eyes minimum.
+ * <p>Routing topologies (from the band's {@code bodyType} + {@code level} + {@code quorum}):
+ * <ul>
+ *   <li><b>SINGLE</b> — one decision by an approver ranked ≥ the band's {@code level}.</li>
+ *   <li><b>CHAIN</b> ({@code bodyType=CHAIN}, {@code level} = ordered CSV of levels) — sequential
+ *       sign-off; each step needs an approver ranked ≥ that step's level; the effect runs only
+ *       after the last step.</li>
+ *   <li><b>QUORUM</b> ({@code bodyType=COLLEGIAL}, {@code quorum=N}) — N <b>distinct</b> approvers
+ *       each ranked ≥ {@code level}; a repeat voter is ignored; the effect runs at the Nth.</li>
+ * </ul>
+ *
+ * <p>Invariants across every topology: rank gate (reusing {@link DecisionService#rank}); four-eyes
+ * separation-of-duties (no approver is the requester; no approver votes twice); reject at any step
+ * rejects the whole request; the lifecycle is guarded + audited by {@link StatusManager}; a reasoned
+ * {@code APPROVAL_DECISION} is appended to the case hash-chain at each step; and the
+ * {@link DecisionEffect} for the action runs <b>exactly once</b>, only on full completion. No
+ * e-signature, no document rendering (AP-D2); a human always decides (AP-D5).
+ *
+ * <p>Deferred (later slices): escalation / delegation / timeout; the Independence &amp; COI service
+ * (#3). SoD + distinct-voter here is the four-eyes minimum.
  */
 public class ApprovalService {
 
     public static final String F_APPROVAL = "cmApproval";
-    public static final String F_POLICY = "mdApprovalPolicy";
-    private static final String ENTITY = "cmApproval";
+    public static final String F_AUTH = "mmAuthority";
     private static final List<String> SCOPE = Collections.singletonList("DEFAULT");
     private static final int FETCH_ALL = 100000;
     private static final String CLASS_NAME = ApprovalService.class.getName();
@@ -39,6 +52,33 @@ public class ApprovalService {
     /** The module's lifecycle step the gate runs when an action is approved (or auto-passes). */
     public interface DecisionEffect {
         String run(String entity, String recordId, String actor, LocalDateTime now);
+    }
+
+    /** A resolved authority route for a (actionType, materiality). */
+    static final class Route {
+        final String kind;          // SINGLE | CHAIN | QUORUM
+        final List<String> levels;  // CHAIN: ordered steps; SINGLE/QUORUM: [level]
+        final int quorum;           // QUORUM: N; else 1
+
+        Route(String kind, List<String> levels, int quorum) {
+            this.kind = kind;
+            this.levels = levels;
+            this.quorum = Math.max(quorum, 1);
+        }
+
+        String firstLevel() {
+            return levels.isEmpty() ? "" : levels.get(0);
+        }
+
+        String describe() {
+            if ("CHAIN".equals(kind)) {
+                return String.join("→", levels) + " (chain)";
+            }
+            if ("QUORUM".equals(kind)) {
+                return quorum + "×" + firstLevel() + " (quorum)";
+            }
+            return firstLevel();
+        }
     }
 
     private final FormDataDao dao;
@@ -55,7 +95,7 @@ public class ApprovalService {
 
     // ---------------- REQUEST ----------------
 
-    /** Raise an approval request (or auto-pass below the lowest band). */
+    /** Raise an approval request (or auto-pass when no band matches the materiality). */
     public String request(String entity, String recordId, String actionType, double materiality,
                           String requester, String caseId, String actor, LocalDateTime now) {
         updateSchemas();
@@ -63,10 +103,10 @@ public class ApprovalService {
         if (live != null) {
             return "already pending (" + live.getId() + ")"; // idempotent
         }
-        String authority = resolveAuthority(actionType, materiality);
-        if (authority == null) {
+        Route route = resolveRoute(actionType, materiality);
+        if (route == null) {
             event(caseId, "APPROVAL_NOT_REQUIRED", actor,
-                    "below approval threshold for " + actionType + " (materiality " + materiality + ")",
+                    "below approval band for " + actionType + " (materiality " + materiality + ")",
                     extra(entity, recordId, actionType, materiality, ""));
             return "AUTO (no approval required) -> " + runEffect(entity, recordId, actionType, actor, now);
         }
@@ -79,43 +119,69 @@ public class ApprovalService {
         ap.setProperty("materiality", String.valueOf(materiality));
         ap.setProperty("caseId", caseId);
         ap.setProperty("requestedBy", requester);
-        ap.setProperty("requiredAuthority", authority);
+        ap.setProperty("routeKind", route.kind);
+        ap.setProperty("requiredLevel", route.firstLevel());
+        ap.setProperty("chain", "CHAIN".equals(route.kind) ? String.join(",", route.levels) : "");
+        ap.setProperty("currentStep", "0");
+        ap.setProperty("quorum", String.valueOf(route.quorum));
+        ap.setProperty("approvalsCount", "0");
+        ap.setProperty("voters", "");
+        ap.setProperty("requiredAuthority", route.describe());
         ap.setProperty("status", "Pending"); // plain genesis (guarded moves run at decide)
         ap.setProperty("reason", "");
-        save(F_APPROVAL, ap);
+        save(ap);
         event(caseId, "APPROVAL_REQUESTED", actor,
-                "approval requested: " + actionType + " -> authority " + authority,
-                extra(entity, recordId, actionType, materiality, authority));
-        return "PENDING (authority=" + authority + ", id=" + apId + ")";
+                "approval requested: " + actionType + " -> " + route.describe(),
+                extra(entity, recordId, actionType, materiality, route.firstLevel()));
+        return "PENDING (" + route.describe() + ", id=" + apId + ")";
     }
 
     /**
-     * Resolve the required authority from the matrix: the role of the highest threshold the
-     * materiality strictly exceeds; {@code null} when it exceeds none (no approval required).
+     * Resolve the authority route from {@code mmAuthority}: the band whose [amountMin, amountMax]
+     * contains the materiality. {@code null} when no band matches (no approval required).
      */
-    String resolveAuthority(String actionType, double materiality) {
-        FormRowSet rows = dao.find(F_POLICY, F_POLICY,
+    Route resolveRoute(String actionType, double materiality) {
+        FormRow band = bandRow(actionType, materiality);
+        if (band == null) {
+            return null;
+        }
+        String level = p(band, "level");
+        String bodyType = p(band, "bodyType");
+        int q = (int) parseLong(p(band, "quorum"));
+        if ("CHAIN".equalsIgnoreCase(bodyType)) {
+            List<String> steps = splitCsv(level);
+            return steps.isEmpty() ? null : new Route("CHAIN", steps, steps.size());
+        }
+        if ("COLLEGIAL".equalsIgnoreCase(bodyType)) {
+            return new Route("QUORUM", Collections.singletonList(level), Math.max(q, 1));
+        }
+        return new Route("SINGLE", Collections.singletonList(level), 1);
+    }
+
+    /** The mmAuthority band for (actionType, amount in [amountMin, amountMax]), or null. */
+    private FormRow bandRow(String actionType, double materiality) {
+        FormRowSet rows = dao.find(F_AUTH, F_AUTH,
                 "WHERE e.customProperties.actionType = ?1", new Object[]{actionType},
-                null, Boolean.FALSE, 0, FETCH_ALL);
-        String best = null;
-        double bestThreshold = -1;
-        if (rows != null) {
-            for (FormRow r : rows) {
-                double thr = num(p(r, "threshold"));
-                if (materiality > thr && thr >= bestThreshold) {
-                    bestThreshold = thr;
-                    best = p(r, "authorityRole");
-                }
+                "dateCreated", Boolean.FALSE, 0, FETCH_ALL);
+        if (rows == null) {
+            return null;
+        }
+        for (FormRow r : rows) {
+            double min = num(p(r, "amountMin"));
+            String maxStr = p(r, "amountMax");
+            double max = maxStr.isEmpty() ? Double.MAX_VALUE : num(maxStr);
+            if (materiality >= min && materiality <= max) {
+                return r;
             }
         }
-        return (best == null || best.isEmpty()) ? null : best;
+        return null;
     }
 
     // ---------------- DECIDE ----------------
 
     /** An authority decides a Pending request. outcome ∈ approve | reject | return. */
-    public String decide(String approvalId, String approver, String outcome, String reason,
-                         LocalDateTime now) {
+    public String decide(String approvalId, String approver, String approverLevel, String outcome,
+                         String reason, LocalDateTime now) {
         updateSchemas();
         FormRow ap = dao.load(F_APPROVAL, F_APPROVAL, approvalId);
         if (ap == null) {
@@ -132,30 +198,85 @@ public class ApprovalService {
         String actionType = p(ap, "actionType");
         String caseId = p(ap, "caseId");
         double materiality = num(p(ap, "materiality"));
-        // separation of duties — approver ≠ requester (four-eyes); blocking
+        String authority = p(ap, "requiredAuthority");
+        // separation of duties — approver ≠ requester (four-eyes); blocking, request stays Pending
         if (approver != null && approver.equalsIgnoreCase(p(ap, "requestedBy"))) {
             event(caseId, "APPROVAL_SOD_BLOCKED", approver,
                     "separation of duties: approver == requester (" + approver + ")",
-                    extra(entity, recordId, actionType, materiality, p(ap, "requiredAuthority")));
+                    extra(entity, recordId, actionType, materiality, authority));
             return "SoD: approver == requester";
         }
-        String target = "approve".equalsIgnoreCase(outcome) ? "Approved"
-                : "return".equalsIgnoreCase(outcome) ? "Returned" : "Rejected";
+
+        // reject / return are terminal for the whole request (a reject anywhere stops the route)
+        if (!"approve".equalsIgnoreCase(outcome)) {
+            String target = "return".equalsIgnoreCase(outcome) ? "Returned" : "Rejected";
+            finalize(ap, caseId, entity, recordId, actionType, materiality, authority,
+                    target, approver, reason, now);
+            return target.toUpperCase();
+        }
+
+        // approve: rank gate against the CURRENT required level (chain cursor / single / quorum)
+        String requiredLevel = p(ap, "requiredLevel");
+        if (DecisionService.rank(approverLevel) < DecisionService.rank(requiredLevel)) {
+            event(caseId, "APPROVAL_RANK_BLOCKED", approver,
+                    "rank too low: " + approverLevel + " below required " + requiredLevel,
+                    extra(entity, recordId, actionType, materiality, authority));
+            return "rank too low: " + approverLevel + " < " + requiredLevel;
+        }
+        // distinct voter — no one approves twice (quorum dedup + chain step distinctness); blocking
+        List<String> voters = splitCsv(p(ap, "voters"));
+        if (containsIgnoreCase(voters, approver)) {
+            return "duplicate voter ignored (" + approver + ")";
+        }
+        voters.add(approver);
+        ap.setProperty("voters", String.join(",", voters));
+        // each step writes its own reasoned record on the chain
+        event(caseId, "APPROVAL_DECISION", approver, "approve: " + reason,
+                extra(entity, recordId, actionType, materiality, requiredLevel)
+                        + ",\"outcome\":\"approve\",\"level\":\"" + CaseEventWriter.esc(approverLevel) + "\"");
+
+        String kind = orDefault(p(ap, "routeKind"), "SINGLE");
+        if ("CHAIN".equals(kind)) {
+            List<String> chain = splitCsv(p(ap, "chain"));
+            int step = (int) parseLong(p(ap, "currentStep")) + 1;
+            if (step < chain.size()) {
+                ap.setProperty("currentStep", String.valueOf(step));
+                ap.setProperty("requiredLevel", chain.get(step));
+                save(ap);
+                return "chain advanced to step " + (step + 1) + "/" + chain.size()
+                        + " (next: " + chain.get(step) + ")";
+            }
+            // last step done -> complete
+        } else if ("QUORUM".equals(kind)) {
+            int cnt = (int) parseLong(p(ap, "approvalsCount")) + 1;
+            int quorum = Math.max((int) parseLong(p(ap, "quorum")), 1);
+            ap.setProperty("approvalsCount", String.valueOf(cnt));
+            if (cnt < quorum) {
+                save(ap);
+                return "quorum " + cnt + "/" + quorum + " (awaiting " + (quorum - cnt) + " more)";
+            }
+            // quorum reached -> complete
+        }
+        // SINGLE, or the completing step of CHAIN / QUORUM
+        finalize(ap, caseId, entity, recordId, actionType, materiality, authority,
+                "Approved", approver, reason, now);
+        return "APPROVED -> " + runEffect(entity, recordId, actionType, approver, now);
+    }
+
+    /** Guarded + audited terminal transition (Approved / Rejected / Returned) + decision record. */
+    private void finalize(FormRow ap, String caseId, String entity, String recordId, String actionType,
+                          double materiality, String authority, String target, String approver,
+                          String reason, LocalDateTime now) {
         ap.setProperty("decision", target);
         ap.setProperty("reason", reason);
         ap.setProperty("decidedBy", approver);
         ap.setProperty("decidedAt", now.toString());
-        // guarded + audited Pending -> target (sets status + a STATUS_CHANGED row on the chain)
+        // guarded Pending -> target (sets status + a STATUS_CHANGED row on the chain)
         status.apply(F_APPROVAL, ap, "status", caseId, target, SCOPE, approver, reason);
-        save(F_APPROVAL, ap);
-        // first-class reasoned decision record (§14)
+        save(ap);
         event(caseId, "APPROVAL_DECISION", approver, target + ": " + reason,
-                extra(entity, recordId, actionType, materiality, p(ap, "requiredAuthority"))
+                extra(entity, recordId, actionType, materiality, authority)
                         + ",\"outcome\":\"" + CaseEventWriter.esc(target) + "\"");
-        if ("Approved".equals(target)) {
-            return "APPROVED -> " + runEffect(entity, recordId, actionType, approver, now);
-        }
-        return target.toUpperCase();
     }
 
     // ---------------- helpers ----------------
@@ -201,10 +322,10 @@ public class ApprovalService {
         events.append(caseId, type, actor, "", "", reason, extra);
     }
 
-    private void save(String form, FormRow row) {
+    private void save(FormRow row) {
         FormRowSet set = new FormRowSet();
         set.add(row);
-        dao.saveOrUpdate(form, form, set);
+        dao.saveOrUpdate(F_APPROVAL, F_APPROVAL, set);
     }
 
     private void updateSchemas() {
@@ -219,9 +340,47 @@ public class ApprovalService {
         return v == null ? "" : v;
     }
 
+    private static String orDefault(String v, String dflt) {
+        return (v == null || v.trim().isEmpty()) ? dflt : v.trim();
+    }
+
+    private static List<String> splitCsv(String s) {
+        List<String> out = new ArrayList<String>();
+        if (s == null) {
+            return out;
+        }
+        for (String t : s.split(",")) {
+            String x = t.trim();
+            if (!x.isEmpty()) {
+                out.add(x);
+            }
+        }
+        return out;
+    }
+
+    private static boolean containsIgnoreCase(List<String> list, String v) {
+        if (v == null) {
+            return false;
+        }
+        for (String s : list) {
+            if (s.equalsIgnoreCase(v)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static double num(String s) {
         try {
             return (s == null || s.trim().isEmpty()) ? 0 : Double.parseDouble(s.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private static long parseLong(String s) {
+        try {
+            return (s == null || s.trim().isEmpty()) ? 0 : Long.parseLong(s.trim());
         } catch (NumberFormatException e) {
             return 0;
         }
