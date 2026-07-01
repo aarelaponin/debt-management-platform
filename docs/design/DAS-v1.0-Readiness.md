@@ -43,7 +43,8 @@ by adding exactly that, and its bespoke approval flow was retired.
 
 - **Per-role landing-page gating** (#60 / #91) — a Joget `GroupPermission` directory-resolution quirk;
   the per-user inbox does **not** depend on it. Deferred.
-- **cmWriteOffApprove console menu removal** — the bespoke path is retired in code; the vestigial menu
-  node removal is a cosmetic cleanup for the next faithful dmbb userview regen (ADR-006 P2 note).
+- **cmWriteOffApprove console menu removal** — ✅ **DONE (2026-07-01)**: the vestigial "Write-off
+  approvals" menu node has been removed from the deployed `dmbbConsole` (68→67 menus) and the deployed
+  userview confirmed clean; full regression t02–t39 **38/38 green**. See ADR-006 "Post-v1.0 cleanup".
 - **Extraction to a standalone cross-project JAR** — deliberately deferred (ADR-006 §5): re-opens as a
   future ADR now that ≥2 in-platform consumers have battle-tested the contract.
