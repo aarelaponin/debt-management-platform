@@ -253,6 +253,15 @@ public class ApprovalService {
                     extra(entity, recordId, actionType, materiality, authority));
             return "COI: approver barred";
         }
+        // auto-derived COI (P5) — when an mmCoi EXCLUDE_DECISION_MAKER rule is in force for the case
+        // type, one person may not decide more than one request for the SAME taxpayer (TIN): an
+        // approver who already voted on another request for this TIN is barred (blocking, stays Pending).
+        if (autoCoiBarred(approver, caseId, ap.getId())) {
+            event(caseId, "APPROVAL_AUTOCOI_BLOCKED", approver,
+                    "auto-COI: " + approver + " already decided another request for this taxpayer",
+                    extra(entity, recordId, actionType, materiality, authority));
+            return "auto-COI: already decided for this taxpayer";
+        }
         // delegation binding (P4) — once a request is delegated, ONLY the named delegate may decide
         // it (any outcome); anyone else is blocked and the request stays Pending with the delegate.
         String delegatedTo = p(ap, "delegatedTo");
@@ -471,6 +480,57 @@ public class ApprovalService {
                 String which = ab.length > 1 ? ab[1].trim() : "*";
                 if (("*".equals(who) || who.equalsIgnoreCase(approver))
                         && ("*".equals(which) || which.equalsIgnoreCase(tin))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Auto-derived COI (P5): when an {@code mmCoi} {@code EXCLUDE_DECISION_MAKER} rule is in force for
+     * the case type, the same person may not decide more than one approval request for the same
+     * taxpayer. True when {@code approver} is already a recorded voter on some OTHER request whose
+     * case has the same TIN. Derived from the decision record itself — no separate declaration.
+     */
+    boolean autoCoiBarred(String approver, String caseId, String currentApId) {
+        if (approver == null || approver.isEmpty() || caseId == null || caseId.isEmpty()) {
+            return false;
+        }
+        FormRow c = dao.load("cmCase", "cmCase", caseId);
+        if (c == null) {
+            return false;
+        }
+        String tin = p(c, "tin");
+        if (tin.isEmpty()) {
+            return false;
+        }
+        boolean enabled = false;
+        FormRowSet rules = mm.coiRules(p(c, "caseType"));
+        if (rules != null) {
+            for (FormRow r : rules) {
+                if ("EXCLUDE_DECISION_MAKER".equalsIgnoreCase(p(r, "ruleType"))) {
+                    enabled = true;
+                    break;
+                }
+            }
+        }
+        if (!enabled) {
+            return false;
+        }
+        FormRowSet voted = dao.find(F_APPROVAL, F_APPROVAL,
+                "WHERE e.customProperties.voters LIKE ?1", new Object[]{"%" + approver + "%"},
+                null, Boolean.FALSE, 0, FETCH_ALL);
+        if (voted != null) {
+            for (FormRow o : voted) {
+                if (o.getId().equals(currentApId)) {
+                    continue; // the current request itself is not "another"
+                }
+                if (!containsIgnoreCase(splitCsv(p(o, "voters")), approver)) {
+                    continue;
+                }
+                FormRow oc = dao.load("cmCase", "cmCase", p(o, "caseId"));
+                if (oc != null && tin.equalsIgnoreCase(p(oc, "tin"))) {
                     return true;
                 }
             }

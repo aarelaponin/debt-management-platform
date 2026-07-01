@@ -487,6 +487,49 @@ public class ApprovalServiceTest {
                 }).count();
     }
 
+    // ---------------- P5: auto-derived COI ----------------
+
+    @Test
+    public void autoCoiBarsASecondDecisionForTheSameTaxpayer() {
+        ApprovalService s = svc();
+        put("cmCase", row("caseType", "DM", "tin", "TIN-AC"), "caseAC1");
+        put("cmCase", row("caseType", "DM", "tin", "TIN-AC"), "caseAC2"); // same taxpayer, another case
+        put("mmCoi", row("caseType", "DM", "ruleType", "EXCLUDE_DECISION_MAKER", "expression", "*"), "coi-dm-dec");
+        req(s, "agr-ac1", 6000, "caseAC1");
+        assertTrue(s.decide(apId(), "boss", "SUPERVISOR", "approve", "ok1", LocalDateTime.now()).startsWith("APPROVED"));
+        req(s, "agr-ac2", 6000, "caseAC2");
+        String ap2 = apId();
+        String r2 = s.decide(ap2, "boss", "SUPERVISOR", "approve", "ok2", LocalDateTime.now());
+        assertTrue(r2, r2.contains("auto-COI"));
+        assertEquals(1, ev("APPROVAL_AUTOCOI_BLOCKED"));
+        assertEquals("Pending", prop("cmApproval", ap2, "status"));
+    }
+
+    @Test
+    public void autoCoiIsOffWithoutTheRule() {
+        ApprovalService s = svc();
+        put("cmCase", row("caseType", "DM", "tin", "TIN-AD"), "caseAD1");
+        put("cmCase", row("caseType", "DM", "tin", "TIN-AD"), "caseAD2");
+        req(s, "agr-ad1", 6000, "caseAD1");
+        s.decide(apId(), "boss", "SUPERVISOR", "approve", "ok", LocalDateTime.now());
+        req(s, "agr-ad2", 6000, "caseAD2");
+        String r2 = s.decide(apId(), "boss", "SUPERVISOR", "approve", "ok", LocalDateTime.now());
+        assertTrue(r2, r2.startsWith("APPROVED")); // no EXCLUDE_DECISION_MAKER rule -> allowed
+    }
+
+    @Test
+    public void autoCoiAllowsADifferentTaxpayer() {
+        ApprovalService s = svc();
+        put("cmCase", row("caseType", "DM", "tin", "TIN-AE1"), "caseAE1");
+        put("cmCase", row("caseType", "DM", "tin", "TIN-AE2"), "caseAE2"); // different taxpayer
+        put("mmCoi", row("caseType", "DM", "ruleType", "EXCLUDE_DECISION_MAKER", "expression", "*"), "coi-dm-dec2");
+        req(s, "agr-ae1", 6000, "caseAE1");
+        s.decide(apId(), "boss", "SUPERVISOR", "approve", "ok", LocalDateTime.now());
+        req(s, "agr-ae2", 6000, "caseAE2");
+        String r2 = s.decide(apId(), "boss", "SUPERVISOR", "approve", "ok", LocalDateTime.now());
+        assertTrue(r2, r2.startsWith("APPROVED")); // a different taxpayer is fine
+    }
+
     // ---------------- fake store ----------------
 
     private FormRowSet query(String form, String cond, Object[] params, Integer limit) {
