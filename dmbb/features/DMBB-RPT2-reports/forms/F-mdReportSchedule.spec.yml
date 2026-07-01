@@ -1,0 +1,44 @@
+form:
+  id: mdReportSchedule
+  name: DM - Scheduled Report
+  table: mdReportSchedule
+  listColumns: [code, reportConfig, frequency, format, active, lastRunAt]
+  description: 'RPT-FR-017 scheduled report generation. Binds a saved report configuration (mdReportConfig) to a cadence and a recipient list so the report is generated and delivered automatically. The cadence + recipients + format are captured here; the generation trigger runs on the platform scheduler and delivery uses the deployment SMTP gateway (an ops wiring recorded in the open ledger — postal/SMS/SMTP at deployment). lastRunAt is stamped by the scheduler.'
+sections:
+- label: Schedule
+  columns: 2
+  fields:
+  - {id: code, type: textfield, label: Code, required: true}
+  - id: reportConfig
+    type: select
+    label: Report configuration
+    required: true
+    lookup:
+      formDefId: mdReportConfig
+      idColumn: code
+      labelColumn: name
+      extraCondition: "c_active = 'true'"
+  - id: frequency
+    type: select
+    label: Frequency
+    value: MONTHLY
+    static_options:
+    - {value: DAILY, label: Daily}
+    - {value: WEEKLY, label: Weekly}
+    - {value: MONTHLY, label: Monthly}
+    - {value: QUARTERLY, label: Quarterly}
+  - {id: cronExpression, type: textfield, label: 'Cron (optional, overrides frequency)'}
+  - id: format
+    type: select
+    label: Output format
+    value: PDF
+    static_options:
+    - {value: PDF, label: PDF}
+    - {value: XLS, label: Excel}
+    - {value: CSV, label: CSV}
+  - {id: active, type: textfield, label: Active (true/false), value: 'true'}
+  - {id: lastRunAt, type: textfield, label: Last run at (managed by scheduler), managed: true}
+- label: Delivery
+  columns: 1
+  fields:
+  - {id: recipients, type: textarea, label: 'Recipients (email addresses, comma-separated)'}

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="rptStaffProductivity" language="java" pageWidth="595" pageHeight="842"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <style name="Bold" fontName="SansSerif" fontSize="9">
+        <conditionalStyle>
+            <conditionExpression><![CDATA["TOTAL".equals($F{line_type})]]></conditionExpression>
+            <style isBold="true" backcolor="#EEEEEE" mode="Opaque"><box><topPen lineWidth="0.5"/></box></style>
+        </conditionalStyle>
+    </style>
+    <queryString>
+        <![CDATA[
+        SELECT officer, line_type, cases_assigned, cases_resolved, total_recovered, avg_days, sla_breaches, sortkey FROM (
+          SELECT COALESCE(NULLIF(c.c_assignee,''),'(unassigned)') AS officer, 'DETAIL' AS line_type,
+                 COUNT(*)::int AS cases_assigned,
+                 SUM(CASE WHEN term.c_code IS NOT NULL THEN 1 ELSE 0 END)::int AS cases_resolved,
+                 COALESCE(SUM(pay.paid),0) AS total_recovered,
+                 ROUND(AVG(CASE WHEN term.c_code IS NOT NULL
+                       THEN EXTRACT(day FROM COALESCE(c.datemodified, now()) - c.datecreated) END),1) AS avg_days,
+                 SUM(CASE WHEN c.c_slastatus='RED' THEN 1 ELSE 0 END)::int AS sla_breaches, 1 AS sortkey
+          FROM app_fd_cmcase c
+          LEFT JOIN app_fd_mmstate term ON term.c_code = c.c_currentstate AND term.c_isterminal='true'
+          LEFT JOIN (SELECT c_caseid AS cid, SUM(COALESCE(NULLIF(c_appliedamount,'')::numeric,0)) AS paid
+                     FROM app_fd_dmpayment GROUP BY 1) pay ON pay.cid = c.id
+          WHERE c.c_casetype='DM'
+          GROUP BY 1
+          UNION ALL
+          SELECT 'ALL OFFICERS','TOTAL', COUNT(*)::int,
+                 SUM(CASE WHEN term.c_code IS NOT NULL THEN 1 ELSE 0 END)::int,
+                 COALESCE(SUM(pay.paid),0),
+                 ROUND(AVG(CASE WHEN term.c_code IS NOT NULL
+                       THEN EXTRACT(day FROM COALESCE(c.datemodified, now()) - c.datecreated) END),1),
+                 SUM(CASE WHEN c.c_slastatus='RED' THEN 1 ELSE 0 END)::int, 9
+          FROM app_fd_cmcase c
+          LEFT JOIN app_fd_mmstate term ON term.c_code = c.c_currentstate AND term.c_isterminal='true'
+          LEFT JOIN (SELECT c_caseid AS cid, SUM(COALESCE(NULLIF(c_appliedamount,'')::numeric,0)) AS paid
+                     FROM app_fd_dmpayment GROUP BY 1) pay ON pay.cid = c.id
+          WHERE c.c_casetype='DM'
+        ) q ORDER BY sortkey, total_recovered DESC, officer
+        ]]>
+    </queryString>
+    <field name="officer" class="java.lang.String"/>
+    <field name="line_type" class="java.lang.String"/>
+    <field name="cases_assigned" class="java.lang.Integer"/>
+    <field name="cases_resolved" class="java.lang.Integer"/>
+    <field name="total_recovered" class="java.math.BigDecimal"/>
+    <field name="avg_days" class="java.math.BigDecimal"/>
+    <field name="sla_breaches" class="java.lang.Integer"/>
+    <title>
+        <band height="58">
+            <staticText><reportElement x="0" y="0" width="555" height="24"/>
+                <textElement><font fontName="SansSerif" size="16" isBold="true"/></textElement>
+                <text><![CDATA[MTCA — Staff Productivity Report]]></text></staticText>
+            <staticText><reportElement x="0" y="26" width="400" height="14"/>
+                <textElement><font fontName="SansSerif" size="10"/></textElement>
+                <text><![CDATA[Debt officer performance (RPT-FR-013)]]></text></staticText>
+            <textField pattern="dd MMM yyyy HH:mm"><reportElement x="355" y="26" width="200" height="14"/>
+                <textElement textAlignment="Right"><font fontName="SansSerif" size="10"/></textElement>
+                <textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression></textField>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="20">
+            <staticText><reportElement x="0" y="0" width="150" height="18"/><textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Officer]]></text></staticText>
+            <staticText><reportElement x="150" y="0" width="65" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Assigned]]></text></staticText>
+            <staticText><reportElement x="215" y="0" width="65" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Resolved]]></text></staticText>
+            <staticText><reportElement x="280" y="0" width="120" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Recovered (EUR)]]></text></staticText>
+            <staticText><reportElement x="400" y="0" width="75" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Avg days]]></text></staticText>
+            <staticText><reportElement x="475" y="0" width="80" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[SLA breach]]></text></staticText>
+            <line><reportElement x="0" y="18" width="555" height="1"/></line>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="16">
+            <textField><reportElement style="Bold" x="0" y="0" width="150" height="15"/><textElement verticalAlignment="Middle"/><textFieldExpression class="java.lang.String"><![CDATA[$F{officer}]]></textFieldExpression></textField>
+            <textField><reportElement style="Bold" x="150" y="0" width="65" height="15"/><textElement textAlignment="Right" verticalAlignment="Middle"/><textFieldExpression class="java.lang.Integer"><![CDATA[$F{cases_assigned}]]></textFieldExpression></textField>
+            <textField><reportElement style="Bold" x="215" y="0" width="65" height="15"/><textElement textAlignment="Right" verticalAlignment="Middle"/><textFieldExpression class="java.lang.Integer"><![CDATA[$F{cases_resolved}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.00"><reportElement style="Bold" x="280" y="0" width="120" height="15"/><textElement textAlignment="Right" verticalAlignment="Middle"/><textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{total_recovered}]]></textFieldExpression></textField>
+            <textField pattern="#,##0.0"><reportElement style="Bold" x="400" y="0" width="75" height="15"/><textElement textAlignment="Right" verticalAlignment="Middle"/><textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{avg_days}]]></textFieldExpression></textField>
+            <textField><reportElement style="Bold" x="475" y="0" width="80" height="15"/><textElement textAlignment="Right" verticalAlignment="Middle"/><textFieldExpression class="java.lang.Integer"><![CDATA[$F{sla_breaches}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="16"><textField><reportElement x="355" y="0" width="200" height="14"/><textElement textAlignment="Right"><font fontName="SansSerif" size="8"/></textElement><textFieldExpression class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression></textField></band>
+    </pageFooter>
+</jasperReport>

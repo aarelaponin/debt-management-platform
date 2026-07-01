@@ -199,6 +199,8 @@ BUCKET = {
     # DMBB-F14 (DM-FR-018/019/020): officer contact/visit capture -> Operations;
     # the fast-track threshold config -> Admin transient -> Collection settings.
     "Contacts & visits": "Operations", "Contact config": "Admin",
+    # DMBB-RPT2 (RPT-FR-015/016/017): report configuration + scheduling -> Collection settings.
+    "Reporting config": "Admin",
 }
 
 

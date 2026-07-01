@@ -1,0 +1,26 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  # Merges into the existing Reports category (Operations bucket, dm_officer).
+  - label: Reports
+    menus:
+    - type: jasper
+      customId: rptCollectionStatus
+      label: Collection Status Report
+      jrxmlFile: ../reports/rptCollectionStatus.jrxml
+    - type: jasper
+      customId: rptStaffProductivity
+      label: Staff Productivity Report
+      jrxmlFile: ../reports/rptStaffProductivity.jrxml
+  # RPT-FR-015/016/017 report configuration + scheduling -> "Admin" transient -> Collection settings.
+  - label: Reporting config
+    menus:
+    - type: crud
+      formDefId: mdReportConfig
+      datalistId: list_mdReportConfig
+      label: Saved report configurations
+    - type: crud
+      formDefId: mdReportSchedule
+      datalistId: list_mdReportSchedule
+      label: Scheduled reports

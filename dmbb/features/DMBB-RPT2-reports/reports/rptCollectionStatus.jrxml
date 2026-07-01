@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="rptCollectionStatus" language="java" pageWidth="842" pageHeight="595"
+              orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <style name="Row" fontName="SansSerif" fontSize="9">
+        <conditionalStyle>
+            <conditionExpression><![CDATA["OVERDUE".equals($F{overdue})]]></conditionExpression>
+            <style forecolor="#B00020" isBold="true"/>
+        </conditionalStyle>
+    </style>
+    <queryString>
+        <![CDATA[
+        SELECT c.c_tin AS tin,
+               COALESCE(NULLIF(c.c_taxpayername,''), c.c_tin) AS taxpayer,
+               COALESCE(NULLIF(d.c_debtcategory,''), c.c_category, '-') AS category,
+               COALESCE(NULLIF(d.c_stage,''),'-') AS stage,
+               COALESCE(NULLIF(c.c_assignee,''),'-') AS officer,
+               GREATEST(0, EXTRACT(day FROM now() - COALESCE(le.last_evt, c.datecreated)))::int AS days_since,
+               COALESCE(to_char(NULLIF(c.c_nextactiondue,'')::date,'dd Mon yyyy'),'-') AS next_action,
+               NULLIF(c.c_riskscore,'')::numeric AS risk_score,
+               COALESCE(NULLIF(c.c_slastatus,''),'-') AS sla_status,
+               CASE WHEN NULLIF(c.c_nextactiondue,'') IS NOT NULL AND c.c_nextactiondue::date < current_date
+                    THEN 'OVERDUE' ELSE '' END AS overdue
+        FROM app_fd_cmcase c
+        JOIN app_fd_dmdebt d ON d.id = c.id
+        LEFT JOIN (SELECT c_caseid, max(dateCreated) AS last_evt FROM app_fd_cmevent GROUP BY c_caseid) le
+               ON le.c_caseid = c.id
+        WHERE c.c_casetype='DM' AND COALESCE(d.c_writeoffstatus,'')<>'written-off'
+          AND COALESCE(c.c_currentstate,'') NOT IN (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal='true')
+        ORDER BY (CASE WHEN NULLIF(c.c_nextactiondue,'') IS NOT NULL AND c.c_nextactiondue::date < current_date THEN 0 ELSE 1 END),
+                 COALESCE(NULLIF(c.c_riskscore,'')::numeric,0) DESC, c.c_tin
+        ]]>
+    </queryString>
+    <field name="tin" class="java.lang.String"/>
+    <field name="taxpayer" class="java.lang.String"/>
+    <field name="category" class="java.lang.String"/>
+    <field name="stage" class="java.lang.String"/>
+    <field name="officer" class="java.lang.String"/>
+    <field name="days_since" class="java.lang.Integer"/>
+    <field name="next_action" class="java.lang.String"/>
+    <field name="risk_score" class="java.math.BigDecimal"/>
+    <field name="sla_status" class="java.lang.String"/>
+    <field name="overdue" class="java.lang.String"/>
+    <title>
+        <band height="52">
+            <staticText><reportElement x="0" y="0" width="600" height="24"/>
+                <textElement><font fontName="SansSerif" size="16" isBold="true"/></textElement>
+                <text><![CDATA[MTCA — Collection Status Report]]></text></staticText>
+            <staticText><reportElement x="0" y="26" width="560" height="14"/>
+                <textElement><font fontName="SansSerif" size="10"/></textElement>
+                <text><![CDATA[Active debt cases by enforcement stage (RPT-FR-009). Overdue next-action in red.]]></text></staticText>
+            <textField pattern="dd MMM yyyy HH:mm"><reportElement x="602" y="26" width="200" height="14"/>
+                <textElement textAlignment="Right"><font fontName="SansSerif" size="10"/></textElement>
+                <textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression></textField>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="20">
+            <staticText><reportElement x="0" y="0" width="75" height="18"/><textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[TIN]]></text></staticText>
+            <staticText><reportElement x="75" y="0" width="150" height="18"/><textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Taxpayer]]></text></staticText>
+            <staticText><reportElement x="225" y="0" width="45" height="18"/><textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Cat.]]></text></staticText>
+            <staticText><reportElement x="270" y="0" width="120" height="18"/><textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Enforcement stage]]></text></staticText>
+            <staticText><reportElement x="390" y="0" width="95" height="18"/><textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Officer]]></text></staticText>
+            <staticText><reportElement x="485" y="0" width="70" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Days since]]></text></staticText>
+            <staticText><reportElement x="555" y="0" width="105" height="18"/><textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Next action]]></text></staticText>
+            <staticText><reportElement x="660" y="0" width="60" height="18"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Risk]]></text></staticText>
+            <staticText><reportElement x="720" y="0" width="82" height="18"/><textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[SLA]]></text></staticText>
+            <line><reportElement x="0" y="18" width="802" height="1"/></line>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="15">
+            <textField><reportElement style="Row" x="0" y="0" width="75" height="14"/><textFieldExpression class="java.lang.String"><![CDATA[$F{tin}]]></textFieldExpression></textField>
+            <textField><reportElement style="Row" x="75" y="0" width="150" height="14"/><textFieldExpression class="java.lang.String"><![CDATA[$F{taxpayer}]]></textFieldExpression></textField>
+            <textField><reportElement style="Row" x="225" y="0" width="45" height="14"/><textFieldExpression class="java.lang.String"><![CDATA[$F{category}]]></textFieldExpression></textField>
+            <textField><reportElement style="Row" x="270" y="0" width="120" height="14"/><textFieldExpression class="java.lang.String"><![CDATA[$F{stage}]]></textFieldExpression></textField>
+            <textField><reportElement style="Row" x="390" y="0" width="95" height="14"/><textFieldExpression class="java.lang.String"><![CDATA[$F{officer}]]></textFieldExpression></textField>
+            <textField><reportElement style="Row" x="485" y="0" width="70" height="14"/><textElement textAlignment="Right"/><textFieldExpression class="java.lang.Integer"><![CDATA[$F{days_since}]]></textFieldExpression></textField>
+            <textField><reportElement style="Row" x="555" y="0" width="105" height="14"/><textFieldExpression class="java.lang.String"><![CDATA[$F{next_action}]]></textFieldExpression></textField>
+            <textField pattern="#,##0"><reportElement style="Row" x="660" y="0" width="60" height="14"/><textElement textAlignment="Right"/><textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{risk_score}]]></textFieldExpression></textField>
+            <textField><reportElement style="Row" x="720" y="0" width="82" height="14"/><textFieldExpression class="java.lang.String"><![CDATA[$F{sla_status}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="16"><textField><reportElement x="602" y="0" width="200" height="14"/><textElement textAlignment="Right"><font fontName="SansSerif" size="8"/></textElement><textFieldExpression class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression></textField></band>
+    </pageFooter>
+</jasperReport>

@@ -1,0 +1,50 @@
+form:
+  id: mdReportConfig
+  name: DM - Saved Report Configuration
+  table: mdReportConfig
+  listColumns: [code, name, reportId, period, format, active]
+  description: 'RPT-FR-015/016 report configuration interface + saved configurations. A named, reusable report configuration: which report, its filter set, the reporting period and the output format. Officers save and re-run configurations from the Reporting config screen; a saved config is also the unit a schedule (mdReportSchedule) generates on a cadence.'
+sections:
+- label: Report configuration
+  columns: 2
+  fields:
+  - {id: code, type: textfield, label: Code, required: true}
+  - {id: name, type: textfield, label: Configuration name, required: true}
+  - id: reportId
+    type: select
+    label: Report
+    required: true
+    static_options:
+    - {value: rptCollectionStatus, label: Collection Status}
+    - {value: rptStaffProductivity, label: Staff Productivity}
+    - {value: rptDebtAging, label: Debt Aging}
+    - {value: rptTaxDebtStatus, label: Tax Debt Status}
+    - {value: rptRecoveryByAction, label: Recovery by Action}
+    - {value: rptInstalmentCompliance, label: Instalment Compliance}
+    - {value: rptWriteOff, label: Write-Off}
+    - {value: rptDebtorsList, label: Debtors List}
+  - id: period
+    type: select
+    label: Reporting period
+    value: THIS_MONTH
+    static_options:
+    - {value: THIS_MONTH, label: This month}
+    - {value: LAST_MONTH, label: Last month}
+    - {value: THIS_QUARTER, label: This quarter}
+    - {value: YTD, label: Year to date}
+    - {value: ALL, label: All time}
+    - {value: CUSTOM, label: Custom (see filters)}
+  - id: format
+    type: select
+    label: Output format
+    value: PDF
+    static_options:
+    - {value: PDF, label: PDF}
+    - {value: XLS, label: Excel}
+    - {value: CSV, label: CSV}
+  - {id: owner, type: textfield, label: Owner (user/team)}
+  - {id: active, type: textfield, label: Active (true/false), value: 'true'}
+- label: Filters
+  columns: 1
+  fields:
+  - {id: filters, type: textarea, label: 'Filters (key=value per line, e.g. category=C4)'}
