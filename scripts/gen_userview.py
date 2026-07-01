@@ -26,11 +26,21 @@ def uid(name):
 # BUILDS child data — dmInstAgr → ReliefService.draft() generates the instalment schedule — lands the
 # officer ON the saved record in edit mode (add-afterSaved="edit") so the generated schedule +
 # monthly + interest + eligibility note are immediately visible for review (generate→review→submit).
+# The inline "Preview schedule" script (Slice 1b) is menu-level JS (form CustomHTML is sanitiser-
+# stripped); it builds the button + full-width schedule table client-side. Kept in a repo asset file.
+_IA_FOOTER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dmbb", "features",
+                               "DMBB-F06-instalments", "assets", "ia_preview_footer.html")
+try:
+    _IA_PREVIEW_FOOTER = open(_IA_FOOTER_PATH, encoding="utf-8").read()
+except OSError:
+    _IA_PREVIEW_FOOTER = ""
+
 CRUD_AFTERSAVE = {
     "dmInstAgr": {
         "add-afterSaved": "edit", "edit-afterSaved": "continue",
+        "add-customFooter": _IA_PREVIEW_FOOTER, "edit-customFooter": _IA_PREVIEW_FOOTER,
         "add-messageShowAfterComplete":
-            "Draft generated — the instalment schedule, monthly amount and eligibility note are shown "
+            "Draft saved — the instalment schedule, monthly amount and eligibility note are shown "
             "below. Review, then set On save = Submit application to finalise (eligibility + approval "
             "+ enforcement hold).",
     },

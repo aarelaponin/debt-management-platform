@@ -1,0 +1,23 @@
+<script>
+(function(){var RATE=0.5;
+function num(f,n){var e=f.querySelector('[name="'+n+'"]');return e?parseFloat(String(e.value).replace(/[^0-9.\-]/g,''))||0:0;}
+function set(f,n,v){var e=f.querySelector('[name="'+n+'"]');if(e){e.value=v;}}
+function sched(){var s=document.querySelectorAll('.form-section');for(var i=0;i<s.length;i++){if(s[i].textContent.indexOf('Instalment schedule')>=0)return s[i];}return null;}
+function run(f){var total=num(f,'totalDebt'),dur=Math.max(1,Math.round(num(f,'durationMonths')));
+var msg=f.querySelector('#iaPreviewMsg'),out=document.getElementById('iaPreviewOut');
+if(!total||!num(f,'durationMonths')){if(msg)msg.textContent='Enter total debt and duration first.';if(out)out.innerHTML='';return;}
+var interest=Math.round(total*(RATE/100)*(dur/2)*100)/100,monthly=Math.round(((total+interest)/dur)*100)/100;
+set(f,'monthlyAmount',monthly.toFixed(2));set(f,'totalInterest',interest.toFixed(2));
+set(f,'complianceStatus','Preview - monthly & interest are exact; eligibility (category/minimum/active-plan) confirmed on Save & Submit.');
+if(msg)msg.innerHTML='<span style="color:#16a34a">&#10003;</span> '+dur+' instalments &middot; <b>'+monthly.toFixed(2)+'</b>/mo &middot; interest '+interest.toFixed(2)+' &mdash; schedule shown below.';
+if(!out)return;
+var t=new Date(),rows='';for(var i=1;i<=dur;i++){var d=new Date(t.getFullYear(),t.getMonth()+i,t.getDate());var ds=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);rows+='<tr><td style="padding:5px 14px;border-bottom:1px solid #eee">'+i+'</td><td style="padding:5px 14px;border-bottom:1px solid #eee">'+ds+'</td><td style="padding:5px 14px;border-bottom:1px solid #eee;text-align:right">'+monthly.toFixed(2)+'</td></tr>';}
+out.innerHTML='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:12px 14px;margin:0 0 10px 0"><div style="font-weight:600;color:#1e40af;margin-bottom:8px">Draft preview &mdash; not yet saved ('+dur+' instalments, '+monthly.toFixed(2)+'/mo, interest '+interest.toFixed(2)+')</div><table style="border-collapse:collapse;font-size:13px;width:100%;max-width:520px;background:#fff"><thead><tr><th style="text-align:left;padding:5px 14px;border-bottom:2px solid #cbd5e1">#</th><th style="text-align:left;padding:5px 14px;border-bottom:2px solid #cbd5e1">Due date</th><th style="text-align:right;padding:5px 14px;border-bottom:2px solid #cbd5e1">Expected</th></tr></thead><tbody>'+rows+'</tbody></table><div style="color:#64748b;font-size:12px;margin-top:8px">Click <b>Save</b> to persist this draft, then set <b>On save = Submit application</b> to finalise.</div></div>';}
+function build(f){if(f.querySelector('#iaPreviewBtn'))return;var a=f.querySelector('[name="durationMonths"]');if(!a)return;
+var cell=a.closest('.form-cell')||a.parentNode;var w=document.createElement('div');w.className='form-cell';w.style.margin='8px 0';
+w.innerHTML='<div id="iaPreviewBtn" style="display:inline-block;background:#2563eb;color:#fff;padding:8px 14px;border-radius:4px;cursor:pointer;user-select:none;font-weight:600">Preview schedule</div><div id="iaPreviewMsg" style="margin-top:8px;color:#555;font-size:13px"></div>';
+(cell.parentNode||f).insertBefore(w,cell.nextSibling);
+var sec=sched();if(sec){var o=document.createElement('div');o.id='iaPreviewOut';o.style.margin='4px 0';var hdr=sec.querySelector('.form-section-title,h3,h4,legend');if(hdr&&hdr.parentNode){hdr.parentNode.insertBefore(o,hdr.nextSibling);}else{sec.insertBefore(o,sec.firstChild);}}
+f.querySelector('#iaPreviewBtn').addEventListener('click',function(){run(f);});}
+var n=0,iv=setInterval(function(){var a=document.querySelector('form [name="durationMonths"]');var f=a?a.closest('form'):null;if(f)build(f);if(n++>40)clearInterval(iv);},250);})();
+</script>

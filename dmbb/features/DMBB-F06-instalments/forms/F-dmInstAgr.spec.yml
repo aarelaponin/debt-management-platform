@@ -63,6 +63,9 @@ sections:
     static_options:
     - {value: draft, label: 'Generate draft (schedule only — no hold, no approval)'}
     - {value: submit, label: 'Submit application (run eligibility + approval)'}
+  # Inline "Preview schedule" (Slice 1b): the button + schedule are injected and computed by the
+  # CrudMenu add/edit customFooter script (menu-level JS — form CustomHTML is sanitiser-stripped).
+  # See gen_userview.CRUD_AFTERSAVE["dmInstAgr"]. Preview only; the binding calc runs on Save/Submit.
   - id: status
     type: textfield
     label: Status
