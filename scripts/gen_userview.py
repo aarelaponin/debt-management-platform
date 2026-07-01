@@ -22,15 +22,32 @@ def uid(name):
     return str(uuid.uuid5(NS, "cmbb:" + name))
 
 
+# Per-form "after save" override. Default is back-to-list. A form whose save runs an engine that
+# BUILDS child data — dmInstAgr → ReliefService.draft() generates the instalment schedule — lands the
+# officer ON the saved record in edit mode (add-afterSaved="edit") so the generated schedule +
+# monthly + interest + eligibility note are immediately visible for review (generate→review→submit).
+CRUD_AFTERSAVE = {
+    "dmInstAgr": {
+        "add-afterSaved": "edit", "edit-afterSaved": "continue",
+        "add-messageShowAfterComplete":
+            "Draft generated — the instalment schedule, monthly amount and eligibility note are shown "
+            "below. Review, then set On save = Submit application to finalise (eligibility + approval "
+            "+ enforcement hold).",
+    },
+}
+
+
 def crud_menu(form_id, label):
-    return {"className": "org.joget.plugin.enterprise.CrudMenu", "properties": {
+    props = {
         "id": uid("menu:" + form_id), "label": label,
         "addFormId": form_id, "editFormId": form_id,
         "datalistId": f"list_{form_id}", "customId": f"{form_id}_crud",
         "add-afterSaved": "list", "edit-afterSaved": "list",
         "list-showDeleteButton": "yes", "rowCount": "true",
         "buttonPosition": "bothLeft", "checkboxPosition": "left",
-        "selectionType": "multiple", "iconIncluded": False}}
+        "selectionType": "multiple", "iconIncluded": False}
+    props.update(CRUD_AFTERSAVE.get(form_id, {}))
+    return {"className": "org.joget.plugin.enterprise.CrudMenu", "properties": props}
 
 
 def datalist_menu(dl_id, label):
