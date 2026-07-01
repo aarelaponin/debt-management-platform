@@ -44,9 +44,15 @@ def post(form, api, key, payload):
     urllib.request.urlopen(req).read()
 
 
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..", "scripts"))
+import uv_auth
+
+
 def get(url):
-    with urllib.request.urlopen(url, timeout=30) as r:
-        return r.getcode(), r.read().decode("utf-8", "replace")
+    # #91: console categories are GroupPermission-gated; fetch userview pages as admin (member of
+    # all role groups). Anonymous GETs now 302. API POSTs elsewhere keep their own auth (untouched).
+    return uv_auth.admin_get(url)
 
 
 def check(name, cond, detail=""):

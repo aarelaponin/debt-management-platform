@@ -3,10 +3,14 @@
 typeset report (HTTP 200, no JRException/ClassCastException, title + grand-total present), with
 PDF/Excel export links. The reports run the same SQL the F09/F11/F12 datalists already prove.
 
-Usage: run_t22.py   (no auth needed — dmbbConsole has no permission set, DX9-DELTAS F01)
+Usage: run_t22.py   (#91: dmbbConsole categories are now gated — reports render via an admin session)
 """
+import os
 import sys
 import urllib.request
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..", "scripts"))
+import uv_auth
 
 BASE = "http://localhost:8089/jw/web/userview/dmbb/dmbbConsole/_"
 RESULTS = []
@@ -24,11 +28,9 @@ ERR_MARKERS = ("cannot be cast", "Invalid Jasper", "JRException",
 
 
 def get(url):
-    try:
-        with urllib.request.urlopen(url, timeout=30) as r:
-            return r.getcode(), r.read().decode("utf-8", "replace")
-    except urllib.error.HTTPError as e:
-        return e.code, e.read().decode("utf-8", "replace")
+    # #91: reports render inside gated console categories, so fetch through an admin session
+    # (admin is a member of all role groups). Anonymous GETs now 302 to login.
+    return uv_auth.admin_get(url)
 
 
 def check(name, cond, detail=""):

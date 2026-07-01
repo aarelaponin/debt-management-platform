@@ -11,16 +11,22 @@
 
 -- organizationid is nullable and the existing DEV groups (cmbb_user, dm_supervisor) use NULL;
 -- an empty string violates the FK to dir_organization, so leave it NULL.
+--   dm_collection_admin — operational config tier (ADR-004 §7 Collection settings)
+--   dm_legal_admin       — legislative config tier (ADR-004 §7 Legal & reference)
 INSERT INTO dir_group (id, name, description, organizationid) VALUES
-  ('dm_officer',      'dm_officer',      'DM case workers (DEV seed)',            NULL),
-  ('dm_policy_admin', 'dm_policy_admin', 'DM department mgmt + config (DEV seed)', NULL),
-  ('dm_manager',      'dm_manager',      'DM senior management (DEV seed)',        NULL)
+  ('dm_officer',          'dm_officer',          'DM case workers (DEV seed)',                 NULL),
+  ('dm_policy_admin',     'dm_policy_admin',     'DM department mgmt + config (DEV seed)',      NULL),
+  ('dm_manager',          'dm_manager',          'DM senior management (DEV seed)',            NULL),
+  ('dm_collection_admin', 'dm_collection_admin', 'DM operational config — Collection settings', NULL),
+  ('dm_legal_admin',      'dm_legal_admin',      'DM legislative config — Legal & reference',   NULL)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO dir_user_group (groupid, userid) VALUES
-  ('dm_officer',      'admin'),
-  ('dm_policy_admin', 'admin'),
-  ('dm_manager',      'admin'),
-  ('dm_officer',      'officer1'),
-  ('dm_officer',      'officer2')
+  ('dm_officer',          'admin'),
+  ('dm_policy_admin',     'admin'),
+  ('dm_manager',          'admin'),
+  ('dm_collection_admin', 'admin'),
+  ('dm_legal_admin',      'admin'),
+  ('dm_officer',          'officer1'),
+  ('dm_officer',          'officer2')
 ON CONFLICT DO NOTHING;

@@ -62,8 +62,13 @@ def category_permission(role):
     """
     if not role:
         return {"className": "", "properties": {}}
+    # DX9 GroupPermission reads a ;-delimited multiselect property named `allowedGroupIds`
+    # (verified against wflow-core 9.0.7 bytecode + properties/userview/groupPermission.json —
+    # see docs/design/SPIKE-groupperm.md). A single group id is one token; multiple = "id1;id2".
+    # (The pre-2026-07-01 emitter wrote `groupId`/`isExclusive`, which the plugin never reads, so
+    # allowedGroupIds was empty → the match loop never ran → deny-all, incl. admin = #91.)
     return {"className": "org.joget.apps.userview.lib.GroupPermission",
-            "properties": {"groupId": role, "isExclusive": ""}}
+            "properties": {"allowedGroupIds": role}}
 
 
 def formmenu(form_id, label):
@@ -128,20 +133,24 @@ BUCKET_ICON = {"Dashboards": "fa-line-chart", "Operations": "fa-tasks",
 BUCKET_ROLE = {"Dashboards": "dm_manager", "Operations": "dm_officer",
                "Automation": "dm_policy_admin", "Approvals": "dm_supervisor",
                "Collection settings": "dm_collection_admin",  # operational tier (ADR-004 §7)
-               "Legal & reference": "dm_legal_admin"}         # legislative tier (ADR-004 §7)
+               "Legal & reference": "dm_legal_admin",         # legislative tier (ADR-004 §7)
+               # "Approvals MI" is surgically inserted into the deployed userview (P6, not emitted
+               # by this loop since it's not in BUCKET_ORDER); recorded here as the authoritative
+               # role so the surgical insert gates it to senior management.
+               "Approvals MI": "dm_manager"}
 # ADR-004 §7 legislative tier: config determined by law/regulation, change-controlled. Everything
 # else currently authored under an Admin-bucket category is operational → Collection settings.
 LEGISLATIVE_FORMS = {
     "mdInstrument", "mdWoGround", "mdWoDelegation", "mdWoPolicy", "mdLegalFee",
     "mdAgentFee", "mdEstMethod", "mdDefAssessPolicy", "mdPublishRule", "mdViolation",
 }
-# Gating is OPT-IN (UV_GATING=1) and OFF by default. The GroupPermission wiring is correct and
-# gates anonymous users out, BUT this DEV Joget does NOT resolve `admin`'s seeded group membership
-# at render time (a DirectoryManager behaviour — admin/groups are org-less yet admin still isn't
-# recognised; confirmed live 2026-06-19, see DX9-DELTAS). With gating ON the whole console goes
-# blank. Keep OFF until membership resolution is fixed (create groups/members via the directory
-# API, or align the directory manager), then flip UV_GATING=1 — the per-role landing follows for free.
-UV_GATING = os.environ.get("UV_GATING") == "1"
+# Gating is ON by default (set UV_GATING=0 to emit OPEN categories). #91 is fixed: the earlier
+# "admin membership not resolved" symptom was a property-name bug in category_permission (we wrote
+# `groupId`; the plugin reads `allowedGroupIds`) — NOT a DirectoryManager quirk. getGroupByUsername
+# resolves admin's flat dir_user_group membership fine (same call DAS P3 AuthorityResolver uses).
+# admin is a member of ALL six BUCKET_ROLE groups, so the superuser + admin-based render tests still
+# see every category; a role user lands on the first bucket they may see. See SPIKE-groupperm.md.
+UV_GATING = os.environ.get("UV_GATING", "1") != "0"
 BUCKET = {
     "Dashboards": "Dashboards",
     "Debt cases": "Operations", "Instalments": "Operations", "Enforcement": "Operations",

@@ -41,8 +41,11 @@ by adding exactly that, and its bespoke approval flow was retired.
 
 ## Known deferrals (out of the v1.0 bar, tracked)
 
-- **Per-role landing-page gating** (#60 / #91) — a Joget `GroupPermission` directory-resolution quirk;
-  the per-user inbox does **not** depend on it. Deferred.
+- **Per-role landing-page gating** (#60 / #91) — ✅ **DONE (2026-07-01)**: never a directory-resolution
+  quirk — a property-name bug in our emitter (`groupId` vs the plugin's `allowedGroupIds`). Fixed;
+  the six console categories are now GroupPermission-gated and land each role on its first visible
+  category. Live-proven by run_t40 (admin ∈ all groups sees all; anonymous denied). See
+  `docs/design/SPIKE-groupperm.md`.
 - **cmWriteOffApprove console menu removal** — ✅ **DONE (2026-07-01)**: the vestigial "Write-off
   approvals" menu node has been removed from the deployed `dmbbConsole` (68→67 menus) and the deployed
   userview confirmed clean; full regression t02–t39 **38/38 green**. See ADR-006 "Post-v1.0 cleanup".

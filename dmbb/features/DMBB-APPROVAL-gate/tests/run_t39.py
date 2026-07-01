@@ -28,9 +28,15 @@ def sql(q):
     return ("SQL-ERR:" + r.stderr.strip()[:200]) if r.returncode else r.stdout.strip()
 
 
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..", "scripts"))
+import uv_auth
+
+
 def get(url):
-    with urllib.request.urlopen(url, timeout=30) as r:
-        return r.getcode(), r.read().decode("utf-8", "replace")
+    # #91: console categories are GroupPermission-gated; fetch userview pages as admin (member of
+    # all role groups). Anonymous GETs now 302. API POSTs elsewhere keep their own auth (untouched).
+    return uv_auth.admin_get(url)
 
 
 def uv_json():
