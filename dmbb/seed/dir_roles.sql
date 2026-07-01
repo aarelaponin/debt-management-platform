@@ -3,11 +3,17 @@
 -- Mirrors the existing dm_supervisor / cmbb_user DEV seeds. Idempotent.
 --
 -- Roles (RPT-FR-007 three tiers):
---   dm_officer       — case workers (single-stream): officer1, officer2
+--   dm_officer       — case workers (single-stream): officer1 (+ officer2 also works cases)
 --   dm_policy_admin  — department management + configuration
 --   dm_manager       — senior management (top tier, KPI/multi-stream dashboards)
 -- admin is a member of ALL roles so the demo/superuser (and the render-based acceptance
 -- tests that hit pages as admin) continue to see every category.
+--
+-- 3-user deployment model (unlicensed Enterprise = 3 users max): admin=superuser (all);
+-- officer2=MANAGER (dm_officer + dm_manager + dm_supervisor → Operations + Dashboards + Approvals
+-- + Approvals MI, but NOT the admin-only config/legal tiers); officer1=officer (Operations only).
+-- To make officer2 loginable for a live manager demo (DEV only):
+--   UPDATE dir_user SET password=md5('officer2') WHERE username='officer2';   (login officer2/officer2)
 
 -- organizationid is nullable and the existing DEV groups (cmbb_user, dm_supervisor) use NULL;
 -- an empty string violates the FK to dir_organization, so leave it NULL.
@@ -28,5 +34,7 @@ INSERT INTO dir_user_group (groupid, userid) VALUES
   ('dm_collection_admin', 'admin'),
   ('dm_legal_admin',      'admin'),
   ('dm_officer',          'officer1'),
-  ('dm_officer',          'officer2')
+  ('dm_officer',          'officer2'),
+  ('dm_manager',          'officer2'),
+  ('dm_supervisor',       'officer2')
 ON CONFLICT DO NOTHING;

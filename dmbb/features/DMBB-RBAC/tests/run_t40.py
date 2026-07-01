@@ -139,15 +139,20 @@ def main():
         groups = set(filter(None, sql(f"SELECT groupid FROM dir_user_group WHERE userid='{user}'").splitlines()))
         return {label for label, role in cat_role.items() if role in groups}, groups
 
+    # 3-user deployment model (unlicensed Enterprise = 3 users): admin=superuser (all groups);
+    # officer2=MANAGER (dm_officer + dm_manager + dm_supervisor); officer1=officer (dm_officer).
     off_vis, off_groups = visible_for("officer1")
+    mgr_vis, mgr_groups = visible_for("officer2")
     adm_vis, adm_groups = visible_for("admin")
-    # officer1 is in dm_officer (+ the base cmbb_user group, which gates no category) → its VISIBLE
-    # set is exactly {Operations}; admin is in all six role groups → sees every category.
     off_ok = off_vis == {"Operations"} and "dm_officer" in off_groups
+    # manager sees Operations (dm_officer) + Dashboards & Approvals MI (dm_manager) + Approvals (dm_supervisor);
+    # NOT the admin-only config/legal tiers (Automation, Collection settings, Legal & reference).
+    mgr_expected = {"Operations", "Dashboards", "Approvals MI", "Approvals"}
+    mgr_ok = mgr_vis == mgr_expected
     adm_ok = adm_vis == set(cat_role.keys()) and len(adm_vis) >= 7
-    check("T-40.4 per-role landing: officer1 sees only Operations; admin sees all",
-          off_ok and adm_ok,
-          f"officer1={sorted(off_vis)} (groups={sorted(off_groups)}); admin sees {len(adm_vis)}/{len(cat_role)}")
+    check("T-40.4 per-role landing: officer1→Operations only; officer2(manager)→ops+dashboards+approvals; admin→all",
+          off_ok and mgr_ok and adm_ok,
+          f"officer1={sorted(off_vis)}; officer2={sorted(mgr_vis)}; admin sees {len(adm_vis)}/{len(cat_role)}")
 
     npass = sum(1 for _, ok in RESULTS if ok)
     total = len(RESULTS)
