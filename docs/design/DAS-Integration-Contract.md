@@ -36,23 +36,45 @@ The effect is the consumer's "what happens when approved". Contract: it runs **e
 on full approval (or auto-pass); it returns a short result string; it **must tolerate re-entry**
 (be idempotent on its own row) even though the gate guards fire-once via the `Pending` lifecycle.
 
-## What the consumer configures (no code)
+## Config reference (all data, no code)
 
-- **`mmAuthority`** rows — `actionType × [amountMin,amountMax] → level + bodyType(SINGLE/CHAIN/
-  COLLEGIAL) + quorum`. This *is* the policy: who, how many, in what shape, per amount band.
-  (From P1: SLA + max-escalations + effective-dating live here too.)
-- **`mmCoi`** rows (optional) — `EXCLUDE_APPROVER` rules (`approver|tin`, `*` wildcards) to bar
-  conflicted approvers for the action's case type.
-- The **`cmApproval` lifecycle** (`mmEntityTransition` Pending→Approved/Rejected/Returned) is shared
-  and already seeded — consumers do not re-seed it.
+| Carrier | Purpose | Key columns |
+|---|---|---|
+| **`mmAuthority`** | The authority matrix — *the policy*: who decides, how many, in what shape, per amount band, effective when. | `actionType`, `amountMin`, `amountMax`, `level` (OFFICER<SENIOR<SUPERVISOR<MANAGER<DIRECTOR<COMMISSIONER; CSV for CHAIN), `bodyType` (SINGLE / CHAIN / COLLEGIAL), `quorum`, `slaDays`, `maxEscalations`, `effectiveFrom`, `effectiveTo`, `version` |
+| **`mmRoleLevel`** | Bridge the directory's **role-groups** to rank **levels** for identity resolution (P3). Optional — a sensible default map applies if absent. | `roleGroup` (e.g. `dm_supervisor`), `level` (e.g. `SUPERVISOR`) |
+| **`mmCoi`** | Conflict-of-interest rules for the case type (optional). | `caseType`, `ruleType` (`EXCLUDE_APPROVER` = declared bar `approver\|tin`, `*` wildcards; `EXCLUDE_DECISION_MAKER` = auto-COI, one decider per taxpayer), `expression` |
+| **`cmApproval` lifecycle** | Shared, already seeded — consumers do **not** re-seed. | `mmEntityTransition` entity=`cmApproval`: Pending→Approved / Rejected / Returned |
+
+Admin tools: the **Approvals inbox** (`list_cmApproval_my`) shows each officer their own to-decide
+queue; **`cmAuthorityCheck`** validates an action's matrix on demand; **`cmApprovalSweep`** runs the
+SLA escalation/timeout sweep; **`cmApprovalDelegate`** hands a request to a delegate.
 
 ## What the gate guarantees (so the consumer doesn't reimplement it)
 
 Authority resolution by band; SINGLE / sequential-CHAIN / collegial-QUORUM routing with distinct
 voters; rank gate; four-eyes SoD; mandatory reasons; conflict-of-interest exclusion; SLA escalation
 + timeout (auto-reject, never auto-approve); delegation; effect-fires-once; and a reasoned audit
-trail on the case hash-chain — `APPROVAL_REQUESTED / _NOT_REQUIRED / _DECISION / _SOD_BLOCKED /
-_RANK_BLOCKED / _COI_BLOCKED / _ESCALATED / _TIMEOUT / _DELEGATED`.
+trail on the case hash-chain.
+
+Added in DAS v1.0 (finalisation phases P1–P5), all inherited free by every consumer:
+
+- **P1 · config-ified policy** — SLA length, max-escalations and effective-dating are `mmAuthority`
+  columns, resolved at request time; no hard-coded constants.
+- **P3 · directory-resolved identity** — the deciding officer's rank level comes from their Joget
+  **directory** role-groups (directory API) mapped through `mmRoleLevel`, *not* a self-declared field.
+  A **per-user inbox** (`ApprovalInboxBinder`) shows each officer only the requests they may decide
+  (rank + four-eyes + delegation), API-only, no `dir_*` SQL.
+- **P4 · workflow completeness** — delegation **binds** (once delegated, only the delegate decides);
+  lifecycle **notifications** (`NOTIF_PENDING` → F06 dispatcher → cmAlert) on assignment, escalation,
+  timeout and delegation.
+- **P5 · governance integrity** — **auto-derived COI** (`EXCLUDE_DECISION_MAKER`: one person may not
+  decide two requests for the same taxpayer) on top of declared COI; and **authority-matrix
+  validation** (`cmAuthorityCheck` → `MatrixValidator`: level-exists / ascending-chain / quorum /
+  overlap / gap) so a bad config is caught before it routes.
+
+Audit event types: `APPROVAL_REQUESTED / _NOT_REQUIRED / _DECISION / _SOD_BLOCKED / _RANK_BLOCKED /
+_COI_BLOCKED / _AUTOCOI_BLOCKED / _DELEGATE_BLOCKED / _ESCALATED / _TIMEOUT / _DELEGATED`, plus
+`NOTIF_PENDING` for the dispatcher.
 
 ## Onboard a new action — the recipe (write-off is the worked example, P2)
 

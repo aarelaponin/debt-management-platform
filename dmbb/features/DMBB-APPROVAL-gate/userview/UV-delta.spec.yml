@@ -32,3 +32,50 @@ userview_delta:
     # The authority matrix (mmAuthority) is unified with the F08 decision matrix and administered
     # in the cmbb (spine) console — ADR-005. The dmbb Approvals bucket is the operational surface
     # only: the approver inbox + the decision trigger.
+  # DAS P6 — Approvals MI: native enterprise SqlChartMenu (server-side SQL -> ECharts, ADR-002)
+  # over the shared cmApproval / cmEvent tables. Oversight: pending-by-authority, outcomes,
+  # by-action volume, and SLA breaches (escalations/timeouts/delegations).
+  - label: Approvals MI
+    permission_role: dm_manager
+    menus:
+    - type: sqlchart
+      customId: chartApprovalPending
+      label: Pending by authority
+      title: Pending approvals by required authority
+      chartType: bar
+      keyName: authority
+      value: pending
+      sql: |
+        SELECT COALESCE(NULLIF(c_requiredlevel,''),'-') AS authority, COUNT(*) AS pending
+        FROM app_fd_cmapproval WHERE c_status = 'Pending' GROUP BY 1 ORDER BY 1
+    - type: sqlchart
+      customId: chartApprovalOutcomes
+      label: Outcomes
+      title: Approval outcomes
+      chartType: donut
+      keyName: status
+      value: n
+      sql: |
+        SELECT c_status AS status, COUNT(*) AS n
+        FROM app_fd_cmapproval WHERE COALESCE(c_status,'') <> '' GROUP BY 1 ORDER BY 2 DESC
+    - type: sqlchart
+      customId: chartApprovalByAction
+      label: Volume by action
+      title: Approval requests by action type
+      chartType: bar
+      keyName: action
+      value: n
+      sql: |
+        SELECT COALESCE(NULLIF(c_actiontype,''),'-') AS action, COUNT(*) AS n
+        FROM app_fd_cmapproval GROUP BY 1 ORDER BY 2 DESC
+    - type: sqlchart
+      customId: chartApprovalBreaches
+      label: SLA events
+      title: Escalations, timeouts & delegations
+      chartType: bar
+      keyName: event
+      value: n
+      sql: |
+        SELECT c_eventtype AS event, COUNT(*) AS n FROM app_fd_cmevent
+        WHERE c_eventtype IN ('APPROVAL_ESCALATED','APPROVAL_TIMEOUT','APPROVAL_DELEGATED')
+        GROUP BY 1 ORDER BY 1
