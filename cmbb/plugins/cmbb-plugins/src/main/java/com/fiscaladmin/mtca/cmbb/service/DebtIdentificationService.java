@@ -1,6 +1,7 @@
 package com.fiscaladmin.mtca.cmbb.service;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,6 +36,10 @@ public class DebtIdentificationService {
     public static final String F_STATE = "mmState";
     private static final String CLASS_NAME = DebtIdentificationService.class.getName();
     private static final int FETCH_ALL = 100000;
+    /** DM-FR-018 high-value fast-track: config carrier + resolved policy (loaded per identify run). */
+    private static final String F_POLICY = "mdContactPolicy";
+    private BigDecimal highValueThreshold = null; // null => fast-track disabled (no active policy)
+    private long telephoneSlaDays = 2;            // business days to first telephone contact
 
     /** Starts the case envelope for a created case (Joget impl injected at runtime). */
     public interface ProcessStarter {
@@ -85,6 +90,9 @@ public class DebtIdentificationService {
         dao.updateSchema(F_CASE, F_CASE, new FormRowSet());
         dao.updateSchema(F_DEBT, F_DEBT, new FormRowSet());
         dao.updateSchema(F_LINE, F_LINE, new FormRowSet());
+        dao.updateSchema(F_POLICY, F_POLICY, new FormRowSet());                              // DM-FR-018
+        dao.updateSchema(DeadlineService.F_DEADLINE, DeadlineService.F_DEADLINE, new FormRowSet());
+        loadFastTrackPolicy();                                                                // DM-FR-018
         Tally t = new Tally();
         Set<String> taken = tinsWithOpenDmCase();
         String tenant = tenants.resolve(actor);
@@ -100,6 +108,7 @@ public class DebtIdentificationService {
             for (Group g : groups.values()) {
                 String caseId = UUID.randomUUID().toString();
                 String amount = sumEnforceable(g.lines, d);
+                boolean critical = isHighValue(amount); // DM-FR-018 fast-track
                 saveCase(caseId, d, g, amount);
                 saveDebt(caseId, d, g, amount);
                 int n = saveLines(caseId, g.lines);
@@ -109,6 +118,19 @@ public class DebtIdentificationService {
                         "\"tin\":\"" + CaseEventWriter.esc(d.tin) + "\",\"category\":\""
                                 + CaseEventWriter.esc(d.debtCategory) + "\",\"workflow\":\""
                                 + CaseEventWriter.esc(g.workflowCode) + "\"");
+                if (critical) {
+                    // DM-FR-018: high-value debt -> CRITICAL priority + first telephone contact within
+                    // telephoneSlaDays business days. The deadline is a standard cmDeadline clock the
+                    // DeadlineService sweep monitors/escalates like any other.
+                    createTelephoneDeadline(caseId, now);
+                    events.append(caseId, "CASE_PRIORITISED", actor, "", "",
+                            "high-value fast-track: CRITICAL priority + first telephone contact within "
+                                    + telephoneSlaDays + " business day(s)",
+                            "\"amountAtStake\":\"" + CaseEventWriter.esc(amount)
+                                    + "\",\"threshold\":\"" + CaseEventWriter.esc(
+                                    highValueThreshold == null ? "" : highValueThreshold.toPlainString())
+                                    + "\",\"clockCode\":\"TELEPHONE_CONTACT\"");
+                }
                 try {
                     starter.start(caseId, "admin");
                     t.created++;
@@ -178,6 +200,14 @@ public class DebtIdentificationService {
         c.setProperty("amountAtStake", amount);
         c.setProperty("subjectKind", "DEBT");
         c.setProperty("subjectId", caseId);
+        if (isHighValue(amount)) {
+            // DM-FR-018: constitute the high-value debt as a CRITICAL-priority case. The critical
+            // marker is the existing numeric `priority` field (=3, the top escalation band; a normal
+            // case is unset). priorityBand/fastTrack are NOT cmCase form fields, so FormDataDao would
+            // drop them on save — the durable fast-track markers are priority=3, the TELEPHONE_CONTACT
+            // deadline, and the CASE_PRIORITISED event.
+            c.setProperty("priority", "3");
+        }
         save(F_CASE, c);
     }
 
@@ -225,6 +255,66 @@ public class DebtIdentificationService {
             total = total.add(dec(ln.enforceable));
         }
         return total.toPlainString();
+    }
+
+    /** DM-FR-018: true when fast-track is enabled and the amount exceeds the high-value threshold. */
+    private boolean isHighValue(String amount) {
+        return highValueThreshold != null && dec(amount).compareTo(highValueThreshold) > 0;
+    }
+
+    /** Load the active mdContactPolicy row (first governs); leaves fast-track disabled on any miss. */
+    private void loadFastTrackPolicy() {
+        highValueThreshold = null;
+        telephoneSlaDays = 2;
+        try {
+            // Load all rows (proven null-condition pattern) and filter active in Java — the HQL
+            // customProperties condition silently returns empty for a brand-new form's flag.
+            FormRowSet rows = dao.find(F_POLICY, F_POLICY, null, null,
+                    "dateCreated", Boolean.FALSE, 0, FETCH_ALL);
+            if (rows != null) {
+                for (FormRow r : rows) {
+                    if (!"true".equalsIgnoreCase(nz(r.getProperty("active")))) {
+                        continue;
+                    }
+                    String t = nz(r.getProperty("highValueThreshold"));
+                    if (t.isEmpty()) {
+                        continue;
+                    }
+                    highValueThreshold = dec(t);
+                    try {
+                        long days = Long.parseLong(nz(r.getProperty("telephoneSlaDays")).trim());
+                        if (days > 0) {
+                            telephoneSlaDays = days;
+                        }
+                    } catch (NumberFormatException ignored) { /* keep default 2 */ }
+                    break; // first active row with a threshold governs
+                }
+            }
+        } catch (Exception e) {
+            LogUtil.warn(CLASS_NAME, "fast-track policy load failed (fast-track disabled): " + e.getMessage());
+            highValueThreshold = null;
+        }
+    }
+
+    /** DM-FR-018: create the TELEPHONE_CONTACT deadline (business-day clock) for a critical case. */
+    private void createTelephoneDeadline(String caseId, LocalDateTime now) {
+        FormRow cal = new FormRow();
+        cal.setProperty("workingDayMode", "WORKING"); // weekend-aware business days
+        cal.setProperty("holidays", "");
+        LocalDateTime due = DeadlineService.addDays(now, telephoneSlaDays, cal);
+        long span = Math.max(1, Duration.between(now, due).toMinutes());
+        FormRow dl = new FormRow();
+        dl.setId(UUID.randomUUID().toString());
+        dl.setProperty("caseId", caseId);
+        dl.setProperty("clockCode", "TELEPHONE_CONTACT");
+        dl.setProperty("startedAt", DeadlineService.ISO.format(now));
+        dl.setProperty("dueAt", DeadlineService.ISO.format(due));
+        dl.setProperty("warnAt", DeadlineService.ISO.format(now.plusMinutes(span * 75 / 100)));
+        dl.setProperty("critAt", DeadlineService.ISO.format(now.plusMinutes(span * 90 / 100)));
+        dl.setProperty("status", "RUNNING");
+        dl.setProperty("pausedDays", "0");
+        dl.setProperty("escalationLevel", "0");
+        save(DeadlineService.F_DEADLINE, dl);
     }
 
     private static BigDecimal dec(String s) {

@@ -1,0 +1,15 @@
+form:
+  id: mdContactPolicy
+  name: DM - Contact Policy
+  table: mdContactPolicy
+  listColumns: [code, highValueThreshold, telephoneSlaDays, active]
+  description: 'DM-FR-018 fast-track configuration carrier. A debt whose amountAtStake exceeds highValueThreshold (EUR) is constituted at identification as a CRITICAL-priority case and given a TELEPHONE_CONTACT deadline of telephoneSlaDays business days (default 2). Read by DebtIdentificationService at identify(); the single active=true row governs. Config-as-code (Collection settings tier).'
+sections:
+- label: Fast-track policy
+  columns: 2
+  fields:
+  - {id: code, type: textfield, label: Code, required: true}
+  - {id: highValueThreshold, type: textfield, label: 'High-value threshold (EUR)', storeNumeric: true}
+  - {id: telephoneSlaDays, type: textfield, label: Telephone SLA (business days), storeNumeric: true}
+  - {id: seniorRole, type: textfield, label: Senior-officer role (directory group)}
+  - {id: active, type: textfield, label: Active (true/false)}

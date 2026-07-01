@@ -1,0 +1,65 @@
+form:
+  id: dmVisit
+  name: DM - Field visit
+  table: dmVisit
+  loadBinder: prefill          # configurable FormPrefillLoadBinder — config in prefill: below
+  prefill:
+    keySources:
+      - {source: requestParam, name: tin}
+    formId: cmCase
+    matchField: tin
+    filters:
+      - {field: caseType, op: eq, value: DM}
+      - {field: currentState, op: ne, value: CLOSED}
+    orderBy: amountAtStake
+    orderNumeric: true
+    mappings:
+      - {from: key, to: tin}
+      - {from: id, to: debtCaseId}
+  listColumns: [tin, purpose, status, scheduledDate, visitDate, outcome]
+  description: 'DM-FR-020 taxpayer-visit scheduling and recording by enforcement/field officers (debt categories C4-C5). A visit is scheduled (SCHEDULED) then completed (COMPLETED) with date, location, persons present, outcome, evidence collected and follow-up actions, linked to the debt case (debtCaseId -> cmCase). Launched prefilled from the worklist "Schedule visit" quick-action (?tin=).'
+sections:
+- label: Visit
+  columns: 2
+  fields:
+  - {id: tin, type: textfield, label: TIN, required: true}
+  - {id: debtCaseId, type: textfield, label: Debt case id (cmCase id)}
+  - id: purpose
+    type: select
+    label: Purpose
+    static_options:
+    - {value: FIELD_DEMAND, label: Field demand}
+    - {value: ASSET_VERIFICATION, label: Asset verification}
+    - {value: NEGOTIATION, label: Negotiation}
+    - {value: SERVE_NOTICE, label: Serve notice}
+  - {id: scheduledDate, type: date, label: Scheduled date}
+  - {id: fieldOfficer, type: textfield, label: Field officer}
+  - {id: location, type: textfield, label: Location / address}
+  - id: status
+    type: select
+    label: Status
+    value: SCHEDULED
+    static_options:
+    - {value: SCHEDULED, label: Scheduled}
+    - {value: COMPLETED, label: Completed}
+    - {value: CANCELLED, label: Cancelled}
+- label: Visit report
+  columns: 2
+  fields:
+  - {id: visitDate, type: date, label: Actual visit date}
+  - {id: personsPresent, type: textfield, label: Persons present}
+  - id: outcome
+    type: select
+    label: Outcome
+    static_options:
+    - {value: CONTACT_MADE, label: Contact made}
+    - {value: PROMISE_TO_PAY, label: Promise to pay}
+    - {value: ASSETS_IDENTIFIED, label: Assets identified}
+    - {value: ABSENT, label: Taxpayer absent}
+    - {value: PREMISES_CLOSED, label: Premises closed / vacated}
+  - {id: gpsCoords, type: textfield, label: GPS coordinates (optional)}
+- label: Follow-up
+  columns: 1
+  fields:
+  - {id: evidenceCollected, type: textarea, label: Evidence collected}
+  - {id: followUpActions, type: textarea, label: Follow-up actions}

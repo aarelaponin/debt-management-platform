@@ -1,0 +1,39 @@
+datalist:
+  id: list_visits
+  name: Field visit register
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: >-
+      SELECT g.id,
+             COALESCE(NULLIF(c.c_caseref,''), g.c_debtcaseid) AS case_ref,
+             g.c_tin AS tin,
+             COALESCE(NULLIF(c.c_taxpayername,''), g.c_tin) AS taxpayer,
+             COALESCE(NULLIF(g.c_purpose,''),'-') AS purpose,
+             COALESCE(NULLIF(g.c_status,''),'SCHEDULED') AS status,
+             COALESCE(NULLIF(g.c_scheduleddate,''),'-') AS scheduled_date,
+             COALESCE(NULLIF(g.c_visitdate,''),'-') AS visit_date,
+             COALESCE(NULLIF(g.c_outcome,''),'-') AS outcome,
+             COALESCE(NULLIF(g.c_fieldofficer,''),'-') AS field_officer,
+             g.c_debtcaseid AS case_id
+      FROM app_fd_dmvisit g LEFT JOIN app_fd_cmcase c ON c.id = g.c_debtcaseid
+      WHERE ('#requestParam.ftin#' = '' OR g.c_tin = '#requestParam.ftin#')
+        AND ('#requestParam.fstat#' = '' OR COALESCE(NULLIF(g.c_status,''),'SCHEDULED') = '#requestParam.fstat#')
+      ORDER BY g.dateCreated DESC
+  columns:
+  - {id: case_ref, label: Case}
+  - {id: tin, label: TIN}
+  - {id: taxpayer, label: Taxpayer}
+  - {id: purpose, label: Purpose}
+  - {id: status, label: Status}
+  - {id: scheduled_date, label: Scheduled}
+  - {id: visit_date, label: Visited}
+  - {id: outcome, label: Outcome}
+  - {id: field_officer, label: Field officer}
+  filters:
+  - {id: tin, label: TIN, type: text, param: ftin}
+  - {id: status, label: Status, type: select, param: fstat, options: [SCHEDULED, COMPLETED, CANCELLED]}
+  rowActions:
+  - {label: Open case, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmCaseConsole_crud?_mode=edit', hrefColumn: case_id, hrefParam: id}
+  sort: {column: scheduled_date, desc: true}
+notes: 'DM-FR-020 field-visit register. dmVisit joined to cmCase for case ref/taxpayer; filter by TIN/status; row drill Open case -> dmCaseConsole.'

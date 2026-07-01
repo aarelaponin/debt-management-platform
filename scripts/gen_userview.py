@@ -148,11 +148,12 @@ def dashboard_menu(m, base_dir):
 # Business-friendly console: collapse the ~18 per-feature categories into 4 buckets so business users
 # see WHAT THEY DO, not configuration. Mapping is by the spec category label; unknown -> Operations.
 BUCKET_ORDER = ["Dashboards", "Operations", "Automation", "Approvals",
-                "Collection settings", "Legal & reference"]
+                "Collection settings", "Legal & reference", "Approvals MI"]
 BUCKET_ICON = {"Dashboards": "fa-line-chart", "Operations": "fa-tasks",
                "Automation": "fa-bolt", "Approvals": "fa-gavel",
                "Collection settings": "fa-sliders",
-               "Legal & reference": "fa-balance-scale"}
+               "Legal & reference": "fa-balance-scale",
+               "Approvals MI": "fa-line-chart"}
 # Per-role gating + landing (task #60): each bucket is visible only to its directory group.
 # `admin` is a member of all three groups (so superuser/admin checks still see everything);
 # a role user lands on the first bucket they may see. Memberships compose the per-role view:
@@ -161,9 +162,9 @@ BUCKET_ROLE = {"Dashboards": "dm_manager", "Operations": "dm_officer",
                "Automation": "dm_policy_admin", "Approvals": "dm_supervisor",
                "Collection settings": "dm_collection_admin",  # operational tier (ADR-004 §7)
                "Legal & reference": "dm_legal_admin",         # legislative tier (ADR-004 §7)
-               # "Approvals MI" is surgically inserted into the deployed userview (P6, not emitted
-               # by this loop since it's not in BUCKET_ORDER); recorded here as the authoritative
-               # role so the surgical insert gates it to senior management.
+               # "Approvals MI" (DAS P6 oversight charts) is now a first-class bucket emitted by
+               # this loop (in BUCKET_ORDER + BUCKET), gated to senior management. No longer a
+               # post-build surgical insert (DMBB-F14 fix).
                "Approvals MI": "dm_manager"}
 # ADR-004 §7 legislative tier: config determined by law/regulation, change-controlled. Everything
 # else currently authored under an Admin-bucket category is operational → Collection settings.
@@ -185,12 +186,19 @@ BUCKET = {
     "Collection MI": "Operations", "Reports": "Operations", "Detail views": "Operations",
     "Operations — batch runs": "Automation",
     "Approvals": "Approvals",  # Decision & Approval Service (#6) inbox + authority matrix
+    "Approvals MI": "Approvals MI",  # DAS P6 oversight charts — now emitted natively (was a
+                                     # post-build surgical insert; folding it into BUCKET_ORDER
+                                     # keeps its 4 SqlChartMenus out of Operations and gated to
+                                     # dm_manager. run_t40 asserts the 7th gated category.
     "Workflow configuration": "Collection settings",  # ADR-004 §6 workspace entry
     # The admin categories map to a transient "Admin" bucket; each menu is then routed per the
     # ADR-004 §7 operational/legislative split (LEGISLATIVE_FORMS) into the two real buckets.
     "DM administration": "Admin", "Relief config": "Admin", "Enforcement config": "Admin",
     "Enforcement admin": "Admin", "Write-off config": "Admin",
     "Default assessment config": "Admin", "Collection MI config": "Admin",
+    # DMBB-F14 (DM-FR-018/019/020): officer contact/visit capture -> Operations;
+    # the fast-track threshold config -> Admin transient -> Collection settings.
+    "Contacts & visits": "Operations", "Contact config": "Admin",
 }
 
 
@@ -206,6 +214,10 @@ def main():
     spec = specs[0]
     for extra in specs[1:]:
         spec["categories"] += extra["categories"]
+    # The Workflow configuration workspace must lead the Collection settings bucket (run_t29),
+    # independent of the UV-delta file order passed in. Stable sort keeps every other category's
+    # relative order; only "Workflow configuration" is hoisted to the front of its bucket.
+    spec["categories"].sort(key=lambda c: 0 if c.get("label") == "Workflow configuration" else 1)
     uv_id, uv_name = spec["userviewId"], spec["name"]
     bucket_menus = {b: [] for b in BUCKET_ORDER}
     for cat in spec["categories"]:

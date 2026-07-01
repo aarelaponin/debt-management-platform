@@ -1,0 +1,2 @@
+id,code,highValueThreshold,telephoneSlaDays,seniorRole,active
+CTP-DEFAULT,CTP-DEFAULT,200000,2,dm_supervisor,true

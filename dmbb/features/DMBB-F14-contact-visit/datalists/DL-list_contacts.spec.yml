@@ -1,0 +1,37 @@
+datalist:
+  id: list_contacts
+  name: Telephone contacts
+  binder:
+    type: jdbc
+    primaryKey: id
+    sql: >-
+      SELECT g.id,
+             COALESCE(NULLIF(c.c_caseref,''), g.c_debtcaseid) AS case_ref,
+             g.c_tin AS tin,
+             COALESCE(NULLIF(c.c_taxpayername,''), g.c_tin) AS taxpayer,
+             COALESCE(NULLIF(g.c_method,''),'TELEPHONE') AS method,
+             COALESCE(NULLIF(g.c_outcome,''),'-') AS outcome,
+             COALESCE(NULLIF(g.c_contactdate,''),'-') AS contact_date,
+             COALESCE(NULLIF(g.c_followupdate,''),'-') AS follow_up,
+             COALESCE(NULLIF(g.c_officer,''),'-') AS officer,
+             g.c_debtcaseid AS case_id
+      FROM app_fd_dmcontact g LEFT JOIN app_fd_cmcase c ON c.id = g.c_debtcaseid
+      WHERE ('#requestParam.ftin#' = '' OR g.c_tin = '#requestParam.ftin#')
+        AND ('#requestParam.foutcome#' = '' OR COALESCE(NULLIF(g.c_outcome,''),'-') = '#requestParam.foutcome#')
+      ORDER BY g.dateCreated DESC
+  columns:
+  - {id: case_ref, label: Case}
+  - {id: tin, label: TIN}
+  - {id: taxpayer, label: Taxpayer}
+  - {id: method, label: Method}
+  - {id: outcome, label: Outcome}
+  - {id: contact_date, label: Contact date}
+  - {id: follow_up, label: Follow-up}
+  - {id: officer, label: Officer}
+  filters:
+  - {id: tin, label: TIN, type: text, param: ftin}
+  - {id: outcome, label: Outcome, type: select, param: foutcome, options: [PROMISE_TO_PAY, ARRANGEMENT_AGREED, DISPUTE, UNABLE_TO_CONTACT, REFUSED, CALLBACK]}
+  rowActions:
+  - {label: Open case, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmCaseConsole_crud?_mode=edit', hrefColumn: case_id, hrefParam: id}
+  sort: {column: contact_date, desc: true}
+notes: 'DM-FR-019 telephone-contact register. dmContact joined to cmCase for case ref/taxpayer; filter by TIN/outcome; row drill Open case -> dmCaseConsole.'

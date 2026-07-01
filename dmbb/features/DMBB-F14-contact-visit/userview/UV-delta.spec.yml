@@ -1,0 +1,29 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  # Officer-facing contact/visit activity capture (Operations bucket -> dm_officer).
+  - label: Contacts & visits
+    menus:
+    - type: crud
+      formDefId: dmContact
+      datalistId: list_dmContact
+      label: Log telephone contact
+    - type: crud
+      formDefId: dmVisit
+      datalistId: list_dmVisit
+      label: Field visits
+    - type: datalist
+      datalistId: list_contacts
+      label: Telephone contacts
+    - type: datalist
+      datalistId: list_visits
+      label: Field visit register
+  # DM-FR-018 fast-track threshold config -> "Admin" transient -> Collection settings
+  # (mdContactPolicy is operational config, not in LEGISLATIVE_FORMS).
+  - label: Contact config
+    menus:
+    - type: crud
+      formDefId: mdContactPolicy
+      datalistId: list_mdContactPolicy
+      label: Fast-track policy

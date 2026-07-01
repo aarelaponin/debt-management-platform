@@ -1,0 +1,60 @@
+form:
+  id: dmContact
+  name: DM - Telephone contact
+  table: dmContact
+  loadBinder: prefill          # configurable FormPrefillLoadBinder — config in prefill: below
+  prefill:
+    keySources:
+      - {source: requestParam, name: tin}
+    formId: cmCase
+    matchField: tin
+    filters:
+      - {field: caseType, op: eq, value: DM}
+      - {field: currentState, op: ne, value: CLOSED}
+    orderBy: amountAtStake
+    orderNumeric: true
+    mappings:
+      - {from: key, to: tin}
+      - {from: id, to: debtCaseId}
+  listColumns: [tin, method, outcome, contactDate, followUpDate, status]
+  description: 'DM-FR-019 telephone-contact tracking (debt categories C3-C5). Records date/time, officer, taxpayer contacted, method, outcome code and agreed follow-up action, linked to the debt case (debtCaseId -> cmCase). Launched prefilled from the worklist "Log call" quick-action (?tin=); tin stays editable so the data-API create path persists it.'
+sections:
+- label: Contact
+  columns: 2
+  fields:
+  - {id: tin, type: textfield, label: TIN, required: true}
+  - {id: debtCaseId, type: textfield, label: Debt case id (cmCase id)}
+  - {id: contactPerson, type: textfield, label: Person contacted}
+  - id: method
+    type: select
+    label: Contact method
+    value: TELEPHONE
+    static_options:
+    - {value: TELEPHONE, label: Telephone}
+    - {value: VISIT, label: Visit}
+    - {value: EMAIL, label: Email}
+    - {value: SMS, label: SMS}
+    - {value: LETTER, label: Letter}
+  - {id: contactDate, type: date, label: Contact date, required: true}
+  - {id: contactTime, type: textfield, label: 'Contact time (HH:mm)'}
+  - {id: officer, type: textfield, label: Officer}
+- label: Outcome
+  columns: 2
+  fields:
+  - id: outcome
+    type: select
+    label: Outcome
+    static_options:
+    - {value: PROMISE_TO_PAY, label: Promise to pay}
+    - {value: ARRANGEMENT_AGREED, label: Arrangement agreed}
+    - {value: DISPUTE, label: Dispute raised}
+    - {value: UNABLE_TO_CONTACT, label: Unable to contact}
+    - {value: REFUSED, label: Refused to pay}
+    - {value: CALLBACK, label: Callback requested}
+  - {id: promiseAmount, type: textfield, label: 'Promised amount (EUR)', storeNumeric: true}
+  - {id: followUpDate, type: date, label: Agreed follow-up date}
+  - {id: status, type: textfield, label: Status (managed), value: LOGGED, managed: true}
+- label: Notes
+  columns: 1
+  fields:
+  - {id: notes, type: textarea, label: Notes}

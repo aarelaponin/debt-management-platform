@@ -58,6 +58,10 @@ datalist:
   # debtor's open DM case + outstanding from it.
   - {label: Instalment, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmInstAgr_crud?_mode=add', hrefColumn: 'tin', hrefParam: 'tin'}
   - {label: Payment, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmPayment_crud?_mode=add', hrefColumn: 'tin', hrefParam: 'tin'}
+  # WF-FR-009 quick-actions: log a telephone call / schedule a field visit, prefilled from
+  # the debtor's open DM case (?tin=) via FormPrefillLoadBinder (DMBB-F14).
+  - {label: Call, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmContact_crud?_mode=add', hrefColumn: 'tin', hrefParam: 'tin'}
+  - {label: Visit, href: '#request.contextPath#/web/userview/dmbb/dmbbConsole/_/dmVisit_crud?_mode=add', hrefColumn: 'tin', hrefParam: 'tin'}
   sort: {column: total_debt, desc: true}
 notes: 'DM-FR-057 debtors list. UX-QA: sortable columns; category dropdown + stage/tax filters via
   #requestParam.fcat/fstage/ftax# (the verified JDBC filter mechanism — same param a summary cell-drill

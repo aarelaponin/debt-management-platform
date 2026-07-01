@@ -29,6 +29,7 @@ public class DebtIdentificationServiceTest {
     private FormDataDao dao;
     private final List<FormRow> workflows = new ArrayList<FormRow>(); // ADR-004 dmWorkflow catalogue
     private final List<FormRow> existingDm = new ArrayList<FormRow>();
+    private final List<FormRow> contactPolicy = new ArrayList<FormRow>(); // DM-FR-018 fast-track cfg
     private final Map<String, List<FormRow>> saved = new HashMap<String, List<FormRow>>();
     private final List<String> started = new ArrayList<String>();
     private GoldMartScanner scanner;
@@ -39,6 +40,7 @@ public class DebtIdentificationServiceTest {
         dao = mock(FormDataDao.class);
         saved.clear();
         existingDm.clear();
+        contactPolicy.clear();
         started.clear();
         // ADR-004 catalogue: W-DEFAULT (tax ANY → consolidates) + W-VAT (tax-specific → own case)
         workflows.clear();
@@ -56,6 +58,8 @@ public class DebtIdentificationServiceTest {
                         out.addAll(existingDm);
                     } else if ("dmWorkflow".equals(form)) {
                         out.addAll(workflows);
+                    } else if ("mdContactPolicy".equals(form)) {
+                        out.addAll(contactPolicy);
                     }
                     return out; // cmEvent / mdUserTenant -> empty (genesis / default tenant)
                 });
@@ -135,6 +139,52 @@ public class DebtIdentificationServiceTest {
         DebtIdentificationService.Tally t = svc().identify("100", "tester");
         assertEquals(0, t.created);
         assertEquals(0, t.failed);
+    }
+
+    @Test
+    public void fastTracksHighValueDebt() {
+        // DM-FR-018: with an active policy (threshold 100000), a debtor whose case amount
+        // exceeds it is constituted CRITICAL and given a TELEPHONE_CONTACT deadline.
+        contactPolicy.add(policy("100000", "2"));
+        scanner = new GoldMartScanner(new GoldMartScanner.ScanGateway() {
+            public java.util.List<GoldMartScanner.GoldLine> lines(String tin) {
+                return Arrays.asList(line("CIT", "500000")); // CIT not tax-specific -> consolidates
+            }
+
+            public java.util.List<GoldMartScanner.GoldDebtor> scan(String minAmount) {
+                return Arrays.asList(debtor("900900Z", "C4", "500000"));
+            }
+        });
+        DebtIdentificationService.Tally t = svc().identify("100", "tester");
+        assertEquals(1, t.created);
+        FormRow c = saved.get("cmCase").get(0);
+        assertEquals("3", c.getProperty("priority")); // CRITICAL band = top numeric priority
+        java.util.List<FormRow> dls = saved.get("cmDeadline");
+        assertEquals(1, dls.size());
+        assertEquals("TELEPHONE_CONTACT", dls.get(0).getProperty("clockCode"));
+        assertEquals(c.getId(), dls.get(0).getProperty("caseId"));
+        assertEquals("RUNNING", dls.get(0).getProperty("status"));
+    }
+
+    @Test
+    public void noFastTrackWhenBelowThreshold() {
+        // A debtor below the threshold stays NORMAL: no priorityBand, no telephone deadline.
+        contactPolicy.add(policy("1000000", "2"));
+        DebtIdentificationService.Tally t = svc().identify("100", "tester");
+        assertEquals(4, t.created);
+        for (FormRow c : saved.get("cmCase")) {
+            org.junit.Assert.assertNull(c.getProperty("priority")); // not fast-tracked
+        }
+        org.junit.Assert.assertNull(saved.get("cmDeadline"));
+    }
+
+    private static FormRow policy(String threshold, String slaDays) {
+        FormRow r = new FormRow();
+        r.setProperty("code", "CTP");
+        r.setProperty("highValueThreshold", threshold);
+        r.setProperty("telephoneSlaDays", slaDays);
+        r.setProperty("active", "true");
+        return r;
     }
 
     private static FormRow wf(String code, String tenant, String taxType, String floor) {
