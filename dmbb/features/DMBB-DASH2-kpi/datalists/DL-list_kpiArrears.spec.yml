@@ -1,0 +1,62 @@
+datalist:
+  id: list_kpiArrears
+  name: KPI Monitoring (Arrears Management)
+  binder:
+    type: jdbc
+    primaryKey: kpino
+    sql: >-
+      WITH base AS (
+        SELECT EXTRACT(day FROM now()-c.datecreated) AS age_d,
+               COALESCE(NULLIF(d.c_consolidatedamount,'')::numeric,0) AS amt,
+               (COALESCE(c.c_currentstate,'') IN (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal='true')) AS term,
+               COALESCE(d.c_writeoffstatus,'') AS wo
+        FROM app_fd_cmcase c JOIN app_fd_dmdebt d ON d.id=c.id WHERE c.c_casetype='DM'
+      ), openb AS (SELECT * FROM base WHERE wo<>'written-off' AND NOT term),
+      agg AS (SELECT
+        (SELECT SUM(amt) FROM openb) AS t,
+        (SELECT SUM(amt) FROM base) AS assessed,
+        (SELECT count(*) FROM app_fd_dminstagr) AS ic,
+        (SELECT count(*) FROM app_fd_dminstagr WHERE c_status='ACTIVE') AS ica,
+        (SELECT SUM(COALESCE(NULLIF(c_totaldebt,'')::numeric,0)) FROM app_fd_dminstagr WHERE c_status='ACTIVE') AS iav,
+        (SELECT SUM(COALESCE(NULLIF(c_totaldebt,'')::numeric,0)) FROM app_fd_dminstagr) AS itotv,
+        (SELECT SUM(COALESCE(NULLIF(c_appliedamount,'')::numeric,0)) FROM app_fd_dmpayment) AS pay,
+        (SELECT SUM(COALESCE(NULLIF(c_recoveredamount,'')::numeric,0)) FROM app_fd_dmaction) AS rec,
+        (SELECT SUM(COALESCE(NULLIF(c_amount,'')::numeric,0)) FROM app_fd_dmaction) AS actval,
+        (SELECT count(*) FROM app_fd_dmaction) AS ac,
+        (SELECT count(*) FROM app_fd_dmaction WHERE c_instrument ILIKE '%GARNISH%') AS gc),
+      kpi AS (
+        SELECT 1 AS kpi_no, 100.0*(SELECT SUM(amt) FROM openb WHERE age_d<=365)/NULLIF((SELECT t FROM agg),0) AS cv
+        UNION ALL SELECT 2, 100.0*(SELECT t FROM agg)/NULLIF((SELECT assessed FROM agg),0)
+        UNION ALL SELECT 3, 100.0*(SELECT iav FROM agg)/NULLIF((SELECT t FROM agg),0)
+        UNION ALL SELECT 4, 100.0*(SELECT SUM(amt) FROM openb WHERE age_d<=180)/NULLIF((SELECT t FROM agg),0)
+        UNION ALL SELECT 5, 100.0*(SELECT SUM(amt) FROM openb WHERE age_d<=730)/NULLIF((SELECT t FROM agg),0)
+        UNION ALL SELECT 6, 100.0*(SELECT ica FROM agg)/NULLIF((SELECT ic FROM agg),0)
+        UNION ALL SELECT 7, (SELECT actval FROM agg)
+        UNION ALL SELECT 8, (SELECT itotv FROM agg)
+        UNION ALL SELECT 9, (SELECT pay FROM agg)+(SELECT rec FROM agg)
+        UNION ALL SELECT 10, 100.0*(SELECT gc FROM agg)/NULLIF((SELECT ic FROM agg),0)
+        UNION ALL SELECT 11, 100.0*(SELECT count(*) FROM base WHERE term AND age_d<=180)/NULLIF((SELECT count(*) FROM base),0)
+        UNION ALL SELECT 12, (SELECT ac FROM agg)+(SELECT ic FROM agg)),
+      tgt AS (SELECT NULLIF(c_kpino,'')::int AS kn, c_kpiname AS nm,
+                     NULLIF(c_target,'')::numeric AS tv, c_unit AS unit, c_direction AS dir
+              FROM app_fd_mdkpitarget WHERE c_active='true')
+      SELECT t.kn AS kpino, t.nm AS kpi, ROUND(COALESCE(k.cv,0),1) AS current_value,
+             t.tv AS target_value, t.unit AS unit,
+             ROUND(100.0*(COALESCE(k.cv,0)-t.tv)/NULLIF(t.tv,0),1) AS variance_pct,
+             CASE WHEN t.dir='LOWER'
+                  THEN CASE WHEN COALESCE(k.cv,0)<=t.tv THEN 'GREEN' WHEN COALESCE(k.cv,0)<=t.tv*1.1 THEN 'AMBER' ELSE 'RED' END
+                  ELSE CASE WHEN COALESCE(k.cv,0)>=t.tv THEN 'GREEN' WHEN COALESCE(k.cv,0)>=t.tv*0.9 THEN 'AMBER' ELSE 'RED' END
+             END AS rag
+      FROM tgt t LEFT JOIN kpi k ON k.kpi_no=t.kn
+      ORDER BY t.kn
+  columns:
+  - {id: kpino, label: '#'}
+  - {id: kpi, label: KPI}
+  - {id: current_value, label: Current}
+  - {id: target_value, label: Target}
+  - {id: unit, label: Unit}
+  - {id: variance_pct, label: 'Variance %'}
+  - {id: rag, label: Status}
+  filters: []
+  sort: {column: kpino, desc: false}
+notes: 'RPT-FR-003 KPI Monitoring dashboard — the 12 Arrears Management KPIs (PDF-T5 items 24-35), current value computed from the DM data model, RAG-coloured (Status) against the configurable mdKpiTarget thresholds (green >= target, amber within 10%, red beyond; direction-aware). 12-month trend/sparkline accrues from a KPI-history snapshot in production; revenue-ratio denominators (KPIs 1-2) wire to STA collections at go-live.'

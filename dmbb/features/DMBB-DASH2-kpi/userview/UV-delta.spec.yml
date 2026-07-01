@@ -1,0 +1,54 @@
+userview_delta:
+  userviewId: dmbbConsole
+  name: DMBB Console
+  categories:
+  # Merges into the existing Dashboards category (dm_manager). RPT-FR-003 KPI monitoring +
+  # RPT-FR-006 multi-stream additions + RPT-FR-007 entity-targeted (hierarchical) roll-up.
+  - label: Dashboards
+    menus:
+    - type: datalist
+      datalistId: list_kpiArrears
+      label: KPI Monitoring (12 arrears KPIs)
+    - type: sqlchart
+      customId: chartCasesByPriority
+      label: Open cases by priority
+      title: Open DM cases by priority band
+      chartType: donut
+      keyName: band
+      value: n
+      sql: |
+        SELECT band, COUNT(*) AS n FROM (
+          SELECT CASE WHEN COALESCE(NULLIF(c.c_priority,'')::numeric,0) >= 3 THEN '1: High'
+                      WHEN COALESCE(NULLIF(c.c_priority,'')::numeric,0) >= 1 THEN '2: Medium'
+                      ELSE '3: Normal' END AS band
+          FROM app_fd_cmcase c JOIN app_fd_dmdebt d ON d.id = c.id
+          WHERE c.c_casetype='DM' AND COALESCE(d.c_writeoffstatus,'') <> 'written-off'
+            AND COALESCE(c.c_currentstate,'') NOT IN (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal='true')
+        ) q GROUP BY band ORDER BY band
+    - type: sqlchart
+      customId: chartCaseByOrigin
+      label: Case mix by origin
+      title: Open DM cases by origin (channel)
+      chartType: bar
+      keyName: origin
+      value: n
+      sql: |
+        SELECT COALESCE(NULLIF(c.c_origin,''),'-') AS origin, COUNT(*) AS n
+        FROM app_fd_cmcase c JOIN app_fd_dmdebt d ON d.id = c.id
+        WHERE c.c_casetype='DM' AND COALESCE(d.c_writeoffstatus,'') <> 'written-off'
+          AND COALESCE(c.c_currentstate,'') NOT IN (SELECT s.c_code FROM app_fd_mmstate s WHERE s.c_isterminal='true')
+        GROUP BY 1 ORDER BY n DESC
+    - type: datalist
+      datalistId: list_debtByOfficer
+      label: Debt by officer
+  # RPT-FR-003 KPI targets + RPT-FR-020 SAS risk source config -> Collection settings.
+  - label: Reporting config
+    menus:
+    - type: crud
+      formDefId: mdKpiTarget
+      datalistId: list_mdKpiTarget
+      label: KPI targets
+    - type: crud
+      formDefId: mdRiskSource
+      datalistId: list_mdRiskSource
+      label: Risk score source (SAS)

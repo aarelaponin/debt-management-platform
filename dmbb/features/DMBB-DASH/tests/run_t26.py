@@ -98,8 +98,10 @@ def main():
     label0 = re.sub(r"<[^>]+>", "", cat0["properties"]["label"]).strip()
     chart_ids = [m["properties"].get("customId") for m in cat0.get("menus", []) if m["className"].endswith("SqlChartMenu")]
     landing = cat0["menus"][0]["properties"].get("formId") if cat0["menus"] else None
-    check("T-26.5 Dashboards lands on the one-page dashboard + holds the 4 charts",
-          label0 == "Dashboards" and landing == "dashOverviewForm" and set(chart_ids) == set(CHARTS),
+    # DMBB-DASH2 extended the Dashboards page (KPI Monitoring + priority/origin charts + by-officer),
+    # so the 4 base charts are now a SUBSET of the category's charts, not the exact set.
+    check("T-26.5 Dashboards lands on the one-page dashboard + includes the 4 base charts",
+          label0 == "Dashboards" and landing == "dashOverviewForm" and set(CHARTS) <= set(chart_ids),
           f"label={label0!r} landing={landing} charts={chart_ids}")
 
     # ---------- T-26.6 the one-page dashboard renders all 4 charts as embed iframes ----------

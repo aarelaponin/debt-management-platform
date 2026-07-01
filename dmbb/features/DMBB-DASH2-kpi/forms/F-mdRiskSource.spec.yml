@@ -1,0 +1,17 @@
+form:
+  id: mdRiskSource
+  name: DM - Risk Score Source
+  table: mdRiskSource
+  listColumns: [code, provider, endpoint, refreshHours, active, lastSyncAt]
+  description: 'RPT-FR-020 SAS VIYA risk-score integration config (STUB). Defines the SAS VIYA REST endpoint the platform will poll to import taxpayer/case risk scores (0-100) for display on the debtors list, case detail and reports. Integration is DEFERRED (SAS VIYA not available in the PoC): this carrier records the contract; the scheduled REST consumer + score upsert wire at go-live. Where a score is absent the console already shows "-"/N/A gracefully (no system error), satisfying the unavailability-handling clause.'
+sections:
+- label: Risk source
+  columns: 2
+  fields:
+  - {id: code, type: textfield, label: Code, required: true}
+  - {id: provider, type: textfield, label: Provider, value: SAS_VIYA}
+  - {id: endpoint, type: textfield, label: REST endpoint URL}
+  - {id: apiKeyRef, type: textfield, label: API key reference (secret name, not the secret)}
+  - {id: refreshHours, type: textfield, label: Refresh interval (hours), value: '24', storeNumeric: true}
+  - {id: active, type: textfield, label: Active (true/false), value: 'false'}
+  - {id: lastSyncAt, type: textfield, label: Last sync at (managed by consumer), managed: true}

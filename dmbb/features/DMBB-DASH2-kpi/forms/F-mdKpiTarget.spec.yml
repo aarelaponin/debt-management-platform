@@ -1,0 +1,22 @@
+form:
+  id: mdKpiTarget
+  name: DM - KPI Target
+  table: mdKpiTarget
+  listColumns: [kpiNo, kpiName, target, unit, direction, active]
+  description: 'RPT-FR-003 configurable KPI target thresholds for the 12 Arrears Management KPIs (PDF-T5 items 24-35). Each row defines a KPI, its target value, unit, and whether higher or lower is better; the KPI Monitoring dashboard computes the current value from the DM data and RAG-colours it against this target (green >= target, amber within 10%, red beyond), respecting direction.'
+sections:
+- label: KPI target
+  columns: 2
+  fields:
+  - {id: kpiNo, type: textfield, label: KPI number (1-12), required: true, storeNumeric: true}
+  - {id: kpiName, type: textfield, label: KPI name, required: true}
+  - {id: target, type: textfield, label: Target value, storeNumeric: true}
+  - {id: unit, type: textfield, label: 'Unit (PCT/EUR/COUNT)'}
+  - id: direction
+    type: select
+    label: Better direction
+    value: HIGHER
+    static_options:
+    - {value: HIGHER, label: Higher is better}
+    - {value: LOWER, label: Lower is better}
+  - {id: active, type: textfield, label: Active (true/false), value: 'true'}

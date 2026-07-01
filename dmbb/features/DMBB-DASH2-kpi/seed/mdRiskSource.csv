@@ -1,0 +1,2 @@
+id,code,provider,endpoint,apiKeyRef,refreshHours,active,lastSyncAt
+RS-SASVIYA,RS-SASVIYA,SAS_VIYA,https://sasviya.mtca.internal/risk/api/v1/scores,SAS_VIYA_API_KEY,24,false,

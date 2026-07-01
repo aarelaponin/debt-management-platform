@@ -1,0 +1,13 @@
+id,kpiNo,kpiName,target,unit,direction,active
+KPI-01,1,New tax debt as % of revenue,10,PCT,LOWER,true
+KPI-02,2,Collectable debt as % of revenue,15,PCT,LOWER,true
+KPI-03,3,% tax debt under instalment,25,PCT,HIGHER,true
+KPI-04,4,% debt under 6 months of age,60,PCT,HIGHER,true
+KPI-05,5,% collectable debt under 2 years,80,PCT,HIGHER,true
+KPI-06,6,% complying with instalment arrangements,85,PCT,HIGHER,true
+KPI-07,7,Value of demand notes issued,1000000,EUR,HIGHER,true
+KPI-08,8,Value of instalment agreements made,500000,EUR,HIGHER,true
+KPI-09,9,Revenue collected from recovery actions,1000000,EUR,HIGHER,true
+KPI-10,10,% instalment non-compliance to enforcement,15,PCT,LOWER,true
+KPI-11,11,% new debt resolved within 6 months,50,PCT,HIGHER,true
+KPI-12,12,Volume of demand notes and agreements,500,COUNT,HIGHER,true
